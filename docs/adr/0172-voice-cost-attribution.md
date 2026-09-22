@@ -48,6 +48,14 @@ after a successful API acknowledgement. A repeated terminal event can retry a
 failed report; this is not a durable offline queue or automatic delivery guarantee.
 For a child mid-sentence, an accounting gap is a far better outcome than a stall.
 
+Client response history and subtitle sequencing follow the connection-start
+generation, not the mutable persistence session identifier. Trial mindmap
+creation can resolve that identifier asynchronously during a response without
+ending the turn or dropping buffered subtitles. Usage and retries retain the
+session and maestro captured at `response.created`; subsequent responses use
+the resolved identifier. Reconnecting resets active response ownership even
+when the persistence identifier is unchanged.
+
 Reports carrying a response identifier use a deterministic database key scoped
 to the authenticated user, session and response. Identical retries return the
 stored result; conflicting payloads return HTTP 409. Legacy reports without a

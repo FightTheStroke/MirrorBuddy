@@ -77,6 +77,8 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
         !usageTracker.current.accept(event, {
           sessionId: deps.sessionIdRef.current,
           maestroId: deps.maestroRef.current?.id,
+          // Persistence IDs can resolve mid-turn; connect() owns this stable generation.
+          connectionGeneration: deps.voiceConnectStartTimeRef.current,
         })
       )
         return;

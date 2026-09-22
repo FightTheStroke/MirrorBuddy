@@ -5,7 +5,7 @@
 > Complete visual documentation of the MirrorBuddy platform architecture.
 > All diagrams are in Mermaid format for easy maintenance and version control.
 
-**Version**: 0.39.6
+**Version**: 0.41.5
 **Technical Layout Review**: 2026-09-14 (workspace paths, provider boundaries, tier caps, ADR relationships)
 **Update Policy**: Release owners review diagrams and explicitly update both version markers to `VERSION`. Checks never modify this file.
 
@@ -3561,7 +3561,7 @@ graph TB
 
 ---
 
-_Version: 0.39.6_
+_Version: 0.41.5_
 _Technical layout reviewed: 14 September 2026_
 _Generated from codebase analysis and ADR documentation_
 _Release owner updates both version markers after review; validation is read-only._

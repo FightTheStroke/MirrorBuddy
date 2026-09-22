@@ -3,6 +3,22 @@
 ## Status
 
 Accepted — 2026-05-25
+Corrected — 2026-09-22 (GA transcription prompts; preserve the broader production fix)
+
+## GA transcription contract (2026-09-22)
+
+The GA session payload omits `session.audio.input.transcription.prompt` for
+**every** transcription model, including `whisper-1`, `gpt-realtime-whisper`
+and configured deployment aliases. Production rejected that parameter; limiting
+its omission to the realtime-whisper feature flag would restore the failure.
+Preview session payloads retain vocabulary prompts. The five student locales
+still set the transcription language for non-language-teacher sessions.
+
+This preserves the production correction in `832ec92a` rather than importing
+the narrower historical proposal from #1061. Its regression tests cover both
+transcription models, custom aliases, all five locales and preview behavior.
+This is payload-level coverage, not a new live microphone or playback test.
+See ADR 0169 for the newer model lifecycle and bounded inference evidence.
 
 ## Context
 
@@ -48,40 +64,40 @@ when Pro tier traffic warrants it.
 
 ### Empirical API findings (curl-verified, not docs)
 
-| Endpoint                                | Status | Notes                                                                                          |
-| --------------------------------------- | ------ | ---------------------------------------------------------------------------------------------- |
-| `/openai/v1/realtime/client_secrets` w/ model=`gpt-realtime-2`             | ✅ 200 | Drop-in replacement: identical session contract to `gpt-realtime-1.5`. Only deployment changes. |
+| Endpoint                                                                                               | Status | Notes                                                                                                    |
+| ------------------------------------------------------------------------------------------------------ | ------ | -------------------------------------------------------------------------------------------------------- |
+| `/openai/v1/realtime/client_secrets` w/ model=`gpt-realtime-2`                                         | ✅ 200 | Drop-in replacement: identical session contract to `gpt-realtime-1.5`. Only deployment changes.          |
 | `/openai/v1/realtime/client_secrets` w/ session.audio.input.transcription.model=`gpt-realtime-whisper` | ✅ 200 | Whisper works as the **inline transcription model** of a regular realtime session. Replaces `whisper-1`. |
-| `/openai/v1/realtime/translations`      | ❌ 404 | Dedicated translate endpoint not yet exposed on Azure (works on OpenAI direct).                |
-| `/openai/v1/realtime/client_secrets` w/ model=`gpt-realtime-translate`     | ❌ 400 | `OperationNotSupported` — model cannot piggyback on regular realtime endpoint either.          |
-| `/openai/v1/realtime/transcription_sessions` (dedicated)                   | ❌ 404 | Dedicated transcription endpoint not yet exposed on Azure.                                     |
+| `/openai/v1/realtime/translations`                                                                     | ❌ 404 | Dedicated translate endpoint not yet exposed on Azure (works on OpenAI direct).                          |
+| `/openai/v1/realtime/client_secrets` w/ model=`gpt-realtime-translate`                                 | ❌ 400 | `OperationNotSupported` — model cannot piggyback on regular realtime endpoint either.                    |
+| `/openai/v1/realtime/transcription_sessions` (dedicated)                                               | ❌ 404 | Dedicated transcription endpoint not yet exposed on Azure.                                               |
 
 **Reference:** MS Learn `realtime-audio-reference` confirms Azure deviation:
-*"input_audio_transcription.model accepts the name of the existing model
-deployment"* — this validates the whisper-as-nested-model approach.
+_"input_audio_transcription.model accepts the name of the existing model
+deployment"_ — this validates the whisper-as-nested-model approach.
 
 ### Changes
 
-| File                                                              | Change                                                         |
-| ----------------------------------------------------------------- | -------------------------------------------------------------- |
+| File                                                              | Change                                                                                                                                  |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `.env.example`                                                    | Add `AZURE_OPENAI_REALTIME_DEPLOYMENT_V2`, `AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT`. Translate stays commented (pending Azure). |
-| `apps/web/src/lib/ai/providers/deployment-mapping.ts`             | Register `gpt-realtime-2`, `gpt-realtime-whisper`, `gpt-realtime-translate`. |
-| `apps/web/src/lib/feature-flags/types.ts` + service + client      | Add `voice_realtime_2`, `voice_realtime_whisper_transcription`, `voice_realtime_translate`. |
-| `apps/web/src/app/api/realtime/ephemeral-token/route.ts`          | Prefer V2 deployment when `voice_realtime_2` is enabled.       |
-| `apps/web/src/app/api/realtime/token/route.ts`                    | Mirror the same V2 preference.                                 |
-| `apps/web/src/lib/hooks/voice-session/session-config.ts`          | Use whisper-realtime deployment name as `input.transcription.model` when `voice_realtime_whisper_transcription` is enabled. |
-| `apps/web/src/lib/azure/realtime-translate-availability.ts` (new) | Stub probe used by status route; flag defaults to `degraded`.  |
-| `apps/web/src/app/api/realtime/status/route.ts`                   | Surface the three new flags' state for admin diagnostics.      |
-| Tests                                                             | Extend `deployment-mapping.test.ts`, `feature-flags` known-flags, payload builder. |
-| Docs                                                              | Update `CLAUDE.md` voice section + this ADR + `ARCHITECTURE.md` voice diagram. |
+| `apps/web/src/lib/ai/providers/deployment-mapping.ts`             | Register `gpt-realtime-2`, `gpt-realtime-whisper`, `gpt-realtime-translate`.                                                            |
+| `apps/web/src/lib/feature-flags/types.ts` + service + client      | Add `voice_realtime_2`, `voice_realtime_whisper_transcription`, `voice_realtime_translate`.                                             |
+| `apps/web/src/app/api/realtime/ephemeral-token/route.ts`          | Prefer V2 deployment when `voice_realtime_2` is enabled.                                                                                |
+| `apps/web/src/app/api/realtime/token/route.ts`                    | Mirror the same V2 preference.                                                                                                          |
+| `apps/web/src/lib/hooks/voice-session/session-config.ts`          | Use whisper-realtime deployment name as `input.transcription.model` when `voice_realtime_whisper_transcription` is enabled.             |
+| `apps/web/src/lib/azure/realtime-translate-availability.ts` (new) | Stub probe used by status route; flag defaults to `degraded`.                                                                           |
+| `apps/web/src/app/api/realtime/status/route.ts`                   | Surface the three new flags' state for admin diagnostics.                                                                               |
+| Tests                                                             | Extend `deployment-mapping.test.ts`, `feature-flags` known-flags, payload builder.                                                      |
+| Docs                                                              | Update `CLAUDE.md` voice section + this ADR + `ARCHITECTURE.md` voice diagram.                                                          |
 
 ### Feature Flags & Default Rollout
 
-| Flag                                    | Default     | Rollout %     | Tier scope        |
-| --------------------------------------- | ----------- | ------------- | ----------------- |
-| `voice_realtime_2`                      | `disabled`  | 10% (Pro)     | Pro only — A/B vs `gpt-realtime-1.5` |
-| `voice_realtime_whisper_transcription`  | `enabled`   | 100% all tiers | Accessibility — replaces `whisper-1` |
-| `voice_realtime_translate`              | `degraded`  | 0%            | Pending Azure endpoint enablement    |
+| Flag                                   | Default    | Rollout %      | Tier scope                           |
+| -------------------------------------- | ---------- | -------------- | ------------------------------------ |
+| `voice_realtime_2`                     | `disabled` | 10% (Pro)      | Pro only — A/B vs `gpt-realtime-1.5` |
+| `voice_realtime_whisper_transcription` | `enabled`  | 100% all tiers | Accessibility — replaces `whisper-1` |
+| `voice_realtime_translate`             | `degraded` | 0%             | Pending Azure endpoint enablement    |
 
 Killing any flag is non-breaking: the route falls back to the existing
 `gpt-realtime-1.5` deployment + `whisper-1` transcription.
@@ -122,12 +138,12 @@ AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT=gpt-realtime-whisper
 
 ### Risks & Mitigations
 
-| Risk                                             | Mitigation                                                                |
-| ------------------------------------------------ | ------------------------------------------------------------------------- |
-| `gpt-realtime-2` Preview API breaks unannounced  | Feature flag kill-switch; auto-falls back to 1.5.                          |
-| Whisper-realtime regression in any language      | Kept behind a flag for fast rollback; A/B telemetry on WER per locale.    |
-| Azure translate endpoint never ships in EU       | Provision stays cheap (idle billing only); ADR remains valid as roadmap.  |
-| Quota cap (10 RPM) trips production              | Status route surfaces `quotaSaturated`; degradation service falls back.   |
+| Risk                                            | Mitigation                                                               |
+| ----------------------------------------------- | ------------------------------------------------------------------------ |
+| `gpt-realtime-2` Preview API breaks unannounced | Feature flag kill-switch; auto-falls back to 1.5.                        |
+| Whisper-realtime regression in any language     | Kept behind a flag for fast rollback; A/B telemetry on WER per locale.   |
+| Azure translate endpoint never ships in EU      | Provision stays cheap (idle billing only); ADR remains valid as roadmap. |
+| Quota cap (10 RPM) trips production             | Status route surfaces `quotaSaturated`; degradation service falls back.  |
 
 ### Cost Guards
 
@@ -148,14 +164,14 @@ Add per-deployment lines so dashboards (Grafana per ADR 0047) separate:
 
 ## Roadmap
 
-| Phase | When             | What                                                                          |
-| ----- | ---------------- | ----------------------------------------------------------------------------- |
-| 1     | This ADR (now)   | All three deployments live, env+mapping+flags+route+session+probe shipped.    |
-| 2     | +7d              | Promote `voice_realtime_2` 10% → 50% on Pro if telemetry green.                |
-| 3     | +14d             | Default-on live captions overlay (DSA profile `hearing-impaired`).             |
-| 4     | When Azure ships | Enable `voice_realtime_translate` and design tandem multilingue flow.          |
-| 5     | +30d             | Read-back checker for dyslexia (whisper-realtime tight-loop pronunciation).    |
-| 6     | +60d             | Retire `gpt-realtime-1.5` once `-2` is GA and ≥99% sessions opted in.          |
+| Phase | When             | What                                                                        |
+| ----- | ---------------- | --------------------------------------------------------------------------- |
+| 1     | This ADR (now)   | All three deployments live, env+mapping+flags+route+session+probe shipped.  |
+| 2     | +7d              | Promote `voice_realtime_2` 10% → 50% on Pro if telemetry green.             |
+| 3     | +14d             | Default-on live captions overlay (DSA profile `hearing-impaired`).          |
+| 4     | When Azure ships | Enable `voice_realtime_translate` and design tandem multilingue flow.       |
+| 5     | +30d             | Read-back checker for dyslexia (whisper-realtime tight-loop pronunciation). |
+| 6     | +60d             | Retire `gpt-realtime-1.5` once `-2` is GA and ≥99% sessions opted in.       |
 
 ## References
 

@@ -14,7 +14,7 @@ export function createTranscriptHandler() {
   const sequencer = createTranscriptSequencer();
   return (event: Record<string, unknown>, deps: EventHandlerDeps, pauseAudio: () => void) => {
     let handled = false;
-    for (const ready of sequencer.accept(event, deps.sessionIdRef.current)) {
+    for (const ready of sequencer.accept(event, deps.voiceConnectStartTimeRef.current)) {
       handled = handleTranscriptEvent(ready, deps, pauseAudio) || handled;
     }
     // Lifecycle events can flush captions and must still reach the response handler.

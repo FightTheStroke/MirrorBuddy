@@ -8,7 +8,9 @@ import {
   type VoiceUsageReport,
 } from './voice-usage-reporter';
 
-type Context = Pick<VoiceUsageReport, 'sessionId' | 'maestroId'>;
+type Context = Pick<VoiceUsageReport, 'sessionId' | 'maestroId'> & {
+  connectionGeneration: number | null;
+};
 type Entry = Context & {
   responseId?: string;
   state: 'created' | 'pending' | 'reported' | 'retryable' | 'cancelled';
@@ -19,8 +21,8 @@ export const MAX_TRACKED_VOICE_RESPONSES = 256;
 export function createVoiceUsageTracker() {
   const entries = new Map<string, Entry>();
   let active: Entry | null = null;
-  let sessionId: string | null = null;
-  const key = (context: Context, id: string) => JSON.stringify([context.sessionId, id]);
+  let generation: number | null = null;
+  const key = (context: Context, id: string) => JSON.stringify([context.connectionGeneration, id]);
   const remember = (entry: Entry, id: string) => {
     if (entries.size >= MAX_TRACKED_VOICE_RESPONSES) {
       const evictable = [...entries].find(
@@ -42,8 +44,8 @@ export function createVoiceUsageTracker() {
     accept(event: Record<string, unknown>, context: Context): boolean {
       if (!['response.created', 'response.done', 'response.cancelled'].includes(String(event.type)))
         return true;
-      if (context.sessionId !== sessionId) {
-        sessionId = context.sessionId;
+      if (context.connectionGeneration !== generation) {
+        generation = context.connectionGeneration;
         active = null;
         for (const entry of entries.values()) {
           if (entry.state === 'created') entry.state = 'cancelled';

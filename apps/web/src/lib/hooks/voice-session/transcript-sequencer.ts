@@ -17,7 +17,7 @@ const record = (value: unknown): Event | null =>
 // Output-item identity preserves commentary/final separation without inventing a channel.
 export function createTranscriptSequencer() {
   const responses = new Map<string, Response>();
-  let session: string | null = null;
+  let generation: number | null = null;
   function drain(response: Response, terminal = false): Event[] {
     const ready: Event[] = [];
     if (terminal) {
@@ -45,14 +45,14 @@ export function createTranscriptSequencer() {
     return ready;
   }
   return {
-    accept(event: Event | null | undefined, sessionId: string | null): Event[] {
+    accept(event: Event | null | undefined, connectionGeneration: number | null): Event[] {
       if (!event) {
         logger.warn('[VoiceSession] Missing transcript event');
         return [];
       }
-      if (session !== sessionId) {
+      if (generation !== connectionGeneration) {
         responses.clear();
-        session = sessionId;
+        generation = connectionGeneration;
       }
       const envelope = record(event.response);
       if (event.type === 'response.created') {

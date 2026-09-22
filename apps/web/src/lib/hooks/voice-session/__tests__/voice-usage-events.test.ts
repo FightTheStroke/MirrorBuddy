@@ -114,6 +114,7 @@ describe('real handler and reporter internal usage identity', () => {
     result.current(done('resp-old'));
     await flush();
     deps.sessionIdRef.current = 'voice-new-session';
+    deps.voiceConnectStartTimeRef.current = 20;
     rerender();
     result.current(created());
     result.current(done('resp-old'));
@@ -133,6 +134,7 @@ describe('real handler and reporter internal usage identity', () => {
     result.current(done('resp-1'));
     await flush();
     deps.sessionIdRef.current = 'voice-second';
+    deps.voiceConnectStartTimeRef.current = 20;
     result.current(created('resp-1'));
     result.current(done('resp-1'));
     await flush();

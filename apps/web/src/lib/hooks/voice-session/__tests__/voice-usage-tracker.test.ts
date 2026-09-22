@@ -13,7 +13,11 @@ vi.mock('@/lib/logger/client', () => ({
 }));
 import { csrfFetch } from '@/lib/auth';
 import { clientLogger } from '@/lib/logger/client';
-const context = { sessionId: 'voice-tracker', maestroId: 'first-maestro' };
+const context = {
+  sessionId: 'voice-tracker',
+  maestroId: 'first-maestro',
+  connectionGeneration: 10,
+};
 const settled = () => new Promise((resolve) => setTimeout(resolve, 0));
 beforeEach(() => {
   vi.resetAllMocks();
@@ -21,6 +25,23 @@ beforeEach(() => {
 });
 
 describe('bounded identity history and metadata snapshots', () => {
+  it('retains creation attribution and retry identity when persistence resolves mid-response', async () => {
+    vi.mocked(csrfFetch).mockRejectedValueOnce(new Error('Offline'));
+    const tracker = createVoiceUsageTracker();
+    tracker.accept(created('resp-trial'), context);
+    const resolved = { ...context, sessionId: 'trial-owned' };
+    expect(tracker.accept(done('resp-trial'), resolved)).toBe(true);
+    await settled();
+    expect(tracker.accept(done('resp-trial'), resolved)).toBe(false);
+    await settled();
+    expect(csrfFetch).toHaveBeenCalledTimes(2);
+    const bodies = vi.mocked(csrfFetch).mock.calls.map(([, options]) => options?.body);
+    expect(bodies[0]).toBe(bodies[1]);
+    expect(JSON.parse(String(bodies[0]))).toMatchObject({
+      sessionId: context.sessionId,
+      responseId: 'resp-trial',
+    });
+  });
   it('retains the creating maestro even when the current context changes', async () => {
     const tracker = createVoiceUsageTracker();
     tracker.accept(created('resp-a'), context);

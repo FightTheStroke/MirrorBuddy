@@ -189,6 +189,7 @@ describe('real handler multi-output subtitle contract', () => {
     const { result } = renderHook(() => useHandleServerEvent(deps));
     result.current(created('resp-output'));
     deps.sessionIdRef.current = 'voice-reconnected';
+    deps.voiceConnectStartTimeRef.current = 20;
     result.current(created('resp-new'));
     result.current(transcript(0, 'Old session text.'));
     result.current(output(0, false, 'resp-new'));

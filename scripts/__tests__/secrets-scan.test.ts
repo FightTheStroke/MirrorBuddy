@@ -1,7 +1,7 @@
 // @vitest-environment node
 // Behaviour regressions for scripts/secrets-scan.sh. The fixture harness lives in
 // the sibling secrets-scan-fixture.ts module.
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as fs from 'node:fs';
 import { join } from 'node:path';
 import {
@@ -13,6 +13,9 @@ import {
   scanner,
   synthetic,
 } from './secrets-scan-fixture';
+
+// Cases run up to two real scanner processes; each has a separate 10s deadline.
+vi.setConfig({ testTimeout: 30_000 });
 
 afterEach(cleanupRoots);
 
