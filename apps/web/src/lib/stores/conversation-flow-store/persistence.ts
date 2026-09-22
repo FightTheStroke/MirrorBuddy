@@ -13,6 +13,7 @@ import { csrfFetch } from '@/lib/auth';
 import {
   getClientIdentity,
   getUserIdFromCookie,
+  IdentityUnavailableError,
   requireClientUserId,
 } from '@/lib/auth/client-auth';
 import type { CharacterType } from '@/types';
@@ -98,6 +99,12 @@ export async function loadConversationSummariesFromDB(): Promise<ConversationSum
 
   try {
     const response = await fetch('/api/conversations?limit=20&active=true');
+
+    // The session expired between identity and this request. Signal it with a
+    // cause the caller can recognise, so a stale tab is not reported as a fault.
+    if (response.status === 401 || response.status === 403) {
+      throw new IdentityUnavailableError(`SESSION_EXPIRED (${response.status})`);
+    }
 
     if (!response.ok) {
       throw new Error(`Conversations API returned ${response.status}`);

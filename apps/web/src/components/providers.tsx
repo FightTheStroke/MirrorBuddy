@@ -18,7 +18,7 @@ import { registerOfflineServiceWorker } from '@/lib/pwa/offline-sw-registration'
 import { resolveAccessibleAccentColor } from '@/lib/accessibility/accent-contrast';
 import { IdentityProvider, useClientIdentity } from '@/lib/auth/identity-provider';
 import type { ClientIdentity } from '@/lib/auth/identity-types';
-import { getClientIdentity } from '@/lib/auth/client-auth';
+import { getClientIdentity, IdentityUnavailableError } from '@/lib/auth/client-auth';
 import { logger } from '@/lib/logger';
 import { IdentityNotice } from '@/components/ui/identity-notice';
 
@@ -95,7 +95,13 @@ function StoreInitializer() {
         hydrated = true;
         syncInterval = setupAutoSync(30000);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
+        // An expired session is the ordinary end of a stale tab, not a fault:
+        // the child signs in again. Only an unexpected failure is worth an alarm.
+        if (error instanceof IdentityUnavailableError) {
+          logger.debug('Store hydration skipped: the session is no longer valid');
+          return;
+        }
         logger.warn('Store hydration failed; retry when identity is refreshed');
       });
 
@@ -103,7 +109,11 @@ function StoreInitializer() {
     useConversationFlowStore
       .getState()
       .loadFromServer()
-      .catch(() => {
+      .catch((error: unknown) => {
+        if (error instanceof IdentityUnavailableError) {
+          logger.debug('Conversation hydration skipped: the session is no longer valid');
+          return;
+        }
         logger.warn('Conversation hydration failed; existing state retained');
       });
 
