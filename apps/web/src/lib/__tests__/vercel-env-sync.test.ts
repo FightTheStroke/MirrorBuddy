@@ -56,13 +56,26 @@ const DEV_ONLY_VARS = new Set([
 /** Variables that may be empty in .env but are still valid */
 const ALLOW_EMPTY = new Set(['BRAVE_SEARCH_API_KEY']);
 
+/**
+ * Vars pre-push-vercel.sh deliberately skips — e.g. optional-by-design
+ * realtime deployments (ADR 0169). Read from the script so the exclusion has
+ * one owner instead of two lists that drift apart.
+ */
+function parseSkippedVars(): Set<string> {
+  const content = readFileSync(resolve(ROOT, 'scripts/pre-push-vercel.sh'), 'utf-8');
+  const match = content.match(/^SKIP_PATTERNS="([^"]*)"/m);
+  return new Set(match ? match[1].split('|').filter(Boolean) : []);
+}
+
 function parseEnvVarNames(filePath: string): string[] {
   const content = readFileSync(resolve(ROOT, filePath), 'utf-8');
   return content
     .split('\n')
-    .filter((line) => /^[A-Z_]+=/.test(line))
+    // Names containing digits (AZURE_OPENAI_GPT5_*) are real production vars;
+    // a letters-only pattern silently hid them from every check below.
+    .filter((line) => /^[A-Z][A-Z0-9_]*=/.test(line))
     .map((line) => line.split('=')[0])
-    .filter((name) => !DEV_ONLY_VARS.has(name));
+    .filter((name) => !DEV_ONLY_VARS.has(name) && !parseSkippedVars().has(name));
 }
 
 function parseRequiredVarsFromBash(filePath: string): string[] {
@@ -72,7 +85,7 @@ function parseRequiredVarsFromBash(filePath: string): string[] {
   // be anchored to a line start, not to the first ")" encountered.
   const blockMatch = content.match(/REQUIRED_VARS=\(([\s\S]*?)\n\)/);
   if (!blockMatch) return [];
-  const blockMatches = blockMatch[1].match(/"([A-Z_]+)"/g) || [];
+  const blockMatches = blockMatch[1].match(/"([A-Z][A-Z0-9_]*)"/g) || [];
   return blockMatches.map((m) => m.replace(/"/g, ''));
 }
 
@@ -106,7 +119,7 @@ describe.skipIf(!HAS_ENV_FILE)('Vercel environment variable alignment', () => {
 
     const criticalNames = criticalProductionEnv.map(({ name }) => name);
     const optionalNames = optionalBlock
-      ? (optionalBlock[1].match(/name:\s*["']([A-Z_]+)["']/g) || []).map((m) =>
+      ? (optionalBlock[1].match(/name:\s*["']([A-Z][A-Z0-9_]*)["']/g) || []).map((m) =>
           m.replace(/name:\s*["']|["']/g, ''),
         )
       : [];
