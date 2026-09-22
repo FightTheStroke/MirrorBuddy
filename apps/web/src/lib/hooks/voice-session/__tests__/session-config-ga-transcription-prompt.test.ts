@@ -12,7 +12,7 @@
  * GA session shape is used. The preview protocol still accepts it.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSendSessionConfig } from '../session-config';
 import { useSettingsStore } from '@/lib/stores';
@@ -76,6 +76,8 @@ describe('GA Realtime rejects transcription.prompt', () => {
   let messages: SessionUpdate[];
   let dataChannel: RTCDataChannel;
 
+  afterEach(() => vi.unstubAllEnvs());
+
   beforeEach(() => {
     vi.clearAllMocks();
     messages = [];
@@ -130,16 +132,25 @@ describe('GA Realtime rejects transcription.prompt', () => {
     expect('prompt' in transcription).toBe(false);
   });
 
-  it('keeps the spoken language on GA so captions stay in the student locale', async () => {
-    useSettingsStore.setState({
-      appearance: { language: 'en', theme: 'system', accentColor: 'blue' },
-    });
-
+  it('omits the GA prompt with a custom realtime transcription deployment alias', async () => {
+    flagState.voice_realtime_whisper_transcription = true;
+    vi.stubEnv('NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT', 'my-whisper-alias');
     const transcription = (await sendConfig()).session.audio!.input.transcription;
-
-    expect(transcription.language).toBe('en');
+    expect(transcription.model).toBe('my-whisper-alias');
     expect('prompt' in transcription).toBe(false);
   });
+
+  it.each(['it', 'en', 'fr', 'de', 'es'] as const)(
+    'keeps the spoken language on GA for student locale %s',
+    async (language) => {
+      useSettingsStore.setState({
+        appearance: { language, theme: 'system', accentColor: 'blue' },
+      });
+      const transcription = (await sendConfig()).session.audio!.input.transcription;
+      expect(transcription.language).toBe(language);
+      expect('prompt' in transcription).toBe(false);
+    },
+  );
 
   it('still sends the prompt on the preview protocol, which accepts it', async () => {
     flagState.voice_ga_protocol = false;
