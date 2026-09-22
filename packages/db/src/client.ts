@@ -13,6 +13,7 @@ import { isSupabaseUrl } from '@mirrorbuddy/utils';
 import { isStagingMode } from '@mirrorbuddy/utils';
 import { createPIIMiddleware } from './pii-middleware';
 import { createSlowQueryMonitor } from './slow-query-monitor';
+import { createTransientRetry } from './transient-retry';
 import { loadSupabaseCertificate, buildSslConfig, cleanConnectionString } from './ssl-config';
 
 const globalForPrisma = globalThis as typeof globalThis & {
@@ -176,8 +177,16 @@ function createDatabase(): { prisma: PrismaClient; pool: Pool } {
   const slowQueryMonitor = createSlowQueryMonitor();
   const monitoredClient = piiExtension.$extends(slowQueryMonitor);
 
+  // ============================================================================
+  // TRANSIENT RETRY (using Prisma Client Extensions)
+  // Applied last so it wraps the whole chain: a read that failed because the
+  // database was briefly unreachable is replayed through every extension.
+  // ============================================================================
+
+  const resilientClient = monitoredClient.$extends(createTransientRetry());
+
   // Type assertion is safe because $extends preserves the PrismaClient interface
-  return { prisma: monitoredClient as unknown as PrismaClient, pool };
+  return { prisma: resilientClient as unknown as PrismaClient, pool };
 }
 
 // Cache the pair atomically, before subsequent module copies can allocate a pool.

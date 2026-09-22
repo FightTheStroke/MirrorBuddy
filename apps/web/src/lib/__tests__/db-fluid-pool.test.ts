@@ -52,6 +52,9 @@ vi.mock('../../../../../packages/db/src/pii-middleware', () => ({
 vi.mock('../../../../../packages/db/src/slow-query-monitor', () => ({
   createSlowQueryMonitor: () => ({}),
 }));
+vi.mock('../../../../../packages/db/src/transient-retry', () => ({
+  createTransientRetry: () => ({}),
+}));
 
 describe('Fluid compute database pool lifecycle', () => {
   beforeEach(() => {
@@ -94,7 +97,7 @@ describe('Fluid compute database pool lifecycle', () => {
       expect(reloaded.dbPool).toBe(first.dbPool);
       expect(adapters).toEqual([first.dbPool]);
       expect(clients).toHaveLength(1);
-      expect(extensions).toHaveBeenCalledTimes(3);
+      expect(extensions).toHaveBeenCalledTimes(4);
       if (vercel === '1') {
         expect(attachDatabasePool).toHaveBeenCalledExactlyOnceWith(first.dbPool);
       } else {
