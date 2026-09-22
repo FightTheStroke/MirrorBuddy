@@ -152,6 +152,11 @@ const STATIC_EXTENSIONS = [
   '.map',
 ];
 
+function isStaticAsset(pathname: string): boolean {
+  // Only the public offline document bypasses page routing, not arbitrary HTML paths.
+  return pathname === '/offline.html' || STATIC_EXTENSIONS.some((ext) => pathname.endsWith(ext));
+}
+
 function pathMatchesRoute(pathname: string, route: string): boolean {
   if (route === '/') return pathname === '/';
   return pathname === route || pathname.startsWith(`${route}/`) || pathname.startsWith(`${route}.`);
@@ -284,7 +289,7 @@ export function shouldSkipI18n(pathname: string): boolean {
     return true;
   }
   // Skip static files (images, fonts, etc.)
-  if (STATIC_EXTENSIONS.some((ext) => pathname.endsWith(ext))) {
+  if (isStaticAsset(pathname)) {
     return true;
   }
   return false;
@@ -311,7 +316,7 @@ export default function proxy(request: NextRequest) {
   // ==========================================================================
   // STATIC FILES - Skip all processing, just add request ID
   // ==========================================================================
-  if (STATIC_EXTENSIONS.some((ext) => pathname.endsWith(ext))) {
+  if (isStaticAsset(pathname)) {
     const response = NextResponse.next({
       request: { headers: requestHeaders },
     });

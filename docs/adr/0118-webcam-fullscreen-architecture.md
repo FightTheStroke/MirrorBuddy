@@ -42,7 +42,7 @@ Both flows use the same `WebcamCapture` component with different entry points.
 Default to environment-facing (rear) camera on mobile devices:
 
 ```typescript
-const preferredFacingMode = isMobileDevice() ? "environment" : "user";
+const preferredFacingMode = isMobileDevice() ? 'environment' : 'user';
 ```
 
 Rationale: Most student captures are documents, homework, or textbooks requiring rear camera.
@@ -77,6 +77,20 @@ Rationale: Most student captures are documents, homework, or textbooks requiring
 - Wrapper key convention: `{ "webcam": { ...keys... } }` per ADR 0104
 
 ## Consequences
+
+### Recovery and resource ownership
+
+Each capture attempt owns its stream, playback readiness and timers. Retry,
+camera switch, timeout and unmount invalidate that attempt; a late permission
+grant is stopped rather than attached to a newer preview. Capture waits for a
+decoded video frame, and confirmation delivers the selected image only once.
+
+When camera access fails, students can choose an existing image. Cancelling the
+picker restores focus without reporting a failure; invalid images remain
+recoverable with a visible error. Expected permission/device limitations retain
+localized guidance and diagnostic breadcrumbs rather than error-level reports.
+Standalone Astuccio captures save `content.imageBase64`; archive and knowledge-hub
+viewers accept this field as well as the existing image representation.
 
 **Positive:**
 

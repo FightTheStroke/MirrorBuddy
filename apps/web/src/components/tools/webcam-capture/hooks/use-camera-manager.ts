@@ -1,8 +1,3 @@
-/**
- * @file use-camera-manager.ts
- * @brief Hook for camera enumeration, switching, and stream management
- */
-
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
@@ -15,6 +10,7 @@ import {
   type CameraDevice,
 } from '../utils/camera-utils';
 import type { ErrorType } from '../constants';
+import { waitForVideoFrame } from '../utils/capture-utils';
 
 interface UseCameraManagerProps {
   preferredCameraId?: string | null;
@@ -23,25 +19,25 @@ interface UseCameraManagerProps {
 export function useCameraManager({ preferredCameraId }: UseCameraManagerProps) {
   const t = useTranslations('tools.webcam');
   const videoRef = useRef<HTMLVideoElement>(null);
+  const mountedRef = useRef(false);
+  const cancelAttemptRef = useRef<(() => void) | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<ErrorType>(null);
-
   const [availableCameras, setAvailableCameras] = useState<CameraDevice[]>([]);
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
   const [showCameraMenu, setShowCameraMenu] = useState(false);
   const [activeCameraLabel, setActiveCameraLabel] = useState<string>('');
   const [isSwitchingCamera, setIsSwitchingCamera] = useState(false);
-
   const [isMobileDevice] = useState(() => isMobile());
-
-  const enumerateCameras = useCallback(async () => {
-    const cameras = await enumerateCamerasUtil();
-    setAvailableCameras(cameras);
-    return cameras;
+  const stopCamera = useCallback(() => {
+    cancelAttemptRef.current?.();
+    cancelAttemptRef.current = null;
+    setStream(null);
+    setIsLoading(false);
+    setIsSwitchingCamera(false);
   }, []);
-
   const showCameraError = useCallback(
     (error: unknown) => {
       const condition = getCameraAccessError(error);
@@ -58,112 +54,120 @@ export function useCameraManager({ preferredCameraId }: UseCameraManagerProps) {
   );
 
   const startCamera = useCallback(
-    async (deviceId?: string) => {
+    async (deviceId?: string, switching = false) => {
+      if (!mountedRef.current) return;
+      cancelAttemptRef.current?.();
+      let active = true;
+      let acquiredStream: MediaStream | null = null;
+      let video: HTMLVideoElement | null = null;
+      let acquisitionFailed = true;
+      const controller = new AbortController();
+      const releaseStream = () => {
+        acquiredStream?.getTracks().forEach((track) => {
+          if (track.readyState !== 'ended') track.stop();
+        });
+        if (video && video.srcObject === acquiredStream) video.srcObject = null;
+        acquiredStream = null;
+      };
+      const cancel = () => {
+        active = false;
+        controller.abort();
+        clearTimeout(timeoutId);
+        releaseStream();
+      };
       setIsLoading(true);
+      setIsSwitchingCamera(switching);
+      setStream(null);
       setError(null);
       setErrorType(null);
-
       const timeoutId = setTimeout(() => {
+        cancel();
+        setStream(null);
         setError(t('errors.timeout.message'));
         setErrorType('timeout');
         setIsLoading(false);
+        setIsSwitchingCamera(false);
       }, 10000);
+      cancelAttemptRef.current = cancel;
+      const attachStream = async (mediaStream: MediaStream, requestedDeviceId?: string) => {
+        if (!active) {
+          mediaStream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+        acquiredStream = mediaStream;
+        acquisitionFailed = false;
+        video = videoRef.current;
+        if (!video) throw new Error('Camera preview unavailable');
+        video.srcObject = mediaStream;
+        await video.play();
+        if (!active) return;
+        const ready = await waitForVideoFrame(video, controller.signal);
+        if (!active || !ready) return;
+        const videoTrack = mediaStream.getVideoTracks()[0];
+        if (videoTrack) {
+          setActiveCameraLabel(videoTrack.label);
+          setSelectedCameraId(videoTrack.getSettings().deviceId || requestedDeviceId || null);
+        }
+        clearTimeout(timeoutId);
+        setStream(mediaStream);
+        setIsLoading(false);
+        setIsSwitchingCamera(false);
+        const cameras = await enumerateCamerasUtil();
+        if (active) setAvailableCameras(cameras);
+      };
 
       try {
-        if (stream) {
-          stream.getTracks().forEach((track) => track.stop());
-        }
-
-        // Build video constraints based on device type and device selection
-        let videoConstraints: VideoConstraints;
-
-        if (deviceId) {
-          // Specific device requested - use device ID
-          videoConstraints = { deviceId: { ideal: deviceId } };
-        } else {
-          // No specific device - set facingMode based on device type
-          // Mobile: rear camera (environment) by default for scanning/photos
-          // Desktop: front camera (user) by default for video calls/selfies
-          const defaultFacingMode = isMobileDevice ? 'environment' : 'user';
-          videoConstraints = { facingMode: defaultFacingMode };
-        }
-
+        const videoConstraints: VideoConstraints = deviceId
+          ? { deviceId: { ideal: deviceId } }
+          : { facingMode: isMobileDevice ? 'environment' : 'user' };
         logger.info('Requesting camera access', {
           deviceId,
           videoConstraints,
           isMobileDevice,
         });
-
-        const mediaStream = await requestVideoStream(videoConstraints);
-        clearTimeout(timeoutId);
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-          try {
-            await videoRef.current.play();
-          } catch (playErr) {
-            logger.warn('Video autoplay blocked', { error: String(playErr) });
-          }
-
-          const videoTrack = mediaStream.getVideoTracks()[0];
-          if (videoTrack) {
-            setActiveCameraLabel(videoTrack.label);
-            setSelectedCameraId(videoTrack.getSettings().deviceId || deviceId || null);
-          }
-
-          setStream(mediaStream);
-          setIsLoading(false);
-          await enumerateCameras();
-        }
+        await attachStream(await requestVideoStream(videoConstraints, 'caller'), deviceId);
       } catch (err) {
-        clearTimeout(timeoutId);
-
-        if (deviceId && !getCameraAccessError(err)) {
+        if (!active) return;
+        releaseStream();
+        setStream(null);
+        if (deviceId && acquisitionFailed && !getCameraAccessError(err)) {
+          logger.error('Camera error', undefined, err);
           logger.info('Retrying with any available camera');
           try {
-            const fallbackStream = await requestVideoStream();
-            if (videoRef.current) {
-              videoRef.current.srcObject = fallbackStream;
-              await videoRef.current.play();
-              const videoTrack = fallbackStream.getVideoTracks()[0];
-              if (videoTrack) {
-                setActiveCameraLabel(videoTrack.label);
-                setSelectedCameraId(videoTrack.getSettings().deviceId || null);
-              }
-              setStream(fallbackStream);
-              setIsLoading(false);
-              await enumerateCameras();
-              return;
-            }
+            await attachStream(await requestVideoStream(undefined, 'caller'));
+            return;
           } catch (fallbackErr) {
+            if (!active) return;
+            releaseStream();
+            setStream(null);
             showCameraError(fallbackErr);
+            cancel();
+            setIsSwitchingCamera(false);
             return;
           }
         }
         showCameraError(err);
+        cancel();
+        setIsSwitchingCamera(false);
       }
     },
-    [stream, enumerateCameras, isMobileDevice, showCameraError, t],
+    [isMobileDevice, showCameraError, t],
   );
 
   const switchCamera = useCallback(
     async (deviceId: string) => {
-      setIsSwitchingCamera(true);
       setShowCameraMenu(false);
-      await startCamera(deviceId);
-      setIsSwitchingCamera(false);
+      await startCamera(deviceId, true);
     },
     [startCamera],
   );
 
   const toggleFrontBack = useCallback(async () => {
     if (availableCameras.length < 2) return;
-
     const currentCamera = availableCameras.find((c) => c.deviceId === selectedCameraId);
     const targetCamera = availableCameras.find(
       (c) => c.isFrontFacing !== currentCamera?.isFrontFacing,
     );
-
     if (targetCamera) {
       await switchCamera(targetCamera.deviceId);
     } else {
@@ -187,26 +191,16 @@ export function useCameraManager({ preferredCameraId }: UseCameraManagerProps) {
     return activeCameraLabel;
   }, [activeCameraLabel]);
 
-  // Initialize camera on mount
   useEffect(() => {
+    mountedRef.current = true;
     startCamera(preferredCameraId || undefined);
-
     return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
+      mountedRef.current = false;
+      cancelAttemptRef.current?.();
+      cancelAttemptRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Preference changes apply on the next opening.
   }, []);
-
-  // Cleanup stream on unmount
-  useEffect(() => {
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, [stream]);
 
   return {
     videoRef,
@@ -223,6 +217,7 @@ export function useCameraManager({ preferredCameraId }: UseCameraManagerProps) {
     isMobileDevice,
     currentCameraName,
     startCamera,
+    stopCamera,
     switchCamera,
     toggleFrontBack,
   };

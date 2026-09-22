@@ -78,6 +78,7 @@ export class WebRTCConnection {
   private dataChannel: RTCDataChannel | null = null;
   private config: WebRTCConnectionConfig;
   private connectionTimeout: NodeJS.Timeout | null = null;
+  private generation = 0;
   /**
    * Aborts whatever SDP request is in flight. Held on the instance so that a
    * student who hangs up mid-negotiation actually cancels the call instead of
@@ -96,70 +97,71 @@ export class WebRTCConnection {
     return !!this.serverConfig?.azureResource;
   }
 
-  private stopResolvedStreamIfUnassigned(resolvedStream: unknown): void {
-    if (this.mediaStream) return;
-    if (typeof resolvedStream !== 'object' || resolvedStream === null) return;
-    const candidate = resolvedStream as { getTracks?: unknown };
-    if (typeof candidate.getTracks !== 'function') return;
-
-    const tracks = candidate.getTracks.call(resolvedStream) as unknown;
-    if (!Array.isArray(tracks)) return;
-    for (const track of tracks) {
-      if (typeof track !== 'object' || track === null) continue;
-      const stoppable = track as { stop?: unknown };
-      if (typeof stoppable.stop === 'function') {
-        stoppable.stop.call(track);
-      }
+  private assertCurrentAttempt(generation: number): void {
+    if (generation !== this.generation) {
+      throw new DOMException('WebRTC connection cancelled', 'AbortError');
     }
   }
 
   async connect(): Promise<WebRTCConnectionResult> {
+    this.cleanup();
+    const generation = this.generation;
     const startTime = Date.now();
     logger.info('[WebRTC] Connection sequence starting...', {
       maestroId: this.config.maestro.id,
     });
-    let resolvedMediaStream: unknown = null;
     try {
       // Run token issuance, server config, and microphone permission in parallel
       // to reduce end-to-end time and to show the mic permission prompt immediately.
       logger.debug(
         '[WebRTC] Step 1: Getting ephemeral token + server config + mic access (parallel)...',
       );
-      const tokenPromise = this.getEphemeralToken();
-      const configPromise = this.fetchServerConfig();
+      const tokenPromise = this.getEphemeralToken(generation);
+      const configPromise = this.fetchServerConfig(generation);
       const mediaPromise = this.getUserMedia().then((stream) => {
-        resolvedMediaStream = stream;
+        if (generation !== this.generation) {
+          stream.getTracks().forEach((track) => track.stop());
+          this.assertCurrentAttempt(generation);
+        }
+        // Own the stream immediately, even while the other startup requests are pending.
+        this.mediaStream = stream;
         return stream;
       });
       const [token, , mediaStream] = await Promise.all([tokenPromise, configPromise, mediaPromise]);
-      this.mediaStream = mediaStream;
+      this.assertCurrentAttempt(generation);
       logger.debug('[WebRTC] Step 3: Creating peer connection...', {
         protocol: this.isGAProtocol ? 'GA' : 'preview',
       });
-      this.peerConnection = await this.createPeerConnection();
+      this.peerConnection = this.createPeerConnection();
       logger.debug('[WebRTC] Step 4: Adding audio tracks...');
       this.addAudioTracks();
       logger.debug('[WebRTC] Step 5: Creating data channel...');
       this.createDataChannel(); // Must be BEFORE offer per Azure docs
       logger.debug('[WebRTC] Step 6: Creating SDP offer...');
-      const offer = await this.createOffer();
+      const offer = await this.createOffer(generation);
+      this.assertCurrentAttempt(generation);
       logger.debug('[WebRTC] Step 7: Exchanging SDP...');
-      await this.exchangeSDP(token, offer);
+      await this.exchangeSDP(token, offer, generation);
+      this.assertCurrentAttempt(generation);
       logger.debug('[WebRTC] Step 8: Waiting for connection...');
       await this.waitForConnection();
+      this.assertCurrentAttempt(generation);
       const connectionTime = Date.now() - startTime;
       logger.info('[WebRTC] Connection established', { connectionTime });
       return {
         peerConnection: this.peerConnection,
-        mediaStream: this.mediaStream,
+        mediaStream,
         dataChannel: this.dataChannel,
-        cleanup: () => this.cleanup(),
-        unmuteAudioTracks: () => this.unmuteAudioTracks(),
+        cleanup: () => {
+          if (generation === this.generation) this.cleanup();
+        },
+        unmuteAudioTracks: () => {
+          if (generation === this.generation) this.unmuteAudioTracks();
+        },
       };
     } catch (error) {
-      // If getUserMedia resolved but Promise.all rejected (e.g. token fetch failure),
-      // ensure we still stop the microphone tracks even before this.mediaStream is assigned.
-      this.stopResolvedStreamIfUnassigned(resolvedMediaStream);
+      // A cancelled or superseded attempt must not release or report against its successor.
+      if (generation !== this.generation) throw error;
       this.cleanup();
       const message = error instanceof Error ? error.message : 'Unknown WebRTC error';
       const connectionTime = Date.now() - startTime;
@@ -182,7 +184,7 @@ export class WebRTCConnection {
       // Preserve a VoiceErrorCode (if the root cause carried one) so the UI layer can
       // map it to a localized, child-friendly message instead of showing raw text.
       const code = getVoiceErrorCode(error);
-      const wrappedError = new Error(message);
+      const wrappedError = new Error(message, { cause: error });
       (wrappedError as Error & { _voiceRootCause: boolean })._voiceRootCause = true;
       if (code) {
         (wrappedError as Error & { code: string }).code = code;
@@ -197,7 +199,7 @@ export class WebRTCConnection {
    * Reuses connectionInfo fields if already populated by the caller
    * (e.g. from the overlay fetch), avoiding a duplicate /api/realtime/token request.
    */
-  private async fetchServerConfig(): Promise<void> {
+  private async fetchServerConfig(generation = this.generation): Promise<void> {
     const ci = this.config.connectionInfo;
     if (ci.azureResource || ci.webrtcEndpoint) {
       this.serverConfig = {
@@ -226,7 +228,9 @@ export class WebRTCConnection {
         logVoiceError('ConfigFetchFailed', `Status: ${response.status}`);
         throw new VoiceError('VOICE_CONFIG_UNAVAILABLE');
       }
-      this.serverConfig = await response.json();
+      const serverConfig: ServerTokenConfig = await response.json();
+      this.assertCurrentAttempt(generation);
+      this.serverConfig = serverConfig;
       logger.debug('[WebRTC] Server config received', {
         protocol: this.isGAProtocol ? 'GA' : 'preview',
         hasAzureResource: !!this.serverConfig?.azureResource,
@@ -234,6 +238,7 @@ export class WebRTCConnection {
       });
     } catch (error) {
       clearTimeout(timeout);
+      if (generation !== this.generation) throw error;
       if (error instanceof DOMException && error.name === 'AbortError') {
         logVoiceError('ConfigFetchTimeout', 'Server config fetch timed out after 10s');
         throw new VoiceError('VOICE_SERVER_TIMEOUT');
@@ -242,8 +247,9 @@ export class WebRTCConnection {
     }
   }
 
-  private async getEphemeralToken(): Promise<string> {
+  private async getEphemeralToken(generation = this.generation): Promise<string> {
     const cachedToken = await this.config.getCachedToken?.();
+    this.assertCurrentAttempt(generation);
     if (cachedToken) {
       logger.debug('[WebRTC] Using cached ephemeral token');
       return cachedToken;
@@ -262,12 +268,14 @@ export class WebRTCConnection {
           signal: controller.signal,
         });
       let response = await fetchToken();
+      this.assertCurrentAttempt(generation);
       // Soft-retry once on 429 after a 1.1s cooldown so normal bursts
       // (preloadToken + webrtc-probe + webrtc-connection within a second)
       // don't surface to the user as "Failed to get ephemeral token".
       if (response.status === 429) {
         logger.debug('[WebRTC] Token endpoint rate-limited; retrying after cooldown');
         await new Promise((resolve) => setTimeout(resolve, 1100));
+        this.assertCurrentAttempt(generation);
         response = await fetchToken();
       }
       clearTimeout(timeout);
@@ -286,6 +294,7 @@ export class WebRTCConnection {
       return data.token;
     } catch (error) {
       clearTimeout(timeout);
+      if (generation !== this.generation) throw error;
       if (error instanceof DOMException && error.name === 'AbortError') {
         logVoiceError('TokenFetchTimeout', 'Ephemeral token fetch timed out after 10s');
         throw new VoiceError('VOICE_SERVER_TIMEOUT');
@@ -348,7 +357,7 @@ export class WebRTCConnection {
     }
   }
 
-  private async createPeerConnection(): Promise<RTCPeerConnection> {
+  private createPeerConnection(): RTCPeerConnection {
     logger.debug('[WebRTC] Creating peer connection');
 
     // T1-07: In GA protocol, Azure provides built-in TURN/STUN servers
@@ -455,14 +464,17 @@ export class WebRTCConnection {
     logger.debug('[WebRTC] Audio tracks unmuted after session.updated');
   }
 
-  private async createOffer(): Promise<RTCSessionDescriptionInit> {
+  private async createOffer(generation = this.generation): Promise<RTCSessionDescriptionInit> {
     if (!this.peerConnection) throw new Error('PeerConnection not initialized');
+    const pc = this.peerConnection;
     logger.debug('[WebRTC] Creating offer...');
-    const offer = await this.peerConnection.createOffer({
+    const offer = await pc.createOffer({
       offerToReceiveAudio: true,
     });
+    this.assertCurrentAttempt(generation);
     logSDPExchange('offer', offer.sdp?.length || 0);
-    await this.peerConnection.setLocalDescription(offer);
+    await pc.setLocalDescription(offer);
+    this.assertCurrentAttempt(generation);
 
     // T1-08: In GA protocol, SDP can be posted immediately without waiting for ICE gathering
     // Protocol mode is determined by server token response (not client flags)
@@ -487,7 +499,11 @@ export class WebRTCConnection {
     return this.peerConnection.localDescription!;
   }
 
-  private async exchangeSDP(token: string, offer: RTCSessionDescriptionInit): Promise<void> {
+  private async exchangeSDP(
+    token: string,
+    offer: RTCSessionDescriptionInit,
+    generation = this.generation,
+  ): Promise<void> {
     logger.debug('[WebRTC] Exchanging SDP with server...');
 
     // Protocol mode is driven by server token response (fetched in connect())
@@ -529,7 +545,9 @@ export class WebRTCConnection {
           signal,
         }),
       );
+      this.assertCurrentAttempt(generation);
     } catch (error) {
+      this.assertCurrentAttempt(generation);
       if (!this.isGAProtocol) {
         const message = error instanceof Error ? error.message : 'Network request failed';
         logVoiceError('SDPExchangeFailed', message);
@@ -567,6 +585,7 @@ export class WebRTCConnection {
         azureRequestId: getUpstreamRequestId(response),
       });
       const directResponse = response;
+      this.assertCurrentAttempt(generation);
       // No `relayAttempted = true` here: this is the last point that can relay,
       // so the flag would never be read again. It is set only in the catch path
       // above, which is the one this block has to guard against.
@@ -592,6 +611,7 @@ export class WebRTCConnection {
       throw new Error(`SDP exchange failed: ${describeUpstreamError(sanitized)}`);
     }
     const answerSdp = await response.text();
+    this.assertCurrentAttempt(generation);
     logSDPExchange('answer', answerSdp.length);
     const answer: AzureSDPResponse = {
       sdp: answerSdp,
@@ -632,6 +652,7 @@ export class WebRTCConnection {
   }
 
   private cleanup(): void {
+    this.generation++;
     if (this.negotiationAbort) this.negotiationAbort.abort();
     if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
     if (this.dataChannel) this.dataChannel.close();

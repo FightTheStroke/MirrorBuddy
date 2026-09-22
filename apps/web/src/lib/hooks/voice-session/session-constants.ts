@@ -48,6 +48,14 @@ export const BILINGUAL_PROMPTS: Record<string, string> = {
   de: `${TRANSCRIPTION_PROMPTS.it}, ${TRANSCRIPTION_PROMPTS.de}, Aussprache, wiederholen Sie, wie sagt man, was bedeutet, Grammatik, Wortschatz, Satz, Dialog, Gespräch, Goethe, Faust, Dichtung`,
 };
 
+export function buildBilingualPrompt(targetLanguage: string, userLanguage: string): string {
+  const prompt = BILINGUAL_PROMPTS[targetLanguage] || TRANSCRIPTION_PROMPTS.it;
+  return prompt.replace(
+    TRANSCRIPTION_PROMPTS.it,
+    TRANSCRIPTION_PROMPTS[userLanguage] || TRANSCRIPTION_PROMPTS.it,
+  );
+}
+
 /**
  * Random greeting prompts for session start (multilingual)
  */
@@ -89,10 +97,10 @@ export const GREETING_PROMPTS: Record<string, string[]> = {
  * unchanged — they still fire when the student raises those topics.
  */
 export const GREETING_PERSONA_DIRECTIVE: Record<string, string> = {
-  it: " Presentati SUBITO col tuo nome e la materia che insegni, restando pienamente nel personaggio. Non descriverti come una \"guida\" o un \"compagno di viaggio\", non dire di essere un'IA e non dire di non avere occhi, mani o un corpo.",
+  it: ' Presentati SUBITO col tuo nome e la materia che insegni, restando pienamente nel personaggio. Non descriverti come una "guida" o un "compagno di viaggio", non dire di essere un\'IA e non dire di non avere occhi, mani o un corpo.',
   en: ' Introduce yourself right away by your name and the subject you teach, staying fully in character. Do not describe yourself as a generic "guide" or "travel companion", do not say you are an AI, and do not say you lack eyes, hands or a body.',
   es: ' Preséntate DE INMEDIATO con tu nombre y la materia que enseñas, permaneciendo plenamente en el personaje. No te describas como una "guía" o un "compañero de viaje", no digas que eres una IA y no digas que no tienes ojos, manos o cuerpo.',
-  fr: " Présente-toi TOUT DE SUITE avec ton nom et la matière que tu enseignes, en restant pleinement dans le personnage. Ne te décris pas comme un \"guide\" ou un \"compagnon de voyage\", ne dis pas que tu es une IA et ne dis pas que tu n'as ni yeux, ni mains, ni corps.",
+  fr: ' Présente-toi TOUT DE SUITE avec ton nom et la matière que tu enseignes, en restant pleinement dans le personnage. Ne te décris pas comme un "guide" ou un "compagnon de voyage", ne dis pas que tu es une IA et ne dis pas que tu n\'as ni yeux, ni mains, ni corps.',
   de: ' Stell dich SOFORT mit deinem Namen und deinem Fach vor und bleibe vollständig in der Rolle. Beschreibe dich nicht als generischen "Begleiter" oder "Reisebegleiter", sage nicht, dass du eine KI bist, und sage nicht, dass du keine Augen, Hände oder keinen Körper hast.',
 };
 
@@ -151,7 +159,7 @@ export function buildLanguageInstruction(
   const langName = LANGUAGE_NAMES[userLanguage] || 'Italian';
   const langUpper = langName.toUpperCase();
 
-  if (isLanguageTeacher && targetLanguage) {
+  if (isLanguageTeacher && targetLanguage && targetLanguage !== userLanguage) {
     const TEACHING_LANG_MAP: Record<string, [string, string]> = {
       en: ['ENGLISH', 'English'],
       es: ['SPANISH', 'Spanish'],
@@ -164,7 +172,7 @@ export function buildLanguageInstruction(
     ];
     return `
 # STRICT BILINGUAL LANGUAGE TEACHING MODE
-You are teaching ${teachingLang} to an Italian student.
+You are teaching ${teachingLang} to a ${langName}-speaking student.
 
 ## MANDATORY LANGUAGE RULES (NEVER BREAK THESE):
 1. EXPLANATIONS, INSTRUCTIONS, FEEDBACK → ALWAYS in ${langUpper}
@@ -175,11 +183,11 @@ You are teaching ${teachingLang} to an Italian student.
    - Responding when student speaks in ${teachingLangLower}
 3. NEVER speak ${teachingLang} for general conversation or instructions
 4. The STUDENT may speak in EITHER language - understand both!
-5. Praise attempts in ${langUpper}: "Ottimo!", "Bravissimo!", "Perfetto!"
+5. Praise attempts in ${langUpper}, not in a fixed default language.
 
 EXAMPLE CORRECT BEHAVIOR:
-- "${langName}: Oggi impariamo i colori. In ${teachingLangLower}, rosso si dice 'red'. Ripeti: red."
-- NOT: "Today we learn colors. Red. Repeat: red." (WRONG - instructions must be in ${langName})
+- Explain meaning and give instructions in ${langName}.
+- Use ${teachingLangLower} for the vocabulary and pronunciation examples, not for instructions.
 
 TRANSCRIPTION: Student may speak ${langName} OR ${teachingLangLower}. Both are transcribed.
 `;
@@ -196,19 +204,15 @@ ABSOLUTE REQUIREMENTS:
 - ZERO tolerance for other languages
 
 FORBIDDEN (NEVER DO THIS):
-- NO English words or phrases
-- NO Spanish words or phrases
-- NO French, German, or any other language
+- NO words or phrases in languages other than ${langName}
 - NO code-switching or mixing languages
 - NO "just this once" exceptions
 
 EXAMPLES OF WRONG BEHAVIOR (NEVER DO):
-- "Hello, come stai?" → WRONG (English mixed)
-- "Hola, benvenuto" → WRONG (Spanish mixed)
-- "Let me explain..." → WRONG (must be in ${langName})
+- Mixing ${langName} with another language or switching languages for an explanation.
 
 CORRECT: Speak 100% in ${langName}, always.
-If you slip, immediately correct: "Scusa, intendevo dire..." (in ${langName})
+If you slip, immediately correct yourself in ${langName}.
 `;
 }
 

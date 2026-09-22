@@ -56,6 +56,7 @@ export const synthetic = {
 function locate(command: string): string {
   const found = spawnSync(BASH, ['-c', `command -v ${command}`], {
     encoding: 'utf8',
+    timeout: 10_000,
     env: { PATH: process.env.PATH ?? '/usr/local/bin:/usr/bin:/bin' },
   });
   expect(found.error, `${command} lookup must launch`).toBeUndefined();
@@ -113,6 +114,7 @@ export function scan(root: string, options: { args?: string[]; search?: Search }
   const result = spawnSync(BASH, [join(root, 'scripts/secrets-scan.sh'), ...args], {
     cwd: root,
     encoding: 'utf8',
+    timeout: 10_000,
     env: { PATH: bin, HOME: root, TMPDIR: join(root, 'tmp') },
   });
   expect(result.error, 'the scanner must launch').toBeUndefined();

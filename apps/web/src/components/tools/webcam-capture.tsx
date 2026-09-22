@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { Smartphone, Monitor } from "lucide-react";
-import { useWebcamCapture } from "./webcam-capture/hooks/use-webcam-capture";
-import { WebcamHeader } from "./webcam-capture/components/webcam-header";
-import { WebcamPreview } from "./webcam-capture/components/webcam-preview";
-import { WebcamControls } from "./webcam-capture/components/webcam-controls";
+import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Smartphone, Monitor } from 'lucide-react';
+import { useWebcamCapture } from './webcam-capture/hooks/use-webcam-capture';
+import { WebcamHeader } from './webcam-capture/components/webcam-header';
+import { WebcamPreview } from './webcam-capture/components/webcam-preview';
+import { WebcamControls } from './webcam-capture/components/webcam-controls';
 import {
   isContinuityCamera as _isContinuityCamera,
   type CameraDevice,
-} from "./webcam-capture/utils/camera-utils";
+} from './webcam-capture/utils/camera-utils';
 
 interface WebcamCaptureProps {
   purpose: string;
   instructions?: string;
-  onCapture: (imageData: string) => void;
+  onCapture: (imageData: string) => void | boolean | Promise<void | boolean>;
   onClose: () => void;
   showTimer?: boolean;
 }
@@ -51,6 +51,10 @@ export function WebcamCapture({
     handleRetake,
     handleConfirm,
     handleRetry,
+    handleImport,
+    handleClose,
+    isImporting,
+    isConfirming,
     switchCamera,
     toggleFrontBack,
   } = useWebcamCapture({ showTimer, onCapture, onClose });
@@ -64,33 +68,55 @@ export function WebcamCapture({
 
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  // Keyboard navigation: Escape to close, Enter to capture
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      } else if (e.key === "Enter" && !capturedImage && !isLoading && !error) {
-        handleCapture();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [capturedImage, isLoading, error, handleCapture, onClose]);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      handleClose();
+    } else if (
+      e.key === 'Enter' &&
+      e.target === e.currentTarget &&
+      !capturedImage &&
+      !isLoading &&
+      !error
+    ) {
+      e.preventDefault();
+      handleCapture();
+    }
+    if (e.key !== 'Tab') return;
+    const buttons = Array.from(
+      e.currentTarget.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'),
+    );
+    const target = document.activeElement;
+    const first = buttons[0];
+    const last = buttons[buttons.length - 1];
+    if (e.shiftKey && (target === first || target === e.currentTarget)) {
+      e.preventDefault();
+      last?.focus();
+    } else if (!e.shiftKey && target === last) {
+      e.preventDefault();
+      first?.focus();
+    }
+  };
 
   // Focus trap: focus dialog on mount
   useEffect(() => {
+    const previousFocus = document.activeElement;
     const element = dialogRef.current;
-    if (element && "focus" in element && typeof element.focus === "function") {
+    if (element && 'focus' in element && typeof element.focus === 'function') {
       element.focus();
     }
+    return () => {
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
+    };
   }, []);
 
   return (
     <motion.div
       ref={dialogRef}
       role="dialog"
-      aria-label={`${purpose}${instructions ? `: ${instructions}` : ""}`}
+      aria-modal="true"
+      onKeyDown={handleKeyDown}
+      aria-label={`${purpose}${instructions ? `: ${instructions}` : ''}`}
       tabIndex={-1}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -110,7 +136,7 @@ export function WebcamCapture({
         error={error}
         onToggleMenu={() => setShowCameraMenu(!showCameraMenu)}
         onSwitchCamera={switchCamera}
-        onClose={onClose}
+        onClose={handleClose}
         getCameraIcon={getCameraIcon}
       />
 
@@ -129,7 +155,9 @@ export function WebcamCapture({
           availableCameras={availableCameras}
           selectedCameraId={selectedCameraId}
           onRetry={handleRetry}
-          onClose={onClose}
+          onClose={handleClose}
+          onImport={handleImport}
+          isImporting={isImporting}
           onCancelCountdown={handleCancelCountdown}
           onToggleFrontBack={toggleFrontBack}
         />
@@ -146,6 +174,7 @@ export function WebcamCapture({
         onCapture={handleCapture}
         onRetake={handleRetake}
         onConfirm={handleConfirm}
+        isConfirming={isConfirming || isImporting}
       />
     </motion.div>
   );

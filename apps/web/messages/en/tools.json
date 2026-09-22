@@ -84,7 +84,14 @@
       "continuity": "Continuity",
       "closeCamera": "Close camera",
       "fotoCatturata": "Foto catturata",
-      "timerOption": "Timer {label}"
+      "timerOption": "Timer {label}",
+      "choosePhoto": "Choose a photo",
+      "choosingPhoto": "Choosing a photo",
+      "importFailed": "Unable to open the photo. Choose a valid JPEG, PNG or GIF image and try again.",
+      "frameUnavailable": "The image is not ready. Try again or choose a photo.",
+      "confirmFailed": "Unable to confirm the photo. Try again.",
+      "cameraReady": "Camera ready",
+      "countdown": "Taking photo in {seconds} seconds"
     },
     "homework": {
       "label": "Homework Help",

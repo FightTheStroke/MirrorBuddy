@@ -59,7 +59,7 @@ describe('recordVoiceUsage', () => {
     expect(prisma.voiceUsageEvent.create).not.toHaveBeenCalled();
   });
 
-  it('never lets accounting break a conversation', async () => {
+  it('exposes storage failure so the API can fail without interrupting the client conversation', async () => {
     vi.mocked(prisma.voiceUsageEvent.create).mockRejectedValue(new Error('database on fire'));
 
     await expect(
@@ -69,7 +69,7 @@ describe('recordVoiceUsage', () => {
         model: 'gpt-realtime',
         usage: AZURE_USAGE,
       }),
-    ).resolves.toBeNull(); // a lost row, not a silent robot
+    ).rejects.toThrow('database on fire');
   });
 
   it('stores no transcript, ever', async () => {
