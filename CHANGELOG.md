@@ -9,7 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.41.8] - 2026-09-22
 
-- No user-facing changes recorded.
+### Fixed
+
+- Cancel obsolete camera, image-import, microphone and voice connection work without
+  allowing late callbacks to replace the current session or retain media resources.
+- Preserve ordered voice transcripts and response usage when a trial tool resolves
+  its persistence session during a conversation; reject stale events after reconnecting.
+- Retain the newer GA transcription-prompt restriction and localized camera diagnostics
+  while completing the recovery changes from #1061 (#1141, #1144, #1147 and #1150).
 
 ## [0.41.7] - 2026-09-22
 
