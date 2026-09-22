@@ -15,7 +15,7 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { Client } from 'pg';
 import { probeVectorSearchFunction } from './lib/vector-search-probe';
-import { createPgClient } from './lib/pg-connection';
+import { createPgClient, connectWithRetry } from './lib/pg-connection';
 
 const MIGRATIONS_DIR = join(process.cwd(), 'apps/web/prisma/migrations');
 
@@ -44,10 +44,18 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const client = createPgClient(url);
+  let client: Client;
+  try {
+    client = await connectWithRetry(() => createPgClient(url));
+  } catch (error) {
+    console.error(
+      '✗ Could not reach the database:',
+      error instanceof Error ? error.message : error,
+    );
+    process.exit(1);
+  }
 
   try {
-    await client.connect();
     const local = localMigrations();
     const applied = await appliedMigrations(client);
     const pending = local.filter((m) => !applied.has(m));
