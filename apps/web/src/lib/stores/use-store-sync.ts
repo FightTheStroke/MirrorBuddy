@@ -7,7 +7,11 @@ import { useProgressStore } from './progress-store';
 import { useConversationStore } from './conversation-store';
 import { useLearningsStore } from './learnings-store';
 import { useAccessibilityStore } from '@/lib/accessibility';
-import { getClientIdentity, getUserIdFromCookie } from '@/lib/auth/client-auth';
+import {
+  getClientIdentity,
+  getUserIdFromCookie,
+  IdentityUnavailableError,
+} from '@/lib/auth/client-auth';
 import { logger } from '@/lib/logger';
 
 /**
@@ -25,12 +29,12 @@ export async function initializeStores() {
   // Still handled: the cookie can be present but stale (expired session).
   const res = await fetch('/api/user');
 
-  // A refused session is not a malfunction — the cookie outlived the session it
-  // belonged to, and signing in again is the app's normal answer. Treating it as
-  // a failure put a warning in the production error feed for every stale tab.
+  // The session died between asking who the user is and asking for their data.
+  // Hydration must still fail — pretending it succeeded would leave empty stores
+  // behind a signed-in interface — but it fails with a cause the caller can
+  // recognise, so an expired session is not reported as a malfunction.
   if (res.status === 401 || res.status === 403) {
-    logger.debug('Store hydration skipped: the session is no longer valid');
-    return;
+    throw new IdentityUnavailableError(`SESSION_EXPIRED (${res.status})`);
   }
 
   if (!res.ok) {

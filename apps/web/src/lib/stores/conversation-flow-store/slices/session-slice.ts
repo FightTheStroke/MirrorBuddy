@@ -22,6 +22,7 @@ import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
 import { getMaestroById } from '@/data/maestri';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/auth';
+import { IdentityUnavailableError } from '@/lib/auth/client-auth';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
 import { loadConversationSummariesFromDB } from '../persistence';
 import { createActiveCharacter, saveCurrentConversation, loadConversationMessages } from '../helpers';
@@ -245,6 +246,13 @@ export const createSessionSlice: StateCreator<
         count: Object.keys(conversationsByCharacter).length,
       });
     } catch (error) {
+      // An expired session simply means this load has no previous context; the
+      // child signs in again and it arrives then. Reporting it put a warning in
+      // the production error feed for every stale tab.
+      if (error instanceof IdentityUnavailableError) {
+        logger.debug('Conversation summaries skipped: the session is no longer valid');
+        return;
+      }
       // Non-critical: app works fine without previous conversation context
       logger.warn('Failed to load conversation summaries', {
         error: error instanceof Error ? error.message : String(error),

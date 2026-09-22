@@ -8,8 +8,10 @@
  * what the app already does. Meanwhile those two warnings sat in the production
  * error feed next to the faults that do need a human.
  *
- * A refused session is now quiet. A server that is genuinely broken — 500, or an
- * unreachable network — still speaks up, because that one nobody else will catch.
+ * Hydration still fails on a 401 — pretending otherwise would leave empty stores
+ * behind a signed-in interface — but it now fails with a cause the caller can
+ * recognise, so a stale tab is logged quietly instead of raising an alarm. A
+ * server that is genuinely broken still speaks up: that one nobody else catches.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -40,7 +42,7 @@ vi.mock('@/lib/accessibility', () => ({
   useAccessibilityStore: { getState: () => ({ loadFromDatabase: vi.fn() }) },
 }));
 
-import { setClientIdentity } from '@/lib/auth';
+import { setClientIdentity, IdentityUnavailableError } from '@/lib/auth';
 import { initializeStores } from '../use-store-sync';
 
 const SIGNED_IN = {
@@ -67,16 +69,22 @@ describe('Hydrating the stores for a session that has expired', () => {
     global.fetch = realFetch;
   });
 
-  it('accepts a refused session quietly instead of failing', async () => {
+  it('names an expired session as such, so the caller can stay quiet', async () => {
     global.fetch = respondWith(401) as unknown as typeof fetch;
 
-    await expect(initializeStores()).resolves.toBeUndefined();
+    await expect(initializeStores()).rejects.toBeInstanceOf(IdentityUnavailableError);
   });
 
   it('treats a forbidden session the same way', async () => {
     global.fetch = respondWith(403) as unknown as typeof fetch;
 
-    await expect(initializeStores()).resolves.toBeUndefined();
+    await expect(initializeStores()).rejects.toBeInstanceOf(IdentityUnavailableError);
+  });
+
+  it('keeps an ordinary server failure distinguishable from an expired session', async () => {
+    global.fetch = respondWith(503) as unknown as typeof fetch;
+
+    await expect(initializeStores()).rejects.not.toBeInstanceOf(IdentityUnavailableError);
   });
 
   it('still fails loudly when the server is broken', async () => {
@@ -98,13 +106,35 @@ describe('Loading previous conversation summaries for an expired session', () =>
     global.fetch = realFetch;
   });
 
-  it('returns no previous context instead of reporting a failure', async () => {
+  it('names an expired session as such rather than a load failure', async () => {
     global.fetch = respondWith(401) as unknown as typeof fetch;
     const { loadConversationSummariesFromDB } = await import(
       '../conversation-flow-store/persistence'
     );
 
-    await expect(loadConversationSummariesFromDB()).resolves.toEqual([]);
+    await expect(loadConversationSummariesFromDB()).rejects.toBeInstanceOf(
+      IdentityUnavailableError,
+    );
+  });
+
+  it('says nothing alarming when the store reacts to an expired session', async () => {
+    global.fetch = respondWith(401) as unknown as typeof fetch;
+    const { logger } = await import('@/lib/logger');
+    const { useConversationFlowStore } = await import('../conversation-flow-store');
+
+    await useConversationFlowStore.getState().loadFromServer();
+
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('still reports a genuinely broken conversations API', async () => {
+    global.fetch = respondWith(503) as unknown as typeof fetch;
+    const { logger } = await import('@/lib/logger');
+    const { useConversationFlowStore } = await import('../conversation-flow-store');
+
+    await useConversationFlowStore.getState().loadFromServer();
+
+    expect(logger.warn).toHaveBeenCalled();
   });
 
   it('still fails loudly when the conversations API is broken', async () => {
