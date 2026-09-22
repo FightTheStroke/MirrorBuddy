@@ -2,7 +2,8 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { logger } from '@/lib/logger';
 import type { collectServiceLimitsSamples } from '../service-limits-metrics';
-import type { prisma, dbPool } from '@/lib/db';
+import { policyTestDatabaseEnabled } from '@/test/policy-test-environment';
+import { createReadOnlyTestDatabase } from '@/test/readonly-test-database';
 
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -14,12 +15,11 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-describe.skipIf(!process.env.TEST_DATABASE_URL)(
+describe.runIf(policyTestDatabaseEnabled())(
   'Azure provider contract with read-only PostgreSQL',
   () => {
     let collect: typeof collectServiceLimitsSamples;
-    let database: typeof prisma;
-    let pool: typeof dbPool;
+    let owned: ReturnType<typeof createReadOnlyTestDatabase> | undefined;
     let helpers: typeof import('@/app/api/azure/costs/helpers');
     let limitsModule: typeof import('../azure-openai-limits');
     const labels = { instance: 'mirrorbuddy', env: 'production' };
@@ -28,13 +28,10 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
     let tpmStatus = 200;
 
     beforeAll(async () => {
-      for (const key of ['TEST_DATABASE_URL', 'DATABASE_URL', 'DEV_DATABASE_URL']) {
-        const url = new URL(process.env[key] ?? '');
-        expect(['localhost', '127.0.0.1']).toContain(url.hostname);
-        expect(url.pathname).toBe('/mirrorbuddy_test');
-        expect(url.searchParams.get('options')).toBe('-c default_transaction_read_only=on');
-      }
-      ({ prisma: database, dbPool: pool } = await import('@/lib/db'));
+      owned = createReadOnlyTestDatabase();
+      const database = owned.prisma;
+      // Bind production collectors to a real owned client, without faking queries or results.
+      vi.doMock('@/lib/db', () => ({ prisma: database, default: database }));
       expect(await database.$queryRaw`SHOW transaction_read_only`).toEqual([
         { transaction_read_only: 'on' },
       ]);
@@ -79,8 +76,11 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
       vi.unstubAllGlobals();
     });
     afterAll(async () => {
-      await database?.$disconnect();
-      if (pool && !pool.ended) await pool.end();
+      try {
+        await owned?.close();
+      } finally {
+        vi.doUnmock('@/lib/db');
+      }
     });
 
     async function collectAggregate() {

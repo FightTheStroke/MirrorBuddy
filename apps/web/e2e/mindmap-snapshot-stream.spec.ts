@@ -29,6 +29,7 @@ test.describe('database-backed mindmap stream', () => {
     const stream = await openMindmapStream(
       request,
       `${baseURL}/api/tools/stream?${new URLSearchParams(identity)}`,
+      baseURL,
     );
     try {
       expect(stream.status).toBe(200);
@@ -166,6 +167,7 @@ test.describe('database-backed mindmap stream', () => {
       const stream = await openMindmapStream(
         guest,
         `${baseURL}/api/tools/stream?${new URLSearchParams(identity)}`,
+        baseURL,
       );
       try {
         expect(stream.status).toBe(200);

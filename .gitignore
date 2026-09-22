@@ -71,6 +71,7 @@ prisma/dev.db-journal
 
 # E2E test auth state
 e2e/.auth/
+/apps/web/e2e/.auth/
 .zed/
 
 # Backend environment

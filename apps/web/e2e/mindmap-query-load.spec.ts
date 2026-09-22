@@ -53,7 +53,11 @@ test('counts isolated app PostgreSQL protocol executions with one and four activ
   for (const readers of [1, 4]) {
     const streams = await Promise.all(
       Array.from({ length: readers }, () =>
-        openMindmapStream(request, `${baseURL}/api/tools/stream?${new URLSearchParams(identity)}`),
+        openMindmapStream(
+          request,
+          `${baseURL}/api/tools/stream?${new URLSearchParams(identity)}`,
+          baseURL,
+        ),
       ),
     );
     try {

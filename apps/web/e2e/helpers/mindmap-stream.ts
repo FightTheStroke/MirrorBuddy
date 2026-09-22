@@ -1,21 +1,53 @@
 import type { APIRequestContext } from '@playwright/test';
 
-const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0', '::1', '[::1]']);
+/** Hosts the acceptance suite is allowed to stream from; the port comes from the caller. */
+const CANONICAL_HOSTS = ['localhost', '127.0.0.1'];
+/** The only route this helper is allowed to send the real session to. */
+const STREAM_ROUTE = '/api/tools/stream';
+
+function parseLocalOrigin(value: unknown, label: string): URL {
+  if (typeof value !== 'string' || value.length === 0)
+    throw new Error(`Mindmap acceptance requires an explicit ${label}`);
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error(`Mindmap acceptance received a malformed ${label}`);
+  }
+  if (parsed.protocol !== 'http:') throw new Error(`Mindmap acceptance requires an http ${label}`);
+  if (parsed.username !== '' || parsed.password !== '')
+    throw new Error(`Mindmap acceptance refuses credentials in the ${label}`);
+  if (!CANONICAL_HOSTS.includes(parsed.hostname))
+    throw new Error(`Mindmap acceptance requires an owned local host in the ${label}`);
+  return parsed;
+}
 
 /**
- * The guard exists so acceptance never streams against a deployed environment.
- * It pinned one port instead, which no runner but the author's used, so every
- * run outside that laptop failed on the guard rather than on the behaviour.
+ * Validate the stream target against the origin Playwright is configured with.
+ *
+ * The origin is never inferred from the url under test, and every rejection happens before
+ * any session cookie is read or any request is issued. Passing these checks proves the
+ * origin only; ownership of that server is established by the coordinator's private
+ * namespace and the real Playwright webServer.
  */
-export function assertLocalStreamTarget(url: string): void {
-  const { hostname } = new URL(url);
-  if (!LOOPBACK_HOSTS.has(hostname))
-    throw new Error(`Mindmap acceptance must run against the local test server, not ${hostname}`);
+function validateStreamTarget(url: string, expectedOrigin: unknown): void {
+  const expected = parseLocalOrigin(expectedOrigin, 'configured origin');
+  if (expected.href !== `${expected.origin}/` && expected.href !== expected.origin)
+    throw new Error('Mindmap acceptance requires a bare configured origin');
+  const target = parseLocalOrigin(url, 'stream target');
+  if (target.origin !== expected.origin)
+    throw new Error('Mindmap acceptance requires the configured local server origin');
+  if (target.pathname !== STREAM_ROUTE)
+    throw new Error(`Mindmap acceptance only streams from ${STREAM_ROUTE}`);
 }
 
 /** Real streaming HTTP client; no interception of auth, persistence or SSE. */
-export async function openMindmapStream(request: APIRequestContext, url: string) {
-  assertLocalStreamTarget(url);
+export async function openMindmapStream(
+  request: APIRequestContext,
+  url: string,
+  expectedOrigin: string | undefined,
+) {
+  validateStreamTarget(url, expectedOrigin);
   const state = await request.storageState();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
@@ -23,11 +55,16 @@ export async function openMindmapStream(request: APIRequestContext, url: string)
   try {
     response = await fetch(url, {
       headers: { cookie: state.cookies.map(({ name, value }) => `${name}=${value}`).join('; ') },
+      redirect: 'error',
       signal: controller.signal,
     });
   } catch (error) {
     clearTimeout(timer);
     throw error;
+  }
+  if (response.status >= 300 && response.status < 400) {
+    clearTimeout(timer);
+    throw new Error('Mindmap acceptance refuses to follow a redirect from the stream route');
   }
   const reader = response.body?.getReader();
   const decoder = new TextDecoder();

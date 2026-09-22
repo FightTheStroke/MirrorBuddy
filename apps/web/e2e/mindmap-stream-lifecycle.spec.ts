@@ -26,6 +26,7 @@ test('storage failure is explicit and cannot report a committed command or keep 
   const stream = await openMindmapStream(
     request,
     `${baseURL}/api/tools/stream?${new URLSearchParams(identity)}`,
+    baseURL,
   );
   try {
     expect(await stream.next()).toMatchObject({ event: 'mindmap:snapshot' });
@@ -75,7 +76,7 @@ test('ten HTTP open/cancel cycles and four independent readers recover the exact
   const durations: number[] = [];
   for (let cycle = 0; cycle < 10; cycle++) {
     const start = Date.now();
-    const stream = await openMindmapStream(request, url);
+    const stream = await openMindmapStream(request, url, baseURL);
     try {
       expect(await stream.next()).toEqual({ event: 'mindmap:snapshot', data: first });
     } finally {
@@ -84,7 +85,7 @@ test('ten HTTP open/cancel cycles and four independent readers recover the exact
     durations.push(Date.now() - start);
   }
   const streams = await Promise.all(
-    Array.from({ length: 4 }, () => openMindmapStream(request, url)),
+    Array.from({ length: 4 }, () => openMindmapStream(request, url, baseURL)),
   );
   const writer = await playwright.request.newContext({
     baseURL,
