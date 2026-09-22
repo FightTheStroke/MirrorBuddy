@@ -15,12 +15,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/lib/logger', () => ({
-  logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
-}));
-
-vi.mock('@/lib/auth/client-auth', () => ({
-  getUserIdFromCookie: vi.fn(() => 'user-1'),
-  getClientIdentity: vi.fn(() => ({ status: 'authenticated', userId: 'user-1' })),
+  logger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    child: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
+  },
 }));
 
 vi.mock('../settings-store', () => ({
@@ -39,7 +40,16 @@ vi.mock('@/lib/accessibility', () => ({
   useAccessibilityStore: { getState: () => ({ loadFromDatabase: vi.fn() }) },
 }));
 
+import { setClientIdentity } from '@/lib/auth';
 import { initializeStores } from '../use-store-sync';
+
+const SIGNED_IN = {
+  status: 'authenticated',
+  userId: 'user-1',
+  role: 'USER',
+  legacyOrigin: false,
+  needsLegacyUpgrade: false,
+} as const;
 
 function respondWith(status: number) {
   return vi.fn(async () => new Response(status === 200 ? '{}' : '', { status }));
@@ -50,6 +60,7 @@ describe('Hydrating the stores for a session that has expired', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    setClientIdentity(SIGNED_IN);
   });
 
   afterEach(() => {
@@ -80,6 +91,7 @@ describe('Loading previous conversation summaries for an expired session', () =>
 
   beforeEach(() => {
     vi.clearAllMocks();
+    setClientIdentity(SIGNED_IN);
   });
 
   afterEach(() => {
