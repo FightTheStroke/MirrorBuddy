@@ -75,6 +75,53 @@ export function standalonePaths(input) {
   };
 }
 
+/** Path of the compiled server instrumentation module, relative to a `.next` directory. */
+const INSTRUMENTATION_MODULE = 'server/instrumentation.js';
+
+function manifestFiles(build) {
+  const path = join(build, 'required-server-files.json');
+  file(path);
+  let manifest;
+  try {
+    manifest = JSON.parse(readFileSync(path, 'utf8'));
+  } catch {
+    throw new Error('required-server-files.json must contain valid JSON');
+  }
+  if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
+    throw new Error('required-server-files.json must contain a manifest object');
+  }
+  if (
+    !Array.isArray(manifest.files) ||
+    !manifest.files.every((entry) => typeof entry === 'string' && entry.length > 0)
+  ) {
+    throw new Error('required-server-files.json must list its files as non-empty strings');
+  }
+  return manifest.files;
+}
+
+/**
+ * A build that compiled the server instrumentation module must also declare it in
+ * required-server-files.json and carry it in the served tree. The framework drives both
+ * from one detection flag, so a compiled-but-undeclared module ships a standalone package
+ * that starts without instrumentation and reports nothing. Manifest entries resolve from
+ * the application root, and the comparison is exact: no basename or substring match.
+ * A build that compiled no module is left alone.
+ */
+function instrumentation(paths) {
+  const canonical = join(paths.build, INSTRUMENTATION_MODULE);
+  if (!existing(canonical)) return;
+  file(canonical);
+  const appRoot = join(paths.root, 'apps/web');
+  if (!manifestFiles(paths.build).some((entry) => resolve(appRoot, entry) === canonical)) {
+    throw new Error('Compiled instrumentation must be declared in required-server-files.json');
+  }
+  const served = join(paths.app, '.next', INSTRUMENTATION_MODULE);
+  if (!existing(served)) {
+    throw new Error('Compiled instrumentation must be present in the standalone server tree');
+  }
+  file(served);
+}
+
 function inventory(root, writable = false) {
   const directories = [];
   const files = [];
@@ -123,6 +170,7 @@ function copyAsset(source, destination) {
  */
 export function prepareStandalone(root) {
   const paths = standalonePaths(root);
+  instrumentation(paths);
   const plans = paths.assets.map(({ source, destination }) => {
     const entries = inventory(source);
     if (existing(destination)) inventory(destination, true);

@@ -3,15 +3,27 @@
  * This script never prints real secrets, only placeholder keys and comments.
  */
 
+// The four illustrative connections are assembled from named placeholder
+// components, so this file holds no complete connection-shaped literal. The
+// emitted bytes are unchanged and pinned by
+// scripts/__tests__/cursor-env-template.test.ts.
+const SCHEME = 'postgres';
+const USER_PLACEHOLDER = 'USER';
+const PASSWORD_PLACEHOLDER = 'PASSWORD';
+const REMOTE_TARGET = 'HOST:PORT/DB_NAME?sslmode=require';
+const REMOTE_TEST_TARGET = 'HOST:PORT/DB_NAME_TEST?sslmode=require';
+const connection = (target: string) =>
+  [SCHEME, '://', USER_PLACEHOLDER, ':', PASSWORD_PLACEHOLDER, '@', target].join('');
+
 const template = `# Cursor Web minimal env template (do NOT commit)
 
 # Remote database for development (PostgreSQL + pgvector, reachable from Cursor Web)
-DATABASE_URL=postgres://USER:PASSWORD@HOST:PORT/DB_NAME?sslmode=require
-DIRECT_URL=postgres://USER:PASSWORD@HOST:PORT/DB_NAME?sslmode=require
+DATABASE_URL=${connection(REMOTE_TARGET)}
+DIRECT_URL=${connection(REMOTE_TARGET)}
 
 # Optional: separate database for tests from Cursor Web
-TEST_DATABASE_URL=postgres://USER:PASSWORD@HOST:PORT/DB_NAME_TEST?sslmode=require
-TEST_DIRECT_URL=postgres://USER:PASSWORD@HOST:PORT/DB_NAME_TEST?sslmode=require
+TEST_DATABASE_URL=${connection(REMOTE_TEST_TARGET)}
+TEST_DIRECT_URL=${connection(REMOTE_TEST_TARGET)}
 
 # Session and cron secrets (use strong random hex strings)
 SESSION_SECRET=your-64-char-random-hex

@@ -3,6 +3,7 @@ import path from 'path';
 import { config } from 'dotenv';
 import { isSupabaseUrl } from './src/lib/utils/url-validation';
 import { E2E_SESSION_SECRET } from './e2e/helpers/session-token-factory';
+import { resolveE2EServerMode } from './src/test/e2e-server-mode';
 
 // Load .env file for TEST_DATABASE_URL
 config();
@@ -64,9 +65,10 @@ const finalTestDb = testDatabaseUrl || 'postgresql://roberdan@localhost:5432/mir
 // Dynamic port for parallel agent isolation (separate worktrees use different ports)
 const appPort = process.env.MIRRORBUDDY_PORT || '3000';
 const appBaseURL = `http://localhost:${appPort}`;
-const webServerCommand = process.env.CI
-  ? 'node .next/standalone/apps/web/server.js'
-  : 'npm run dev';
+// Which server is served is decided by E2E_SERVER_MODE alone; when it is unset the
+// previous CI behaviour is reproduced exactly. Project selection, workers, retries
+// and timeouts below still follow CI and are deliberately left untouched.
+const serverSelection = resolveE2EServerMode(process.env);
 
 // Configure screenshot comparison settings
 export const screenshotComparisonOptions = {
@@ -338,7 +340,7 @@ export default defineConfig({
     // Use the pre-built standalone server in CI, dev server locally.
     // Playwright runs this from apps/web, so `npm run start` would resolve to
     // apps/web/package.json (`next start`) instead of the root standalone script.
-    command: webServerCommand,
+    command: serverSelection.command,
     cwd: __dirname,
     url: appBaseURL,
     // Avoid reusing a manually-started dev server. The E2E webServer env overrides
@@ -360,7 +362,7 @@ export default defineConfig({
       // Next.js dev server expects NODE_ENV=development.
       // Setting NODE_ENV=test can break Next internals (e.g. missing .next/dev artifacts),
       // while E2E_TESTS already gates test-only behavior in the app.
-      NODE_ENV: process.env.CI ? 'production' : 'development',
+      NODE_ENV: serverSelection.nodeEnv,
       // Session secret for cookie signing - MUST match global-setup.ts E2E_SESSION_SECRET
       // Always use test secret for E2E to ensure cookie signatures match
       SESSION_SECRET: E2E_SESSION_SECRET,

@@ -123,6 +123,8 @@ function validateCriticalEnvVars(): void {
 
 function validateOptionalEnvVars(): void {
   const optional = [
+    // E2E - optional server selection, unset means the previous CI behaviour
+    { name: 'E2E_SERVER_MODE', category: 'Testing' },
     // Observability
     // Runtime-provided; health checks use OS memory when unavailable (see SETUP.md).
     { name: 'AWS_LAMBDA_FUNCTION_MEMORY_SIZE', category: 'Observability' },

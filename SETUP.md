@@ -7,6 +7,7 @@
 - **Node.js 24.x** (root `engines.node`; Docker and CI use Node 24)
 - **pnpm 10.33.0** (pinned in root `package.json`)
 - **PostgreSQL 17** with pgvector extension (or Supabase)
+- **ripgrep (`rg`) built with PCRE2** (`brew install ripgrep`) — required by the pre-commit secrets scan, which fails closed when it is missing
 
 Tooling execution evidence uses Node 24.19.0 and pnpm 10.33.0.
 
@@ -48,6 +49,16 @@ by the dev server (normally http://localhost:3000).
   **optional root `.env`**, with an already-set environment value taking
   precedence, and uses **`DATABASE_URL` directly**. It does **not** run Prisma CLI
   configuration or apply its `DEV_DATABASE_URL` / `DIRECT_URL` overrides.
+- **Migration sync:** `scripts/sync-databases.sh` runs two phases. The first
+  applies migrations to the ambient production target — `DIRECT_URL`, else
+  `DATABASE_URL` — with `DEV_DATABASE_URL` masked to an empty value for that
+  child only, so the required local override cannot redirect it. The second
+  applies them to the validated `DEV_DATABASE_URL` target, which must be an
+  explicit **loopback** `postgres://` /
+  `postgresql://` database, without a host-overriding connection parameter, and
+  refuses to start otherwise — the check runs before the production phase.
+  Set `DEV_DATABASE_URL` in the process environment before running this script;
+  its preflight does not load `.env`.
 
 Root `.env` may point to a shared or production Supabase instance, including after
 a vault restore. Before any write, explicitly select and confirm the intended
@@ -278,6 +289,16 @@ SENTRY_AUTH_TOKEN=            # Sentry release management
 GRAFANA_CLOUD_TOKEN=          # Grafana Cloud metrics push
 ```
 
+### Auditing environment variables
+
+`./scripts/env-var-audit.sh` checks application, package source, scripts (including
+shell scripts), E2E and Prisma source references against `.env.example` and the
+production policy registry or validator declarations. It parses declaration
+syntax without executing the validator; comments and ordinary strings do not
+declare variables. Undocumented names remain warnings with exit 0. Missing
+source roots, documentation, reader dependencies or failed searches exit 2.
+A valid checkout with no references exits 0 and explicitly reports the empty scan.
+
 ### Backup & Restore
 
 The `.env` file is NOT tracked in git. It is backed up to **Azure Key Vault** (`kv-virtualbpm-prod`) and synced to **GitHub Secrets** and **Vercel**.
@@ -401,6 +422,21 @@ npm run lint         # Run ESLint
 npm run typecheck    # Run TypeScript
 npm run test         # Run Playwright E2E tests
 ```
+
+### Which server the E2E tests run against
+
+By default `npm run test` serves the **development** server locally and the **built
+standalone** server in CI. Set `E2E_SERVER_MODE` to choose explicitly:
+
+```bash
+E2E_SERVER_MODE=production npm run test   # serve the built standalone server
+E2E_SERVER_MODE=development npm run test  # serve the dev server
+```
+
+Requires a completed production build (`npm run build`) for `production`. The value must be
+exactly `production` or `development`; anything else fails immediately rather than falling
+back silently. It affects only the served server and its own `NODE_ENV` — project
+selection, workers, retries and timeouts are unchanged.
 
 ---
 
