@@ -207,19 +207,38 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
           deps.setListening(false);
           break;
 
-        case 'conversation.item.input_audio_transcription.completed':
-          if (event.transcript && typeof event.transcript === 'string') {
+        case 'conversation.item.input_audio_transcription.completed': {
+          const rawTranscript = event.transcript;
+          const spokenWords = typeof rawTranscript === 'string' ? rawTranscript.trim() : null;
+
+          if (typeof rawTranscript !== 'string') {
+            // The field is absent or not text: the protocol changed under us and
+            // a child's words may be going unheard. That deserves an alarm.
+            logger.warn('[VoiceSession] User transcription completed but no transcript', {
+              event: JSON.stringify(event).slice(0, 200),
+            });
+            break;
+          }
+
+          if (!spokenWords) {
+            // Silence or room noise. Azure closes every listening turn this way,
+            // so this is ordinary conversation, not a fault to be alarmed about.
+            logger.debug('[VoiceSession] Listening turn closed with no speech', {
+              sessionId: deps.sessionIdRef.current,
+            });
+            break;
+          }
+
+          {
+            const transcript = rawTranscript;
             logger.info('[VoiceSession] User transcript received', {
-              transcript: event.transcript.substring(0, 100),
+              transcript: transcript.substring(0, 100),
             });
 
             // A child in an imposed silence who asks to leave must be obeyed
             // at once. Sitting through a session you have asked to end is the
             // opposite of what a meditation is for.
-            if (
-              (currentMeditation() || meditationIsArmed()) &&
-              isStopIntent(event.transcript)
-            ) {
+            if ((currentMeditation() || meditationIsArmed()) && isStopIntent(transcript)) {
               logger.info('[VoiceSession] Meditation ended by the student');
               stopBrowserMeditation();
             }
@@ -228,7 +247,7 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
             // Check is guarded by voice_transcript_safety feature flag
             const safetyResult = checkUserTranscript(
               deps.sessionIdRef.current || 'unknown',
-              event.transcript,
+              transcript,
             );
 
             if (safetyResult.actionTaken !== 'allow') {
@@ -254,14 +273,11 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
 
             // The user's own words are surfaced regardless — the redirect above
             // handles the assistant's response. Behaviour for 'allow' is unchanged.
-            deps.addTranscript('user', event.transcript);
-            deps.options.onTranscript?.('user', event.transcript);
-          } else {
-            logger.warn('[VoiceSession] User transcription completed but no transcript', {
-              event: JSON.stringify(event).slice(0, 200),
-            });
+            deps.addTranscript('user', transcript);
+            deps.options.onTranscript?.('user', transcript);
           }
           break;
+        }
 
         // AUDIO OUTPUT EVENTS - WebRTC receives audio via ontrack event, not delta events
         case 'response.output_audio.delta':
