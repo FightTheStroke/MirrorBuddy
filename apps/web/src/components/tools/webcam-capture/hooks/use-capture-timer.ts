@@ -1,63 +1,57 @@
-/**
- * @file use-capture-timer.ts
- * @brief Hook for capture timer and countdown logic
- */
-
-import { useState, useCallback, useEffect } from "react";
-import type { TimerOption } from "../constants";
+import { useState, useCallback, useEffect, useRef } from 'react';
+import type { TimerOption } from '../constants';
 
 interface UseCaptureTimerProps {
   showTimer: boolean;
   onCaptureComplete: () => void;
 }
 
-export function useCaptureTimer({
-  showTimer,
-  onCaptureComplete,
-}: UseCaptureTimerProps) {
-  const [selectedTimer, setSelectedTimer] = useState<TimerOption>(
-    showTimer ? 3 : 0,
-  );
+export function useCaptureTimer({ showTimer, onCaptureComplete }: UseCaptureTimerProps) {
+  const [selectedTimer, setSelectedTimer] = useState<TimerOption>(showTimer ? 3 : 0);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [showFlash, setShowFlash] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(false);
+  const captureRef = useRef(onCaptureComplete);
+  useEffect(() => {
+    captureRef.current = onCaptureComplete;
+  }, [onCaptureComplete]);
+  const clearTimer = useCallback(() => {
+    if (timerRef.current !== null) clearTimeout(timerRef.current);
+    timerRef.current = null;
+  }, []);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      clearTimer();
+    };
+  }, [clearTimer]);
 
   const handleCapture = useCallback(() => {
-    if (selectedTimer > 0) {
-      setCountdown(selectedTimer);
-    } else {
-      setShowFlash(true);
-      setTimeout(() => {
-        setShowFlash(false);
-        onCaptureComplete();
-      }, 150);
-    }
-  }, [selectedTimer, onCaptureComplete]);
+    if (!mountedRef.current || timerRef.current !== null) return;
+    const step = (remaining: number) => {
+      if (remaining > 0) {
+        setCountdown(remaining);
+        timerRef.current = setTimeout(() => step(remaining - 1), 1000);
+      } else {
+        setCountdown(null);
+        setShowFlash(true);
+        timerRef.current = setTimeout(() => {
+          timerRef.current = null;
+          setShowFlash(false);
+          captureRef.current();
+        }, 150);
+      }
+    };
+    step(selectedTimer);
+  }, [selectedTimer]);
 
   const handleCancelCountdown = useCallback(() => {
+    clearTimer();
     setCountdown(null);
-  }, []);
-
-  // Countdown timer effect
-  useEffect(() => {
-    if (countdown === null) return;
-
-    if (countdown === 0) {
-      setShowFlash(true);
-      setTimeout(() => {
-        setShowFlash(false);
-        onCaptureComplete();
-      }, 150);
-      setCountdown(null);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setCountdown(countdown - 1);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countdown]);
+    setShowFlash(false);
+  }, [clearTimer]);
 
   return {
     selectedTimer,

@@ -1,68 +1,55 @@
-"use client";
+'use client';
 
 /**
  * Thumbnail Preview Component
  * Generates visual previews for different material types (Issue #37)
  */
 
-import { useTranslations } from "next-intl";
-import { Play, FileText } from "lucide-react";
-import { TOOL_ICONS } from "./constants";
-import type { ArchiveItem } from "./types";
+import { useTranslations } from 'next-intl';
+import { Play, FileText } from 'lucide-react';
+import { TOOL_ICONS } from './constants';
+import type { ArchiveItem } from './types';
+import { getPhotoUrl } from '@/lib/tools/photo-content';
 
 interface ThumbnailPreviewProps {
   item: ArchiveItem;
 }
 
 export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
-  const t = useTranslations("education.thumbnailPreview");
+  const t = useTranslations('education.thumbnailPreview');
   const Icon = TOOL_ICONS[item.toolType];
   const content = item.content;
 
   // Webcam photos - show actual image
-  if (
-    item.toolType === "webcam" &&
-    typeof content === "object" &&
-    "imageData" in content
-  ) {
+  const photoUrl = item.toolType === 'webcam' ? getPhotoUrl(content) : undefined;
+  if (photoUrl) {
     return (
       <div className="w-full h-24 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
         {/* eslint-disable-next-line @next/next/no-img-element -- User-captured data URL */}
-        <img
-          src={(content as { imageData: string }).imageData}
-          alt={t("webcamAlt")}
-          className="w-full h-full object-cover"
-        />
+        <img src={photoUrl} alt={t('webcamAlt')} className="w-full h-full object-cover" />
       </div>
     );
   }
 
   // Homework - show photo thumbnail with overlay
-  if (
-    item.toolType === "homework" &&
-    typeof content === "object" &&
-    "photoUrl" in content
-  ) {
+  if (item.toolType === 'homework' && typeof content === 'object' && 'photoUrl' in content) {
     const homeworkContent = content as {
       photoUrl: string;
       steps?: Array<{ completed: boolean }>;
     };
-    const completedSteps =
-      homeworkContent.steps?.filter((s) => s.completed).length ?? 0;
+    const completedSteps = homeworkContent.steps?.filter((s) => s.completed).length ?? 0;
     const totalSteps = homeworkContent.steps?.length ?? 0;
     return (
       <div className="relative w-full h-24 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
         {/* eslint-disable-next-line @next/next/no-img-element -- User-uploaded base64 */}
         <img
           src={homeworkContent.photoUrl}
-          alt={t("homeworkAlt")}
+          alt={t('homeworkAlt')}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-1 left-2 right-2 flex items-center justify-between">
-          <span className="text-[10px] text-white font-medium">
-            {t("homeworkLabel")}
-          </span>
+          <span className="text-[10px] text-white font-medium">{t('homeworkLabel')}</span>
           {totalSteps > 0 && (
             <span className="text-[10px] text-white/80">
               {completedSteps}/{totalSteps}
@@ -74,14 +61,10 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
   }
 
   // Mindmaps - show structured preview
-  if (
-    item.toolType === "mindmap" &&
-    typeof content === "object" &&
-    "markdown" in content
-  ) {
+  if (item.toolType === 'mindmap' && typeof content === 'object' && 'markdown' in content) {
     const markdown = (content as { markdown: string }).markdown;
     const lines = markdown
-      .split("\n")
+      .split('\n')
       .filter((l) => l.trim())
       .slice(0, 4);
     return (
@@ -98,11 +81,7 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
   }
 
   // Quiz - show question count
-  if (
-    item.toolType === "quiz" &&
-    typeof content === "object" &&
-    "questions" in content
-  ) {
+  if (item.toolType === 'quiz' && typeof content === 'object' && 'questions' in content) {
     const questions = (content as { questions: unknown[] }).questions;
     return (
       <div className="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 flex items-center justify-center">
@@ -111,7 +90,7 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
             {questions.length}
           </div>
           <div className="text-xs text-green-600/70 dark:text-green-400/70">
-            {t("questionsLabel")}
+            {t('questionsLabel')}
           </div>
         </div>
       </div>
@@ -119,11 +98,7 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
   }
 
   // Flashcards - show card count
-  if (
-    item.toolType === "flashcard" &&
-    typeof content === "object" &&
-    "cards" in content
-  ) {
+  if (item.toolType === 'flashcard' && typeof content === 'object' && 'cards' in content) {
     const cards = (content as { cards: unknown[] }).cards;
     return (
       <div className="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-900/30 dark:to-violet-900/30 flex items-center justify-center">
@@ -132,7 +107,7 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
             {cards.length}
           </div>
           <div className="text-xs text-purple-600/70 dark:text-purple-400/70">
-            {t("flashcardLabel")}
+            {t('flashcardLabel')}
           </div>
         </div>
       </div>
@@ -140,21 +115,19 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
   }
 
   // Demo - show interactive badge
-  if (item.toolType === "demo") {
+  if (item.toolType === 'demo') {
     return (
       <div className="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 flex items-center justify-center">
         <div className="text-center">
           <Play className="w-8 h-8 text-orange-500 mx-auto mb-1" />
-          <div className="text-xs text-orange-600/70 dark:text-orange-400/70">
-            {t("demoLabel")}
-          </div>
+          <div className="text-xs text-orange-600/70 dark:text-orange-400/70">{t('demoLabel')}</div>
         </div>
       </div>
     );
   }
 
   // PDF - show document icon
-  if (item.toolType === "pdf") {
+  if (item.toolType === 'pdf') {
     return (
       <div className="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 flex items-center justify-center">
         <FileText className="w-10 h-10 text-red-400" />

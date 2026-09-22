@@ -1,29 +1,21 @@
 'use client';
 
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useEffect, useRef } from 'react';
 import { Pencil, PencilRuler, FolderUp, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useRouter, useParams } from 'next/navigation';
-import { nanoid } from 'nanoid';
-import { toast } from '@/components/ui/toast';
-import { clientLogger as logger } from '@/lib/logger/client';
 import { ToolCard } from './tool-card';
 import { AstuccioInfoSection } from './astuccio-info-section';
 import { ToolMaestroSelectionDialog } from '@/components/education/tool-maestro-selection-dialog';
 import { StudyKitView } from '@/components/study-kit/StudyKitView';
 import { TypingView } from '@/components/typing/TypingView';
-import { WebcamCapture } from '@/components/tools/webcam-capture';
-import { forceSaveMaterial } from '@/lib/hooks/use-saved-materials';
+import { AstuccioWebcamCapture } from './astuccio-webcam-capture';
 import type { ToolType } from '@/types/tools';
 import type { Maestro } from '@/types';
 import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/ui/page-header';
 import { TOOL_CATEGORIES, getToolsByCategory, toolRequiresMaestro } from '@/lib/tools/constants';
-
-// ============================================================================
-// STATE MANAGEMENT - Unified with useReducer
-// ============================================================================
 
 type DialogState = 'closed' | 'selecting_maestro' | 'study_kit' | 'typing' | 'webcam_standalone';
 
@@ -71,10 +63,6 @@ function astuccioReducer(state: AstuccioState, action: AstuccioAction): Astuccio
   }
 }
 
-// ============================================================================
-// ANIMATION VARIANTS
-// ============================================================================
-
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -89,19 +77,11 @@ const categoryVariants = {
   },
 };
 
-// ============================================================================
-// CATEGORY ICONS
-// ============================================================================
-
 const CATEGORY_ICONS = {
   upload: FolderUp,
   create: Pencil,
   search: Globe,
 } as const;
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 interface AstuccioViewProps {
   onToolRequest?: (toolType: ToolType, maestro: Maestro) => void;
@@ -114,6 +94,13 @@ export function AstuccioView({ onToolRequest: _onToolRequest }: AstuccioViewProp
   const params = useParams();
   const locale = params.locale as string;
   const [state, dispatch] = useReducer(astuccioReducer, initialState);
+  const webcamEntry = useRef<HTMLButtonElement>(null);
+  const returnToWebcam = useRef(false);
+  useEffect(() => {
+    if (state.dialogState !== 'closed' || !returnToWebcam.current) return;
+    returnToWebcam.current = false;
+    if (webcamEntry.current?.isConnected) webcamEntry.current.focus();
+  }, [state.dialogState]);
 
   const getToolI18nKey = useCallback((toolType: ToolType) => {
     // Tool i18n keys are camelCase in messages (ADR 0091).
@@ -122,6 +109,7 @@ export function AstuccioView({ onToolRequest: _onToolRequest }: AstuccioViewProp
   }, []);
 
   const handleToolClick = useCallback((toolType: ToolType) => {
+    returnToWebcam.current = toolType === 'webcam-standalone';
     // Standalone tools have their own flow (no maestro selection)
     if (!toolRequiresMaestro(toolType)) {
       dispatch({ type: 'OPEN_STANDALONE_TOOL', toolType });
@@ -147,40 +135,6 @@ export function AstuccioView({ onToolRequest: _onToolRequest }: AstuccioViewProp
   const handleDialogClose = useCallback(() => {
     dispatch({ type: 'CLOSE_DIALOG' });
   }, []);
-
-  const handleWebcamCapture = useCallback(
-    async (imageBase64: string) => {
-      try {
-        const toolId = nanoid();
-        const timestamp = new Date().toISOString();
-        const title = t('webcamStandalone.savedTitle', {
-          date: new Date().toLocaleDateString(),
-        });
-
-        const content = {
-          imageBase64,
-          extractedText: '',
-          imageDescription: '',
-          analysisTimestamp: timestamp,
-        };
-
-        const success = await forceSaveMaterial('webcam', title, content, {
-          toolId,
-        });
-
-        if (success) {
-          toast.success(t('webcamStandalone.saveSuccess'));
-          dispatch({ type: 'CLOSE_DIALOG' });
-        } else {
-          toast.error(t('webcamStandalone.saveError'));
-        }
-      } catch (error) {
-        logger.error('Error saving webcam capture', undefined, error);
-        toast.error(t('webcamStandalone.saveError'));
-      }
-    },
-    [t],
-  );
 
   // Show Study Kit view if selected
   if (state.dialogState === 'study_kit') {
@@ -212,17 +166,8 @@ export function AstuccioView({ onToolRequest: _onToolRequest }: AstuccioViewProp
     );
   }
 
-  // Show WebcamCapture if webcam-standalone is selected
   if (state.dialogState === 'webcam_standalone') {
-    return (
-      <WebcamCapture
-        purpose={t('webcamStandalone.purpose')}
-        instructions={t('webcamStandalone.instructions')}
-        onCapture={handleWebcamCapture}
-        onClose={handleDialogClose}
-        showTimer={true}
-      />
-    );
+    return <AstuccioWebcamCapture onClose={handleDialogClose} />;
   }
 
   return (
@@ -277,6 +222,7 @@ export function AstuccioView({ onToolRequest: _onToolRequest }: AstuccioViewProp
                     transition={{ delay: index * 0.05 }}
                   >
                     <ToolCard
+                      ref={tool.type === 'webcam-standalone' ? webcamEntry : undefined}
                       title={tTools(`${getToolI18nKey(tool.type)}.label`)}
                       description={tTools(`${getToolI18nKey(tool.type)}.description`)}
                       icon={tool.icon}

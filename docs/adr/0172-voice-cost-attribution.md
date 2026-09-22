@@ -42,8 +42,16 @@ Three constraints follow from the feature being about accuracy:
    twice. The result is clamped so cache can never credit money back.
 
 **Recording is best-effort and never blocks the conversation.** A failed write
-is logged and dropped. For a child mid-sentence, an accounting gap is a far
-better outcome than a stall.
+is reported as a failure, not acknowledged as stored. The browser coalesces
+response events in a bounded 256-entry history and only marks a report recorded
+after a successful API acknowledgement. A repeated terminal event can retry a
+failed report; this is not a durable offline queue or automatic delivery guarantee.
+For a child mid-sentence, an accounting gap is a far better outcome than a stall.
+
+Reports carrying a response identifier use a deterministic database key scoped
+to the authenticated user, session and response. Identical retries return the
+stored result; conflicting payloads return HTTP 409. Legacy reports without a
+response identifier remain accepted but cannot provide this deduplication.
 
 **The admin console and the CLI call the same functions.** A dashboard and a
 script that disagree about the bill are worse than either on its own. This

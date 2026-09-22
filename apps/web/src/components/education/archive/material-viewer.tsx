@@ -14,6 +14,7 @@ import { motion } from 'framer-motion';
 import { X, FileText, ExternalLink, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PrintButton } from '@/components/zaino/print-button';
+import { getPhotoUrl } from '@/lib/tools/photo-content';
 import { TOOL_ICONS, TOOL_LABELS } from './constants';
 import { formatDate } from './utils';
 import type { ArchiveItem } from './types';
@@ -72,12 +73,13 @@ export function MaterialViewer({ item, onClose, onNavigate }: MaterialViewerProp
     }
 
     // Image content (webcam captures) - handle specially for base64 data
-    if (item.toolType === 'webcam' && typeof content === 'object' && 'imageData' in content) {
+    const photoUrl = item.toolType === 'webcam' ? getPhotoUrl(content) : undefined;
+    if (photoUrl) {
       return (
         <div className="flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element -- User-captured data URL */}
           <img
-            src={(content as { imageData: string }).imageData}
+            src={photoUrl}
             alt={item.title || 'Foto catturata'}
             className="max-w-full max-h-[60vh] rounded-lg shadow-lg"
           />

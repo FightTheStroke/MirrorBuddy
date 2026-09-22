@@ -38,7 +38,10 @@ export interface VideoConstraints {
  * Request video stream (camera preview)
  * Uses standard getUserMedia API on all platforms
  */
-export async function requestVideoStream(constraints?: VideoConstraints): Promise<MediaStream> {
+export async function requestVideoStream(
+  constraints?: VideoConstraints,
+  errorOwner: 'bridge' | 'caller' = 'bridge',
+): Promise<MediaStream> {
   try {
     if (!isMediaDevicesAvailable()) {
       throw new DOMException('Camera API unavailable', 'NotSupportedError');
@@ -55,7 +58,7 @@ export async function requestVideoStream(constraints?: VideoConstraints): Promis
     });
     return stream;
   } catch (error) {
-    reportStreamFailure('[MediaBridge] Video stream error', error);
+    if (errorOwner !== 'caller') reportStreamFailure('[MediaBridge] Video stream error', error);
     throw error;
   }
 }

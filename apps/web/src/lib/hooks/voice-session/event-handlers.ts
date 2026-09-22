@@ -1,32 +1,19 @@
-// ============================================================================
-// EVENT HANDLERS
-// Core Azure Realtime API event handling (WebRTC only)
-// ============================================================================
-
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
 import {
-  currentSession as currentMeditation,
-  meditationIsArmed,
   openingFinished,
   responseStarted as meditationResponseStarted,
-  stopBrowserMeditation,
 } from '@/lib/meditation/browser';
-import { isStopIntent } from '@/lib/meditation/stop-intent';
-import {
-  modelFromResponseDone,
-  reportVoiceUsage,
-  usageFromResponseDone,
-} from './voice-usage-reporter';
+import { createVoiceUsageTracker } from './voice-usage-tracker';
 import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
 import { recordUserSpeechEnd } from './latency-utils';
 import { handleErrorEvent } from './error-handler';
 import { computeVoiceTimingDurations } from './voice-timing';
-import { checkUserTranscript, checkAssistantTranscript } from './transcript-safety';
-import { triggerSafetyIntervention, type SafetyWarningState } from './safety-intervention';
+import type { SafetyWarningState } from './safety-intervention';
 import type { AudioChunkQueue } from './audio-queue';
+import { createTranscriptHandler } from './event-transcripts';
 
 export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   hasActiveResponseRef: React.MutableRefObject<boolean>;
@@ -59,13 +46,7 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   startAudioCapture: () => Promise<void>;
 }
 
-/**
- * Stop any playing/queued assistant audio immediately, regardless of
- * data-channel state. Used as the `pauseAudio` fallback for
- * triggerSafetyIntervention (issue #469): when the channel is closed,
- * response.cancel can't reach the model, but local/remote audio already in
- * flight must still stop.
- */
+// A closed data channel cannot deliver response.cancel; stop in-flight audio locally.
 function pauseVoiceAudio(deps: EventHandlerDeps): void {
   deps.webrtcAudioElementRef.current?.pause();
   deps.audioQueueRef.current.clear();
@@ -82,12 +63,23 @@ function pauseVoiceAudio(deps: EventHandlerDeps): void {
   deps.setSpeaking(false);
 }
 
-/**
- * Main server event handler for Azure Realtime API events (WebRTC)
- */
 export function useHandleServerEvent(deps: EventHandlerDeps) {
+  const usageTracker = useRef(createVoiceUsageTracker());
+  const transcripts = useRef(createTranscriptHandler());
   return useCallback(
-    (event: Record<string, unknown>) => {
+    (event: Record<string, unknown> | null | undefined) => {
+      if (!event || typeof event !== 'object') {
+        logger.warn('[VoiceSession] Invalid server event');
+        return;
+      }
+      if (transcripts.current(event, deps, () => pauseVoiceAudio(deps))) return;
+      if (
+        !usageTracker.current.accept(event, {
+          sessionId: deps.sessionIdRef.current,
+          maestroId: deps.maestroRef.current?.id,
+        })
+      )
+        return;
       const eventType = event.type as string;
       logger.debug(`[VoiceSession] >>> handleServerEvent called with type: ${eventType}`);
 
@@ -207,78 +199,6 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
           deps.setListening(false);
           break;
 
-        case 'conversation.item.input_audio_transcription.completed': {
-          const rawTranscript = event.transcript;
-          const spokenWords = typeof rawTranscript === 'string' ? rawTranscript.trim() : null;
-
-          if (typeof rawTranscript !== 'string') {
-            // The field is absent or not text: the protocol changed under us and
-            // a child's words may be going unheard. That deserves an alarm.
-            logger.warn('[VoiceSession] User transcription completed but no transcript', {
-              event: JSON.stringify(event).slice(0, 200),
-            });
-            break;
-          }
-
-          if (!spokenWords) {
-            // Silence or room noise. Azure closes every listening turn this way,
-            // so this is ordinary conversation, not a fault to be alarmed about.
-            logger.debug('[VoiceSession] Listening turn closed with no speech', {
-              sessionId: deps.sessionIdRef.current,
-            });
-            break;
-          }
-
-          {
-            const transcript = rawTranscript;
-            logger.info('[VoiceSession] User transcript received', {
-              transcript: transcript.substring(0, 100),
-            });
-
-            // A child in an imposed silence who asks to leave must be obeyed
-            // at once. Sitting through a session you have asked to end is the
-            // opposite of what a meditation is for.
-            if ((currentMeditation() || meditationIsArmed()) && isStopIntent(transcript)) {
-              logger.info('[VoiceSession] Meditation ended by the student');
-              stopBrowserMeditation();
-            }
-
-            // T2-04: Run transcript safety check (VCE-002 checkpoint)
-            // Check is guarded by voice_transcript_safety feature flag
-            const safetyResult = checkUserTranscript(
-              deps.sessionIdRef.current || 'unknown',
-              transcript,
-            );
-
-            if (safetyResult.actionTaken !== 'allow') {
-              logger.warn('[VoiceSession] Transcript safety check flagged content', {
-                sessionId: deps.sessionIdRef.current,
-                severity: safetyResult.severity,
-                actionTaken: safetyResult.actionTaken,
-                flaggedPatterns: safetyResult.flaggedPatterns,
-              });
-              // Safe-response redirect: cancel the in-flight response and inject
-              // an educational redirect over the data channel + VCE-004 audit.
-              // Internally guarded by the voice_transcript_safety flag and safe
-              // when the data channel is null/closed (no throw).
-              triggerSafetyIntervention({
-                sessionId: deps.sessionIdRef.current || 'unknown',
-                safetyResult,
-                dataChannel: deps.webrtcDataChannelRef.current,
-                setWarningState: deps.setSafetyWarning,
-                pauseAudio: () => pauseVoiceAudio(deps),
-                maestroId: deps.maestroRef.current?.id,
-              });
-            }
-
-            // The user's own words are surfaced regardless — the redirect above
-            // handles the assistant's response. Behaviour for 'allow' is unchanged.
-            deps.addTranscript('user', transcript);
-            deps.options.onTranscript?.('user', transcript);
-          }
-          break;
-        }
-
         // AUDIO OUTPUT EVENTS - WebRTC receives audio via ontrack event, not delta events
         case 'response.output_audio.delta':
         case 'response.audio.delta':
@@ -297,111 +217,10 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
           // Streaming transcript - could show in UI
           break;
 
-        case 'response.output_audio_transcript.done':
-        case 'response.audio_transcript.done':
-          if (event.transcript && typeof event.transcript === 'string') {
-            logger.info('[VoiceSession] AI transcript received', {
-              transcript: event.transcript.substring(0, 100),
-            });
-
-            // T2-05: Run assistant transcript safety check (VCE-003 checkpoint)
-            // Check is guarded by voice_transcript_safety feature flag
-            const assistantSafetyResult = checkAssistantTranscript(
-              deps.sessionIdRef.current || 'unknown',
-              event.transcript,
-            );
-
-            if (assistantSafetyResult.actionTaken === 'reject') {
-              // Audit log for escalation — a rejected assistant utterance
-              // indicates a prompt-engineering / model failure.
-              logger.error('[VoiceSession] Assistant transcript rejected by safety check', {
-                sessionId: deps.sessionIdRef.current,
-                severity: assistantSafetyResult.severity,
-                flaggedPatterns: assistantSafetyResult.flaggedPatterns,
-              });
-
-              // Stop playback of the rejected utterance immediately, mirroring
-              // the barge-in teardown. Local teardown runs regardless of the
-              // data-channel state so queued/scheduled audio never reaches the
-              // student; response.cancel is only sent when a response is active
-              // and the channel is open.
-              if (
-                deps.hasActiveResponseRef.current &&
-                deps.webrtcDataChannelRef.current?.readyState === 'open'
-              ) {
-                deps.webrtcDataChannelRef.current.send(JSON.stringify({ type: 'response.cancel' }));
-                deps.hasActiveResponseRef.current = false;
-              }
-              // WebRTC transport plays assistant audio via the remote track's
-              // audio element, NOT the local queue. Pause it unconditionally:
-              // this kills the unsafe tail even when response.cancel cannot be
-              // delivered (closed channel / late cancel). The next
-              // response.created (e.g. the safe redirect) resumes playback.
-              deps.webrtcAudioElementRef.current?.pause();
-              deps.audioQueueRef.current.clear();
-              deps.isPlayingRef.current = false;
-              deps.isBufferingRef.current = true;
-              deps.scheduledSourcesRef.current.forEach((source) => {
-                try {
-                  source.stop();
-                } catch {
-                  /* already stopped */
-                }
-              });
-              deps.scheduledSourcesRef.current.clear();
-              deps.setSpeaking(false);
-
-              // Fire the safe-response redirect + VCE-004 audit. Map the
-              // assistant 'reject' onto the intervention's 'escalate' action so
-              // it is treated as a serious violation requiring human oversight.
-              triggerSafetyIntervention({
-                sessionId: deps.sessionIdRef.current || 'unknown',
-                safetyResult: {
-                  severity: assistantSafetyResult.severity,
-                  flaggedPatterns: assistantSafetyResult.flaggedPatterns,
-                  actionTaken: 'escalate',
-                  checkDurationMs: assistantSafetyResult.checkDurationMs,
-                },
-                dataChannel: deps.webrtcDataChannelRef.current,
-                setWarningState: deps.setSafetyWarning,
-                maestroId: deps.maestroRef.current?.id,
-              });
-
-              // CRITICAL (child safety): never surface rejected assistant
-              // content in the transcript UI. It is logged above for audit;
-              // skip addTranscript/onTranscript entirely.
-              break;
-            }
-
-            if (assistantSafetyResult.actionTaken === 'sanitize') {
-              logger.warn('[VoiceSession] Assistant transcript flagged but allowed', {
-                sessionId: deps.sessionIdRef.current,
-                severity: assistantSafetyResult.severity,
-                flaggedPatterns: assistantSafetyResult.flaggedPatterns,
-              });
-            }
-
-            deps.addTranscript('assistant', event.transcript);
-            deps.options.onTranscript?.('assistant', event.transcript);
-          } else {
-            logger.warn('[VoiceSession] AI transcript.done but no transcript', {
-              event: JSON.stringify(event).slice(0, 200),
-            });
-          }
-          break;
-
         case 'response.done':
           // If a meditation is waiting for its introduction to end, this is it.
           openingFinished();
           deps.hasActiveResponseRef.current = false;
-          // Azure reports what this turn actually cost. It is the only honest
-          // source: wall-clock minutes would charge silence like speech.
-          reportVoiceUsage({
-            sessionId: deps.sessionIdRef.current,
-            maestroId: deps.maestroRef.current?.id,
-            model: modelFromResponseDone(event),
-            usage: usageFromResponseDone(event),
-          });
           logger.debug('[VoiceSession] Response complete - hasActiveResponse = false');
           break;
 
