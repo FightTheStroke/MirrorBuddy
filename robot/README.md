@@ -461,6 +461,19 @@ tracked for updates, and which version the store would give it. It exists becaus
 the previous failure was silent — the robot worked, it had simply stopped being
 updated months earlier.
 
+### Keeping a robot current from another machine
+
+```bash
+./robot/tools/robot-keeper.sh                       # watch until stopped
+ROBOT_HOST=192.168.1.42 ./robot/tools/robot-keeper.sh
+```
+
+Watches the store and the robot, and updates the robot only when the two versions
+differ and the device actually answers. A robot that is off, off-network or already
+current is left completely alone, because a needless restart interrupts a child
+mid-conversation. `ROBOT_KEEPER_ONCE=1` runs a single pass, which is what the tests
+drive against a stubbed daemon.
+
 ## Roadmap
 
 - **Vision** — the camera hardware is available; sending frames to the realtime model
