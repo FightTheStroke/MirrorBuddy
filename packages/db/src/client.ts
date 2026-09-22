@@ -13,7 +13,7 @@ import { isSupabaseUrl } from '@mirrorbuddy/utils';
 import { isStagingMode } from '@mirrorbuddy/utils';
 import { createPIIMiddleware } from './pii-middleware';
 import { createSlowQueryMonitor } from './slow-query-monitor';
-import { createTransientRetry } from './transient-retry';
+import { createTransientRetry, isTransientDatabaseError } from './transient-retry';
 import { loadSupabaseCertificate, buildSslConfig, cleanConnectionString } from './ssl-config';
 
 const globalForPrisma = globalThis as typeof globalThis & {
@@ -85,6 +85,17 @@ function createDatabase(): { prisma: PrismaClient; pool: Pool } {
     min: 0, // Allow all idle connections to be released
     idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
     connectionTimeoutMillis: 10000, // Timeout after 10 seconds if unable to connect
+  });
+
+  // node-postgres emits 'error' on idle clients; without a listener Node turns it
+  // into an uncaught exception and the serverless function dies.
+  pool.on('error', (error: Error) => {
+    const details = { error: error.message };
+    if (isTransientDatabaseError(error)) {
+      logger.warn('[db] idle database connection dropped, the pool will reconnect', details);
+      return;
+    }
+    logger.error('[db] unexpected database pool failure', details);
   });
 
   // Idle timers cannot release connections while a Fluid instance is suspended.

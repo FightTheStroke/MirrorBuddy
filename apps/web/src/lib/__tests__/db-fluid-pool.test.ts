@@ -14,6 +14,9 @@ vi.mock('pg', () => ({
     constructor(readonly options: object) {
       pools.push(this);
     }
+    on() {
+      return this;
+    }
   },
 }));
 vi.mock('@prisma/adapter-pg', () => ({
@@ -54,6 +57,7 @@ vi.mock('../../../../../packages/db/src/slow-query-monitor', () => ({
 }));
 vi.mock('../../../../../packages/db/src/transient-retry', () => ({
   createTransientRetry: () => ({}),
+  isTransientDatabaseError: () => false,
 }));
 
 describe('Fluid compute database pool lifecycle', () => {
