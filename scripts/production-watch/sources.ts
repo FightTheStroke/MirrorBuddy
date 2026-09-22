@@ -13,7 +13,7 @@ export interface ProductionAlert {
   occurrences: number;
   /** ISO timestamp of the most recent occurrence. */
   lastSeen: string;
-  source: 'sentry' | 'vercel';
+  source: 'sentry' | 'vercel' | 'release';
   monitoring?: boolean;
 }
 
@@ -92,6 +92,88 @@ export function vercelDeploymentToAlert(deployment: VercelDeployment): Productio
     lastSeen: new Date(deployment.createdAt).toISOString(),
     source: 'vercel',
   };
+}
+
+export interface ReleaseStatus {
+  /** Version the public site reports right now. */
+  liveVersion: string;
+  /** Newest published release tag. */
+  latestRelease: string;
+  /** When that release was published, ISO 8601. */
+  releasedAt: string;
+}
+
+/**
+ * Promotion to production is a manual step, so a tagged, built and healthy
+ * release can sit unpublished while the site keeps serving an old build. That
+ * is silent today: nothing watches the gap between what was released and what
+ * people actually get. This turns the silence into one alert per stuck release.
+ */
+const PROMOTION_GRACE_MS = 6 * 60 * 60 * 1000;
+
+export function staleReleaseAlert(
+  status: ReleaseStatus,
+  now = Date.now(),
+  graceMs = PROMOTION_GRACE_MS,
+): ProductionAlert | null {
+  const live = status.liveVersion?.trim();
+  const release = status.latestRelease?.trim();
+  if (!live) throw new Error('Live version unknown — cannot judge whether production is behind');
+  if (!release) throw new Error('Latest release unknown — cannot judge whether production is behind');
+
+  const releasedAt = Date.parse(status.releasedAt);
+  if (!Number.isFinite(releasedAt)) throw new Error('Invalid release timestamp');
+
+  if (release.replace(/^v/, '') === live.replace(/^v/, '')) return null;
+
+  const waitingMs = now - releasedAt;
+  if (waitingMs < graceMs) return null;
+
+  const waitingHours = Math.floor(waitingMs / (60 * 60 * 1000));
+  return {
+    key: `release:${release}`,
+    title: `Production is still serving ${live} while ${release} is released`,
+    details: [
+      `Live version: ${live}`,
+      `Latest release: ${release}, published ${status.releasedAt}`,
+      `Waiting to be promoted for ${waitingHours} hour(s)`,
+      'Promote with: gh workflow run promote-to-production.yml',
+    ],
+    url: 'https://www.mirrorbuddy.org/api/health',
+    occurrences: 1,
+    lastSeen: new Date(now).toISOString(),
+    source: 'release',
+  };
+}
+
+/** Asks the live site what it serves and GitHub what was last released. */
+export async function fetchReleaseAlerts(
+  fetchImpl: typeof fetch,
+  config: { healthUrl: string; repo: string; token?: string },
+  now = Date.now(),
+): Promise<ProductionAlert[]> {
+  const health = await fetchImpl(config.healthUrl);
+  if (!health.ok) throw new Error(`Health endpoint replied ${health.status}`);
+  const liveVersion = (await health.json())?.version;
+
+  const headers: Record<string, string> = { Accept: 'application/vnd.github+json' };
+  if (config.token) headers.Authorization = `Bearer ${config.token}`;
+  const release = await fetchImpl(`https://api.github.com/repos/${config.repo}/releases/latest`, {
+    headers,
+  });
+  if (!release.ok) throw new Error(`GitHub releases replied ${release.status}`);
+  const latest = (await release.json()) as { tag_name?: string; published_at?: string };
+  if (!latest.tag_name || !latest.published_at) throw new Error('Latest release is incomplete');
+
+  const alert = staleReleaseAlert(
+    {
+      liveVersion: String(liveVersion ?? ''),
+      latestRelease: latest.tag_name,
+      releasedAt: latest.published_at,
+    },
+    now,
+  );
+  return alert ? [alert] : [];
 }
 
 export async function fetchSentryAlerts(
