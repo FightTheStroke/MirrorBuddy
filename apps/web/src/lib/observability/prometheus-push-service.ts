@@ -71,6 +71,17 @@ class PrometheusPushService {
       return;
     }
 
+    // Vercel builds previews with NODE_ENV=production, so this service used to
+    // run on every preview: pushing to the same Grafana account under
+    // env=production and raising grafana_transport whenever one of those
+    // pushes timed out. The cron route already guards on VERCEL_ENV.
+    if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production') {
+      logger.info('Grafana Cloud push disabled outside production', {
+        environment: process.env.VERCEL_ENV,
+      });
+      return;
+    }
+
     if (!this.config) {
       if (!this.initialize()) return;
     }
