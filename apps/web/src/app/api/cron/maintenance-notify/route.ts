@@ -26,7 +26,7 @@ export const POST = pipe(
   const emailWindowRange = getWindowRange(23.5, 24.5);
   const inAppWindowRange = getWindowRange(1, 2);
 
-  const [emailWindows, inAppWindows, users] = await Promise.all([
+  const [emailWindows, inAppWindows] = await Promise.all([
     prisma.maintenanceWindow.findMany({
       where: {
         cancelled: false,
@@ -52,20 +52,26 @@ export const POST = pipe(
         endTime: true,
       },
     }),
-    prisma.user.findMany({
-      where: {
-        disabled: false,
-        emailHash: { not: null },
-        username: { not: null },
-        passwordHash: { not: null },
-      },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-      },
-    }),
   ]);
+
+  // Recipients are read only when an email is due: loading them decrypts every
+  // address and audits each decryption, which hourly with nothing scheduled was
+  // pure waste (#1160).
+  const users = emailWindows.length
+    ? await prisma.user.findMany({
+        where: {
+          disabled: false,
+          emailHash: { not: null },
+          username: { not: null },
+          passwordHash: { not: null },
+        },
+        select: {
+          id: true,
+          email: true,
+          username: true,
+        },
+      })
+    : [];
 
   let emailsSent = 0;
   let recipientsChecked = 0;

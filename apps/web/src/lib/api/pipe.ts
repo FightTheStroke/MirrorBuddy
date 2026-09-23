@@ -37,6 +37,19 @@ export class ApiError extends Error {
   }
 }
 
+const AUTH_REJECTION_CODES = new Set(['AUTH_ABSENT', 'SESSION_REJECTED']);
+
+/** The 401 an anonymous or revoked session is meant to receive, or null. */
+function authRejectionCode(error: unknown, statusCode: number): string | null {
+  if (statusCode !== 401 || !(error instanceof ApiError)) return null;
+  const details = error.details;
+  const code =
+    details && typeof details === 'object' && 'code' in details
+      ? (details as { code?: unknown }).code
+      : undefined;
+  return typeof code === 'string' && AUTH_REJECTION_CODES.has(code) ? code : null;
+}
+
 /**
  * Middleware context accumulates typed properties through the pipeline
  * Each middleware can add properties that are available to downstream middlewares and handler
@@ -169,6 +182,15 @@ export function pipe(...middlewares: Middleware[]) {
             { statusCode, path: routeInfo.path, method: routeInfo.method },
             error,
           );
+        } else if (authRejectionCode(error, statusCode)) {
+          // No or revoked session: the correct answer, not a fault (#1165).
+          // Rates remain visible in the proxy 4xx metrics.
+          logger.info('API request rejected: authentication required', {
+            statusCode,
+            code: authRejectionCode(error, statusCode),
+            path: routeInfo.path,
+            method: routeInfo.method,
+          });
         } else {
           logger.warn(`API handled error: ${routeInfo.method} ${routeInfo.path}`, {
             statusCode,

@@ -5,6 +5,7 @@
 import * as Sentry from '@sentry/nextjs';
 import { getEnvironment, isEnabled, getDsn, getRelease } from '@/lib/sentry/env';
 import { classifyClient, normalizeRequestRoute } from '@/lib/observability/client-provenance';
+import { classifyNodeProcessWarning } from '@/lib/sentry/node-process-warning';
 
 type SentryEvent = {
   logger?: string;
@@ -82,6 +83,14 @@ if (dsn) {
     beforeSend(event, hint) {
       if (isStructuredLoggerConsoleEvent(event as SentryEvent)) {
         return null;
+      }
+
+      // Node process warnings arrive via console.error but are not failures.
+      const nodeWarning = classifyNodeProcessWarning(event as SentryEvent);
+      if (nodeWarning?.drop) return null;
+      if (nodeWarning) {
+        event.level = 'warning';
+        event.tags = { ...event.tags, nodeWarning: nodeWarning.warningType };
       }
 
       const error = hint.originalException;

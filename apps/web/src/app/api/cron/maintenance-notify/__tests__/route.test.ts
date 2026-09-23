@@ -122,4 +122,22 @@ describe('POST /api/cron/maintenance-notify', () => {
       endTime: new Date('2026-03-01T12:00:00.000Z'),
     });
   });
+  it('does not read or decrypt recipients when no email window is due (#1160, #1163)', async () => {
+    // Hourly run with nothing scheduled: loading every user decrypted every
+    // email address and wrote one audit row each, for no email sent.
+    vi.mocked(prisma.maintenanceWindow.findMany)
+      .mockResolvedValueOnce([] as never)
+      .mockResolvedValueOnce([] as never);
+
+    const response = await POST(
+      new NextRequest('http://localhost:3000/api/cron/maintenance-notify', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${CRON_SECRET}` },
+      }) as never,
+    );
+
+    expect(response.status).toBe(200);
+    expect(prisma.user.findMany).not.toHaveBeenCalled();
+    expect(await response.json()).toMatchObject({ emailWindows: 0, recipientsChecked: 0 });
+  });
 });

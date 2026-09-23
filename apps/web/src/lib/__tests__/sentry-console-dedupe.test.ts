@@ -82,6 +82,45 @@ describe('Sentry console dedupe', () => {
     expect(result).toBeNull();
   });
 
+  it('drops only the proven-harmless platform warning and downgrades other Node warnings (#1162)', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('SENTRY_DSN', 'https://test@sentry.io/123');
+
+    const Sentry = await import('@sentry/nextjs');
+    await import('../../../sentry.server.config');
+    const beforeSend = vi.mocked(Sentry.init).mock.calls[0][0].beforeSend!;
+    const nodeWarning = (message: string) =>
+      ({
+        logger: 'console',
+        level: 'error',
+        message,
+        extra: { arguments: [message] },
+        tags: {},
+      }) as any;
+
+    expect(
+      beforeSend(
+        nodeWarning(
+          '(node:4) ExperimentalWarning: vm.USE_MAIN_CONTEXT_DEFAULT_LOADER is an experimental feature and might change at any time',
+        ),
+        { originalException: undefined },
+      ),
+    ).toBeNull();
+
+    const kept = beforeSend(nodeWarning('(node:4) Warning: Possible EventEmitter memory leak'), {
+      originalException: undefined,
+    }) as any;
+    expect(kept).not.toBeNull();
+    expect(kept.level).toBe('warning');
+    expect(kept.tags.nodeWarning).toBe('Warning');
+
+    const appError = beforeSend(nodeWarning('Unhandled failure in handler'), {
+      originalException: undefined,
+    }) as any;
+    expect(appError.level).toBe('error');
+  });
+
   it('drops duplicated structured console warnings on edge', async () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('VERCEL', '1');

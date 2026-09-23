@@ -16,7 +16,11 @@ const db = vi.hoisted(() => ({
 vi.mock('@/lib/db', () => ({
   prisma: {
     settings: { findMany: db.list, findUnique: db.settings },
-    profile: { findUnique: db.profile },
+    profile: {
+      findUnique: db.profile,
+      findMany: async ({ where }: { where: { userId: { in: string[] } } }) =>
+        where.userId.in.map((userId) => ({ userId, age: 18 })),
+    },
     funnelEvent: { findFirst: async () => null, create: db.create },
     $queryRaw: db.aggregate,
   },

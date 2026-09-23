@@ -26,6 +26,43 @@ export async function isOptionalAnalyticsEligible(
   return guardian?.consentGranted === true;
 }
 
+function isKnownAge(age: unknown): age is number {
+  return typeof age === 'number' && Number.isInteger(age) && age >= 0;
+}
+
+/**
+ * Same policy as isOptionalAnalyticsEligible for a page of users, in one
+ * Profile query and at most one guardian-consent query (#1159).
+ */
+export async function filterOptionalAnalyticsEligible(
+  userIds: readonly (string | null | undefined)[],
+): Promise<Set<string>> {
+  const ids = [
+    ...new Set(userIds.filter((id): id is string => typeof id === 'string' && !!id.trim())),
+  ];
+  const eligible = new Set<string>();
+  if (ids.length === 0) return eligible;
+  const profiles = await prisma.profile.findMany({
+    where: { userId: { in: ids } },
+    select: { userId: true, age: true },
+  });
+  const minors: string[] = [];
+  for (const profile of Array.isArray(profiles) ? profiles : []) {
+    if (!profile?.userId || !isKnownAge(profile.age)) continue;
+    if (profile.age >= COPPA_AGE_THRESHOLD) eligible.add(profile.userId);
+    else minors.push(profile.userId);
+  }
+  if (minors.length === 0) return eligible;
+  const consents = await prisma.coppaConsent.findMany({
+    where: { userId: { in: minors }, consentGranted: true },
+    select: { userId: true },
+  });
+  for (const consent of Array.isArray(consents) ? consents : []) {
+    if (consent?.userId) eligible.add(consent.userId);
+  }
+  return eligible;
+}
+
 /** No browser flag, locale, profile-view permission or cached grant authorizes ingestion. */
 export async function canCollectOptionalAnalytics(
   userId: string | null | undefined,
