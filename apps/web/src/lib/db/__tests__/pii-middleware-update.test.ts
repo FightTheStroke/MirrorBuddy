@@ -4,119 +4,106 @@
  * Tests for automatic PII encryption in Prisma update operations.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import * as piiEncryption from "@/lib/security";
-import { Prisma } from "@prisma/client";
-import { createPIIMiddleware } from "../pii-middleware";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import * as piiEncryption from '@/lib/security';
+import { Prisma } from '@prisma/client';
+import { createPIIMiddleware } from '../pii-middleware';
 
 // Mock the encryption module (combined barrel mock)
-vi.mock("@/lib/security", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/security")>();
+vi.mock('@/lib/security', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/security')>();
   return {
     ...actual,
-    encryptPII: vi.fn((text: string) =>
-      Promise.resolve(`pii:v1:encrypted_${text}`),
-    ),
+    encryptPII: vi.fn((text: string) => Promise.resolve(`pii:v1:encrypted_${text}`)),
     decryptPII: vi.fn((text: string) =>
-      Promise.resolve(
-        text.startsWith("pii:v1:")
-          ? text.replace("pii:v1:encrypted_", "")
-          : text,
-      ),
+      Promise.resolve(text.startsWith('pii:v1:') ? text.replace('pii:v1:encrypted_', '') : text),
     ),
     hashPII: vi.fn((text: string) => Promise.resolve(`hash_${text}`)),
     isPIIEncryptionConfigured: vi.fn(() => true),
     logDecryptAccess: vi.fn(),
     logBulkDecryptAccess: vi.fn(),
+    logDecryptAccessBatch: vi.fn(),
   };
 });
 
 // Mock Prisma.defineExtension to return the config directly for testing
-vi.spyOn(Prisma, "defineExtension").mockImplementation((config: any) => config);
+vi.spyOn(Prisma, 'defineExtension').mockImplementation((config: any) => config);
 
-describe("PII Encryption on Update", () => {
+describe('PII Encryption on Update', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("encrypts User.email on update", async () => {
-    const mockQuery = vi.fn((args) =>
-      Promise.resolve({ id: "user1", ...args.data }),
-    );
+  it('encrypts User.email on update', async () => {
+    const mockQuery = vi.fn((args) => Promise.resolve({ id: 'user1', ...args.data }));
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "User",
-      operation: "update",
-      args: { where: { id: "user1" }, data: { email: "newemail@example.com" } },
+      model: 'User',
+      operation: 'update',
+      args: { where: { id: 'user1' }, data: { email: 'newemail@example.com' } },
       query: mockQuery,
     };
 
     await middleware.query.$allModels.update(context);
 
-    expect(piiEncryption.encryptPII).toHaveBeenCalledWith(
-      "newemail@example.com",
-    );
+    expect(piiEncryption.encryptPII).toHaveBeenCalledWith('newemail@example.com');
     expect(mockQuery).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
-          email: "pii:v1:encrypted_newemail@example.com",
+          email: 'pii:v1:encrypted_newemail@example.com',
         }),
       }),
     );
   });
 
-  it("encrypts Profile.name on updateMany", async () => {
+  it('encrypts Profile.name on updateMany', async () => {
     const mockQuery = vi.fn(() => Promise.resolve({ count: 1 }));
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "Profile",
-      operation: "updateMany",
-      args: { where: { userId: "user1" }, data: { name: "Jane Doe" } },
+      model: 'Profile',
+      operation: 'updateMany',
+      args: { where: { userId: 'user1' }, data: { name: 'Jane Doe' } },
       query: mockQuery,
     };
 
     await middleware.query.$allModels.updateMany(context);
 
-    expect(piiEncryption.encryptPII).toHaveBeenCalledWith("Jane Doe");
+    expect(piiEncryption.encryptPII).toHaveBeenCalledWith('Jane Doe');
   });
 
-  it("computes emailHash when User.email is updated", async () => {
-    const mockQuery = vi.fn((args) =>
-      Promise.resolve({ id: "user1", ...args.data }),
-    );
+  it('computes emailHash when User.email is updated', async () => {
+    const mockQuery = vi.fn((args) => Promise.resolve({ id: 'user1', ...args.data }));
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "User",
-      operation: "update",
-      args: { where: { id: "user1" }, data: { email: "newemail@example.com" } },
+      model: 'User',
+      operation: 'update',
+      args: { where: { id: 'user1' }, data: { email: 'newemail@example.com' } },
       query: mockQuery,
     };
 
     await middleware.query.$allModels.update(context);
 
-    expect(piiEncryption.hashPII).toHaveBeenCalledWith("newemail@example.com");
+    expect(piiEncryption.hashPII).toHaveBeenCalledWith('newemail@example.com');
     expect(mockQuery).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
-          emailHash: "hash_newemail@example.com",
+          emailHash: 'hash_newemail@example.com',
         }),
       }),
     );
   });
 
-  it("does not compute emailHash when email is null on update", async () => {
-    const mockQuery = vi.fn((args) =>
-      Promise.resolve({ id: "user1", ...args.data }),
-    );
+  it('does not compute emailHash when email is null on update', async () => {
+    const mockQuery = vi.fn((args) => Promise.resolve({ id: 'user1', ...args.data }));
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "User",
-      operation: "update",
-      args: { where: { id: "user1" }, data: { email: null } },
+      model: 'User',
+      operation: 'update',
+      args: { where: { id: 'user1' }, data: { email: null } },
       query: mockQuery,
     };
 

@@ -91,24 +91,10 @@ describe('optional Azure Monitor exporter', () => {
     await register();
     expect(mocks.sentryLoaded).toHaveBeenCalledTimes(1);
     expect(mocks.grafanaStart).toHaveBeenCalledTimes(1);
-    expect(mocks.flagsInitialized).toHaveBeenCalledTimes(1);
+    // Boot runs outside any request; flags load on the first read (#1157).
+    expect(mocks.flagsInitialized).not.toHaveBeenCalled();
     expect(mocks.NodeSDK).not.toHaveBeenCalled();
     expect(logger.error).not.toHaveBeenCalled();
-  });
-
-  it('does not let feature flag loading block server startup', async () => {
-    let releaseLoad: (() => void) | undefined;
-    mocks.flagsInitialized.mockReturnValueOnce(
-      new Promise<void>((resolve) => {
-        releaseLoad = resolve;
-      }),
-    );
-    const { register } = await import('../../../instrumentation');
-
-    await register();
-
-    expect(mocks.grafanaStart).toHaveBeenCalledTimes(1);
-    releaseLoad?.();
   });
 
   it('constructs and starts a configured exporter without claiming remote delivery', async () => {
