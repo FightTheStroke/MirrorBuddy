@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.41.12] - 2026-09-23
+
 ### Fixed
 
 - Stop starting database and metrics work outside a request: Vercel suspended the
