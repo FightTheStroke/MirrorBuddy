@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Stop reporting the platform loader's Node `ExperimentalWarning` as an application error;
+  other Node process warnings stay visible in Sentry at warning level (#1162).
+- Log the 401 answered to an absent or revoked session as an expected outcome rather
+  than a warning; other handled 4xx responses are still reported (#1165).
 - Check analytics eligibility for a whole consent page in one profile query and at most
   one guardian-consent query, instead of one or two queries per user, in the five-minute
   metrics cron (#1159).

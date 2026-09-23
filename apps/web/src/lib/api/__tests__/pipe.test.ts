@@ -234,6 +234,43 @@ describe('pipe() - Composable API handler pipeline', () => {
       );
     });
 
+    it.each(['AUTH_ABSENT', 'SESSION_REJECTED'] as const)(
+      'answers a %s 401 as an expected outcome, not a warning (#1165)',
+      async (code) => {
+        const { pipe, ApiError } = await import('../pipe');
+        const { logger } = await import('@/lib/logger');
+
+        // Same shape AuthenticationError(code) produces for these codes.
+        const handler = pipe()(async () => {
+          throw new ApiError('Authentication required', 401, { code });
+        });
+        const response = await handler(new NextRequest('http://localhost:3000/api/user'));
+
+        expect(response.status).toBe(401);
+        expect(await response.json()).toMatchObject({ code });
+        expect(logger.warn).not.toHaveBeenCalled();
+        expect(logger.info).toHaveBeenCalledWith(
+          'API request rejected: authentication required',
+          expect.objectContaining({ statusCode: 401, code, path: '/api/user', method: 'GET' }),
+        );
+      },
+    );
+
+    it('keeps other handled 401s visible as warnings', async () => {
+      const { pipe, ApiError } = await import('../pipe');
+      const { logger } = await import('@/lib/logger');
+
+      const handler = pipe()(async () => {
+        throw new ApiError('Bad token', 401);
+      });
+      await handler(new NextRequest('http://localhost:3000/api/test'));
+
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('API handled error'),
+        expect.objectContaining({ statusCode: 401 }),
+      );
+    });
+
     it('should log ApiError with 5xx status as error', async () => {
       const { pipe, ApiError } = await import('../pipe');
       const { logger } = await import('@/lib/logger');
