@@ -247,21 +247,24 @@ done
 
 **Resolution**:
 
-- **Cold start** (first request >800ms, subsequent <200ms): Normal, no action
+- **Cold start** (first request >800ms, subsequent <200ms): Normal, no action. The slow-query
+  monitor logs queries started before an instance's first successful query as
+  `[SlowQuery] Cold start` (info, runtime logs only) instead of WARN; CRITICAL (≥3000 ms) still
+  fires for them (#1163).
 - **Consistent slow** (all requests >1000ms): Check Supabase slow query log
 
 ## Performance Baselines
 
 ### Normal Operation (Serverless)
 
-| Metric             | Expected Range | Notes                     |
-| ------------------ | -------------- | ------------------------- |
-| Cold start latency | 300-800ms      | TLS handshake + pool init |
-| Warm latency       | 20-100ms       | Existing connection reuse |
-| Pool utilization   | 0-50%          | Low traffic typical       |
-| Active connections | 0-2            | Serverless short-lived    |
-| Idle connections   | 0-1            | min: 0 config             |
-| Waiting requests   | 0              | Pool never exhausted      |
+| Metric             | Expected Range | Notes                                                                       |
+| ------------------ | -------------- | --------------------------------------------------------------------------- |
+| Cold start latency | 300-1500ms     | TLS handshake + pool init + Prisma engine init (first query of an instance) |
+| Warm latency       | 20-100ms       | Existing connection reuse                                                   |
+| Pool utilization   | 0-50%          | Low traffic typical                                                         |
+| Active connections | 0-2            | Serverless short-lived                                                      |
+| Idle connections   | 0-1            | min: 0 config                                                               |
+| Waiting requests   | 0              | Pool never exhausted                                                        |
 
 ### High Traffic (>100 req/min)
 

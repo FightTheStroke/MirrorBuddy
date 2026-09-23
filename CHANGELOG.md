@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Stop alerting on the one-time startup cost of a new server instance: its first database
+  queries (Prisma engine initialisation plus the first connection, ~1-1.5 s) are logged as
+  `[SlowQuery] Cold start` instead of WARN; CRITICAL still applies, and warm queries keep the
+  same thresholds (#1163).
+
 ## [0.41.14] - 2026-09-23
 
 ### Security
