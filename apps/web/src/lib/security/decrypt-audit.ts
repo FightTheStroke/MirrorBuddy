@@ -7,15 +7,16 @@
  * @module security/decrypt-audit
  */
 
-import { logger } from "@/lib/logger";
+import { waitUntil } from '@vercel/functions';
+import { logger } from '@/lib/logger';
 
-const log = logger.child({ module: "decrypt-audit" });
+const log = logger.child({ module: 'decrypt-audit' });
 
 // Lazy-load prisma to avoid circular dependency
-let prismaPromise: Promise<typeof import("@/lib/db")> | null = null;
+let prismaPromise: Promise<typeof import('@/lib/db')> | null = null;
 async function getPrisma() {
   if (!prismaPromise) {
-    prismaPromise = import("@/lib/db");
+    prismaPromise = import('@/lib/db');
   }
   const dbModule = await prismaPromise;
   return dbModule.prisma;
@@ -53,56 +54,70 @@ export interface DecryptAuditContext {
   context?: Record<string, unknown>;
 }
 
+function toAuditRow({ model, field, userId, adminId, ipAddress, context }: DecryptAuditContext) {
+  return {
+    userId: userId || null,
+    adminId: adminId || null,
+    eventType: 'data_access',
+    severity: 'info',
+    description: `PII field decrypted: ${model}.${field}`,
+    details: JSON.stringify({
+      model,
+      field,
+      accessedAt: new Date().toISOString(),
+      accessor: adminId || userId || 'system',
+      ...(context || {}),
+    }),
+    ipAddress: ipAddress || null,
+  };
+}
+
 /**
- * Log PII decryption access to compliance audit table.
- *
- * Fire-and-forget: does not throw on error, logs instead.
- * Uses async execution without await for performance.
- *
- * @param auditContext - Context about the decryption operation
+ * Run the audit write without blocking the response, but inside the request
+ * lifetime: a detached promise is frozen when Vercel suspends the instance, and
+ * the write then times out on resume (#1170). Failures stay visible as errors.
  */
-export function logDecryptAccess(auditContext: DecryptAuditContext): void {
-  const { model, field, userId, adminId, ipAddress, context } = auditContext;
-
-  // Fire-and-forget: execute async but don't await
-  void (async () => {
+function recordAudit(entries: DecryptAuditContext[], write: () => Promise<unknown>): void {
+  const pending = (async () => {
     try {
-      const prisma = await getPrisma();
-      await prisma.complianceAuditEntry.create({
-        data: {
-          userId: userId || null,
-          adminId: adminId || null,
-          eventType: "data_access",
-          severity: "info",
-          description: `PII field decrypted: ${model}.${field}`,
-          details: JSON.stringify({
-            model,
-            field,
-            accessedAt: new Date().toISOString(),
-            accessor: adminId || userId || "system",
-            ...(context || {}),
-          }),
-          ipAddress: ipAddress || null,
-        },
-      });
-
-      log.debug("PII decrypt access logged", {
-        model,
-        field,
-        userId: userId?.slice(0, 8),
-        adminId: adminId?.slice(0, 8),
-      });
+      await write();
+      log.debug('PII decrypt access logged', { entries: entries.length });
     } catch (error) {
-      // Fire-and-forget: don't throw, audit failures shouldn't break main flow
-      log.error("Failed to log PII decrypt access", {
-        model,
-        field,
-        userId: userId?.slice(0, 8),
-        adminId: adminId?.slice(0, 8),
+      // Audit failures must not break the main flow, but must never be silent.
+      log.error('Failed to log PII decrypt access', {
+        entries: entries.length,
+        fields: entries.map(({ model, field }) => `${model}.${field}`),
         error: error instanceof Error ? error.message : String(error),
       });
     }
   })();
+  waitUntil(pending);
+}
+
+/**
+ * Log PII decryption access to compliance audit table.
+ *
+ * Non-blocking: does not throw on error, logs instead.
+ *
+ * @param auditContext - Context about the decryption operation
+ */
+export function logDecryptAccess(auditContext: DecryptAuditContext): void {
+  recordAudit([auditContext], async () => {
+    const prisma = await getPrisma();
+    await prisma.complianceAuditEntry.create({ data: toAuditRow(auditContext) });
+  });
+}
+
+/**
+ * Log every decryption performed by one query in a single insert, so reading
+ * N records costs one audit statement instead of N (#1160).
+ */
+export function logDecryptAccessBatch(entries: DecryptAuditContext[]): void {
+  if (!Array.isArray(entries) || entries.length === 0) return;
+  recordAudit(entries, async () => {
+    const prisma = await getPrisma();
+    await prisma.complianceAuditEntry.createMany({ data: entries.map(toAuditRow) });
+  });
 }
 
 /**

@@ -134,7 +134,7 @@ describe('independent metrics push', () => {
     fetchMock.mockRejectedValueOnce(failure);
 
     prometheusPushService.start();
-    await vi.waitFor(() => expect(logger.warn).toHaveBeenCalled());
+    await prometheusPushService.pushIfDue(now);
     prometheusPushService.stop();
 
     expect(logger.error).not.toHaveBeenCalled();

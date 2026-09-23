@@ -31,13 +31,10 @@ export async function register() {
       startOpenTelemetry(sdk);
     }
 
-    // Load feature flag policy from the database. Without this the instance
-    // answers every check from compiled defaults, so kill switches and rollout
-    // percentages never take effect. Deliberately not awaited: startup must not
-    // depend on database availability, and checks keep using defaults until the
-    // policy arrives.
-    const { initializeFlags } = await import('@/lib/feature-flags');
-    void initializeFlags();
+    // Feature flag policy is NOT loaded here. Boot runs outside any request, so
+    // Vercel may suspend the instance mid-handshake and the connection timers
+    // fire on resume (#1157, #1167). The first flag read inside a request loads
+    // it under waitUntil; checks answer from compiled defaults until then.
 
     // Retain the local HTTP/funnel/budget/abuse/conversion exception: another
     // worker's cron cannot read these counters. No shared-source collection here.

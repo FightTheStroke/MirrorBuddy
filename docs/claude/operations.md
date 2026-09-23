@@ -51,9 +51,17 @@ Database connection pool (total/active/idle/waiting/utilization), AI provider co
 
 ```typescript
 import { prometheusPushService } from '@/lib/observability';
-// Production instrumentation starts the instance-local push service.
+// Production instrumentation arms the instance-local push; there is no timer.
+// proxy.ts calls schedulePushAfterResponse() after each tracked API response and
+// hands the push to the request's waitUntil, at most once per interval (#1158).
 // Only the authenticated cron collects shared service-limit and tier sources.
 ```
+
+**Serverless lifecycle rule**: work started at boot or as a detached promise is
+not covered by any request, so Vercel may suspend the instance mid-flight and its
+timers fire on resume (DB connect timeouts, minute-long "slow queries", Grafana
+TimeoutErrors). Feature flags load on the first read under `waitUntil`, the PII
+decrypt audit writes under `waitUntil`, and the Grafana push runs after a response.
 
 **Env vars**: `GRAFANA_CLOUD_PROMETHEUS_URL`, `GRAFANA_CLOUD_PROMETHEUS_USER`, `GRAFANA_CLOUD_API_KEY`
 
@@ -61,10 +69,10 @@ import { prometheusPushService } from '@/lib/observability';
 
 ### Collection ownership and failure semantics
 
-| Path                     | Collector families                                                                                                                                                                                | Cadence                                                                                   |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Instance push            | HTTP, in-memory funnel, budget, abuse, conversion                                                                                                                                                 | Startup and `GRAFANA_CLOUD_PUSH_INTERVAL` (default 60 seconds); best effort on serverless |
-| `/api/cron/metrics-push` | SLI/HTTP summary, database active users and cleanup, database funnel/conversion, churn, behavioral/session health, batch funnel recording, waitlist, service limits (Vercel/Supabase/Azure), tier | Existing five-minute schedule                                                             |
+| Path                     | Collector families                                                                                                                                                                                | Cadence                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Instance push            | HTTP, in-memory funnel, budget, abuse, conversion                                                                                                                                                 | After an API response, at most once per `GRAFANA_CLOUD_PUSH_INTERVAL` (default 60 s) |
+| `/api/cron/metrics-push` | SLI/HTTP summary, database active users and cleanup, database funnel/conversion, churn, behavioral/session health, batch funnel recording, waitlist, service limits (Vercel/Supabase/Azure), tier | Existing five-minute schedule                                                        |
 
 The cron owns service limits and tier on **all hosts**, not just Vercel.
 `metrics-push/scheduled-metrics.ts` contains that registry; neither cron collection

@@ -23,6 +23,7 @@ vi.mock('@/lib/security', async (importOriginal) => {
     isPIIEncryptionConfigured: vi.fn(() => true),
     logDecryptAccess: vi.fn(),
     logBulkDecryptAccess: vi.fn(),
+    logDecryptAccessBatch: vi.fn(),
   };
 });
 
