@@ -3,8 +3,8 @@ import { Prisma } from '@prisma/client';
 import { recordStageTransition, hasStage } from './index';
 import { logger } from '@/lib/logger';
 import {
+  filterOptionalAnalyticsEligible,
   hasStoredAnalyticsOptIn,
-  isOptionalAnalyticsEligible,
 } from '@/lib/telemetry/optional-analytics-server';
 
 const log = logger.child({ module: 'batch-funnel' });
@@ -33,14 +33,11 @@ async function* permittedUserBatches(): AsyncGenerator<string[]> {
     const lastUserId = settings.at(-1)?.userId;
     if (!lastUserId || (after && lastUserId <= after))
       throw new Error('Invalid analytics consent cursor');
-    const permitted: string[] = [];
-    for (const setting of settings) {
-      if (
-        hasStoredAnalyticsOptIn(setting?.azureCostConfig) &&
-        (await isOptionalAnalyticsEligible(setting?.userId))
-      )
-        permitted.push(setting.userId);
-    }
+    const optedIn = settings
+      .filter((setting) => hasStoredAnalyticsOptIn(setting?.azureCostConfig))
+      .map((setting) => setting.userId);
+    const eligible = await filterOptionalAnalyticsEligible(optedIn);
+    const permitted = optedIn.filter((userId) => eligible.has(userId));
     if (permitted.length) yield permitted;
     if (settings.length < BATCH_SIZE) return;
     after = lastUserId;

@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Feature flags now load on the first read inside a request, reading instead of
   upserting the global policy; decryption audits are written once per query.
 
+## [0.41.11] - 2026-09-23
+
+### Fixed
+
+- Check analytics eligibility for a whole consent page in one profile query and at most
+  one guardian-consent query, instead of one or two queries per user, in the five-minute
+  metrics cron (#1159).
+- Read and decrypt maintenance-email recipients only when a maintenance email is due;
+  the hourly run used to decrypt every account's address with nothing scheduled (#1160).
+
 ## [0.41.10] - 2026-09-23
 
 ### Fixed
