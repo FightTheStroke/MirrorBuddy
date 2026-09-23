@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Reject unsigned Stripe webhook requests (still 400, never verified or processed) without
+  raising a Sentry warning; a present but invalid signature is still reported as an error
+  (#1166).
+
 ## [0.41.9] - 2026-09-22
 
 - No user-facing changes recorded.

@@ -71,6 +71,36 @@ describe('POST /api/webhooks/stripe', () => {
       expect(data.error).toBe('Missing signature');
     });
 
+    it('rejects an unsigned request without raising a Sentry warning (#1166)', async () => {
+      // Stripe always signs deliveries, so an unsigned POST is never Stripe and
+      // never a secret mismatch: it is a probe (our own smoke test included).
+      const { logger } = await import('@/lib/logger');
+      const response = await POST(createWebhookRequest('{}', null));
+
+      expect(response.status).toBe(400);
+      expect(mockConstructWebhookEvent).not.toHaveBeenCalled();
+      expect(logger.warn).not.toHaveBeenCalled();
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.info).toHaveBeenCalledWith(
+        'Stripe webhook rejected: missing signature',
+        expect.any(Object),
+      );
+    });
+
+    it('still reports a present but invalid signature as an error', async () => {
+      const { logger } = await import('@/lib/logger');
+      mockConstructWebhookEvent.mockRejectedValueOnce(new Error('No signatures found'));
+
+      const response = await POST(createWebhookRequest('{}', 't=1,v1=forged'));
+
+      expect(response.status).toBe(400);
+      expect(logger.error).toHaveBeenCalledWith(
+        'Stripe webhook signature verification failed',
+        undefined,
+        expect.any(Error),
+      );
+    });
+
     it('returns 400 when signature is invalid', async () => {
       mockConstructWebhookEvent.mockRejectedValueOnce(new Error('Invalid signature'));
 

@@ -11,22 +11,25 @@
  * Note: Webhooks don't require auth/CSRF, only signature verification
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry } from "@/lib/api/middlewares";
-import { stripeService } from "@/lib/stripe";
-import { logger } from "@/lib/logger";
-import { prisma } from "@/lib/db";
-import Stripe from "stripe";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry } from '@/lib/api/middlewares';
+import { stripeService } from '@/lib/stripe';
+import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/db';
+import Stripe from 'stripe';
 
 export const revalidate = 0;
-export const POST = pipe(withSentry("/api/webhooks/stripe"))(async (ctx) => {
+export const POST = pipe(withSentry('/api/webhooks/stripe'))(async (ctx) => {
   const body = await ctx.req.text();
-  const signature = ctx.req.headers.get("stripe-signature");
+  const signature = ctx.req.headers.get('stripe-signature');
 
   if (!signature) {
-    logger.warn("Stripe webhook missing signature");
-    return NextResponse.json({ error: "Missing signature" }, { status: 400 });
+    // Stripe signs every delivery, so this is never Stripe nor a secret
+    // mismatch: it is a probe or our own smoke check. Rejected, not alerted.
+    logger.info('Stripe webhook rejected: missing signature', {
+      reason: 'missing_signature',
+    });
+    return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
   }
 
   let event: Stripe.Event;
@@ -34,48 +37,38 @@ export const POST = pipe(withSentry("/api/webhooks/stripe"))(async (ctx) => {
   try {
     event = await stripeService.constructWebhookEvent(body, signature);
   } catch (error) {
-    logger.error(
-      "Stripe webhook signature verification failed",
-      undefined,
-      error,
-    );
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    logger.error('Stripe webhook signature verification failed', undefined, error);
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  logger.info("Stripe webhook received", { type: event.type, id: event.id });
+  logger.info('Stripe webhook received', { type: event.type, id: event.id });
 
   try {
     switch (event.type) {
-      case "checkout.session.completed":
-        await handleCheckoutCompleted(
-          event.data.object as Stripe.Checkout.Session,
-        );
+      case 'checkout.session.completed':
+        await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
         break;
 
-      case "customer.subscription.updated":
-        await handleSubscriptionUpdated(
-          event.data.object as Stripe.Subscription,
-        );
+      case 'customer.subscription.updated':
+        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
         break;
 
-      case "customer.subscription.deleted":
-        await handleSubscriptionDeleted(
-          event.data.object as Stripe.Subscription,
-        );
+      case 'customer.subscription.deleted':
+        await handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
         break;
 
-      case "invoice.payment_failed":
+      case 'invoice.payment_failed':
         await handlePaymentFailed(event.data.object as Stripe.Invoice);
         break;
 
       default:
-        logger.info("Unhandled webhook event type", { type: event.type });
+        logger.info('Unhandled webhook event type', { type: event.type });
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    logger.error("Webhook handler error", { type: event.type }, error);
-    return NextResponse.json({ error: "Handler failed" }, { status: 500 });
+    logger.error('Webhook handler error', { type: event.type }, error);
+    return NextResponse.json({ error: 'Handler failed' }, { status: 500 });
   }
 });
 
@@ -85,13 +78,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const subscriptionId = session.subscription as string;
 
   if (!userId) {
-    logger.warn("Checkout completed but no userId in metadata", {
+    logger.warn('Checkout completed but no userId in metadata', {
       sessionId: session.id,
     });
     return;
   }
 
-  logger.info("Checkout completed", {
+  logger.info('Checkout completed', {
     sessionId: session.id,
     customerId,
     userId,
@@ -100,7 +93,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   const priceId = session.line_items?.data[0]?.price?.id;
   if (!priceId) {
-    logger.error("No price ID in checkout session", { sessionId: session.id });
+    logger.error('No price ID in checkout session', { sessionId: session.id });
     return;
   }
 
@@ -109,7 +102,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   });
 
   if (!tier) {
-    logger.error("No tier found for price ID", { priceId });
+    logger.error('No tier found for price ID', { priceId });
     return;
   }
 
@@ -119,7 +112,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       tierId: tier.id,
       stripeCustomerId: customerId,
       stripeSubscriptionId: subscriptionId,
-      status: "ACTIVE",
+      status: 'ACTIVE',
       startedAt: new Date(),
       expiresAt: null,
     },
@@ -128,19 +121,19 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       tierId: tier.id,
       stripeCustomerId: customerId,
       stripeSubscriptionId: subscriptionId,
-      status: "ACTIVE",
+      status: 'ACTIVE',
       startedAt: new Date(),
     },
   });
 
-  logger.info("User subscription activated", { userId, tierCode: tier.code });
+  logger.info('User subscription activated', { userId, tierCode: tier.code });
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string;
   const status = subscription.status;
 
-  logger.info("Subscription updated", {
+  logger.info('Subscription updated', {
     subscriptionId: subscription.id,
     customerId,
     status,
@@ -151,17 +144,17 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   });
 
   if (!userSub) {
-    logger.warn("Subscription update for unknown user", {
+    logger.warn('Subscription update for unknown user', {
       subscriptionId: subscription.id,
     });
     return;
   }
 
-  let dbStatus: "ACTIVE" | "CANCELLED" | "PAUSED" = "ACTIVE";
-  if (status === "canceled" || status === "unpaid") {
-    dbStatus = "CANCELLED";
-  } else if (status === "paused") {
-    dbStatus = "PAUSED";
+  let dbStatus: 'ACTIVE' | 'CANCELLED' | 'PAUSED' = 'ACTIVE';
+  if (status === 'canceled' || status === 'unpaid') {
+    dbStatus = 'CANCELLED';
+  } else if (status === 'paused') {
+    dbStatus = 'PAUSED';
   }
 
   await prisma.userSubscription.update({
@@ -169,7 +162,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     data: { status: dbStatus },
   });
 
-  logger.info("User subscription status updated", {
+  logger.info('User subscription status updated', {
     userId: userSub.userId,
     status: dbStatus,
   });
@@ -178,7 +171,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string;
 
-  logger.info("Subscription deleted", {
+  logger.info('Subscription deleted', {
     subscriptionId: subscription.id,
     customerId,
   });
@@ -188,18 +181,18 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   });
 
   if (!userSub) {
-    logger.warn("Subscription delete for unknown user", {
+    logger.warn('Subscription delete for unknown user', {
       subscriptionId: subscription.id,
     });
     return;
   }
 
   const baseTier = await prisma.tierDefinition.findUnique({
-    where: { code: "base" },
+    where: { code: 'base' },
   });
 
   if (!baseTier) {
-    logger.error("Base tier not found, cannot downgrade");
+    logger.error('Base tier not found, cannot downgrade');
     return;
   }
 
@@ -207,19 +200,19 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     where: { id: userSub.id },
     data: {
       tierId: baseTier.id,
-      status: "CANCELLED",
+      status: 'CANCELLED',
       expiresAt: new Date(),
     },
   });
 
-  logger.info("User downgraded to Base tier", { userId: userSub.userId });
+  logger.info('User downgraded to Base tier', { userId: userSub.userId });
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
   const customerId = invoice.customer as string;
   const subscriptionId = (invoice as { subscription?: string }).subscription;
 
-  logger.info("Payment failed", {
+  logger.info('Payment failed', {
     invoiceId: invoice.id,
     customerId,
     subscriptionId,
@@ -227,7 +220,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   });
 
   if (!subscriptionId) {
-    logger.warn("Payment failed but no subscription ID", {
+    logger.warn('Payment failed but no subscription ID', {
       invoiceId: invoice.id,
     });
     return;
@@ -238,7 +231,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   });
 
   if (!userSub) {
-    logger.warn("Payment failed for unknown subscription", { subscriptionId });
+    logger.warn('Payment failed for unknown subscription', { subscriptionId });
     return;
   }
 
@@ -248,12 +241,12 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   await prisma.userSubscription.update({
     where: { id: userSub.id },
     data: {
-      status: "PAUSED",
+      status: 'PAUSED',
       expiresAt: gracePeriodEnd,
     },
   });
 
-  logger.info("User subscription paused, 7-day grace period", {
+  logger.info('User subscription paused, 7-day grace period', {
     userId: userSub.userId,
     gracePeriodEnd,
   });
