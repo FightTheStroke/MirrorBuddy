@@ -12,10 +12,11 @@
 // See: https://nextjs.org/docs/app/api-reference/file-conventions/proxy
 // ============================================================================
 
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse, NextRequest, type NextFetchEvent } from 'next/server';
 import createIntlMiddleware from 'next-intl/middleware';
 import { generateNonce, CSP_NONCE_HEADER } from '@/lib/security';
 import { metricsStore } from '@/lib/observability/metrics-store';
+import { schedulePushAfterResponse } from '@/lib/observability/push-after-response';
 import { AUTH_COOKIE_NAME, LEGACY_AUTH_COOKIE, VISITOR_COOKIE_NAME } from '@/lib/auth';
 import { routing } from '@/i18n/routing';
 import { detectLocaleFromRequest, extractLocaleFromUrl } from '@/lib/i18n/locale-detection';
@@ -295,7 +296,7 @@ export function shouldSkipI18n(pathname: string): boolean {
   return false;
 }
 
-export default function proxy(request: NextRequest) {
+export default function proxy(request: NextRequest, event?: NextFetchEvent) {
   const { pathname } = request.nextUrl;
   const startTime = Date.now();
 
@@ -394,6 +395,8 @@ export default function proxy(request: NextRequest) {
       if (status >= 400) {
         metricsStore.recordError(route, status);
       }
+      // Upload this instance's window after the response, inside its lifetime.
+      schedulePushAfterResponse(event ? (pending) => event.waitUntil(pending) : undefined);
     }
 
     return response;

@@ -29,8 +29,10 @@ function escapeInfluxTagValue(value: string): string {
 
 class PrometheusPushService {
   private config: PushConfig | null = null;
-  private intervalId: ReturnType<typeof setInterval> | null = null;
   private isRunning = false;
+  private startAttempted = false;
+  private inFlight: Promise<void> | null = null;
+  private nextPushAt = 0;
 
   initialize(): boolean {
     const url = process.env.GRAFANA_CLOUD_PROMETHEUS_URL;
@@ -63,8 +65,14 @@ class PrometheusPushService {
    * Serverless suspension/recycling can lose samples. Never use these for
    * application SLOs or durable fleet totals. Shared business sources use cron.
    * NOTE: Disabled in development to avoid unnecessary Grafana Cloud costs
+   *
+   * Arms request-bound pushes only. There is deliberately no timer: Vercel
+   * suspends an instance between requests, and a push in flight at suspension
+   * had its abort timer fire on resume (#1158). See pushIfDue().
    */
   start(): void {
+    this.startAttempted = true;
+
     // Skip in development - use local /api/metrics endpoint instead
     if (process.env.NODE_ENV !== 'production') {
       logger.info('Grafana Cloud push disabled in development (cost savings)');
@@ -92,31 +100,35 @@ class PrometheusPushService {
     }
 
     this.isRunning = true;
-    const intervalMs = this.config!.intervalSeconds * 1000;
-
-    // Push immediately on start
-    this.pushMetrics().catch((error: unknown) =>
-      reportCollectorFailure('grafana_transport', error),
-    );
-
-    // Then push periodically
-    this.intervalId = setInterval(() => {
-      this.pushMetrics().catch((error: unknown) =>
-        reportCollectorFailure('grafana_transport', error),
-      );
-    }, intervalMs);
-
-    logger.info('Prometheus push service started', {
+    logger.info('Prometheus push service armed (request-bound)', {
       intervalSeconds: this.config!.intervalSeconds,
     });
   }
 
+  /**
+   * Push once the interval has elapsed, one push at a time per instance.
+   * Returns the pending push so the caller keeps the instance alive with
+   * waitUntil until it settles, or null when nothing is due. Never rejects.
+   */
+  pushIfDue(now: number = Date.now()): Promise<void> | null {
+    if (!this.startAttempted) this.start();
+    if (!this.isRunning || !this.config || this.inFlight || now < this.nextPushAt) return null;
+
+    this.nextPushAt = now + this.config.intervalSeconds * 1000;
+    const pending = this.pushMetrics()
+      .catch((error: unknown) => reportCollectorFailure('grafana_transport', error))
+      .finally(() => {
+        if (this.inFlight === pending) this.inFlight = null;
+      });
+    this.inFlight = pending;
+    return pending;
+  }
+
   stop(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
     this.isRunning = false;
+    this.startAttempted = false;
+    this.inFlight = null;
+    this.nextPushAt = 0;
     logger.info('Prometheus push service stopped');
   }
 
