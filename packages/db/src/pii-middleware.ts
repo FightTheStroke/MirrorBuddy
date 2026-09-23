@@ -10,7 +10,12 @@
  */
 
 import { encryptPII, decryptPII, hashPII } from '@/lib/security';
-import { logDecryptAccess, logBulkDecryptAccess } from '@/lib/security';
+import {
+  countDecrypt,
+  createDecryptTally,
+  flushDecryptTally,
+  type DecryptTally,
+} from './pii-decrypt-tally';
 import { logger } from '@mirrorbuddy/logger';
 import { Prisma } from '@prisma/client';
 
@@ -122,10 +127,17 @@ export async function encryptPIIFields(
  * FAULT-TOLERANT: Individual field decryption failures are caught and logged.
  * Failed fields get a placeholder value instead of crashing the entire query.
  */
-export async function decryptPIIFields(model: string, result: unknown): Promise<unknown> {
+export async function decryptPIIFields(
+  model: string,
+  result: unknown,
+  tally?: DecryptTally,
+): Promise<unknown> {
   if (!result) {
     return result;
   }
+
+  // The outermost call owns the tally and writes the query's audit batch once.
+  const audit = tally ?? createDecryptTally();
 
   // A model with no PII of its own can still be *carrying* someone's PII in an
   // included relation — RobotDevice.findUnique({ include: { user: { profile } } })
@@ -133,34 +145,12 @@ export async function decryptPIIFields(model: string, result: unknown): Promise<
   // Walk on, with an empty field list.
   const piiFields = PII_FIELD_MAP[model] ?? [];
 
-  // Handle array of results
-  if (Array.isArray(result)) {
-    const decryptedResults = await Promise.all(
-      result.map((item) => decryptSingleRecord(model, piiFields, item)),
-    );
+  const decrypted = Array.isArray(result)
+    ? await Promise.all(result.map((item) => decryptSingleRecord(model, piiFields, item, audit)))
+    : await decryptSingleRecord(model, piiFields, result, audit);
 
-    // Log bulk decryption (fire-and-forget)
-    if (result.length > 0) {
-      for (const field of piiFields) {
-        const fieldCount = result.filter(
-          (item) =>
-            typeof item === 'object' &&
-            item !== null &&
-            field in item &&
-            (item as Record<string, unknown>)[field] != null,
-        ).length;
-
-        if (fieldCount > 0) {
-          logBulkDecryptAccess(model, field, fieldCount);
-        }
-      }
-    }
-
-    return decryptedResults;
-  }
-
-  // Handle single result
-  return decryptSingleRecord(model, piiFields, result);
+  if (!tally) flushDecryptTally(audit);
+  return decrypted;
 }
 
 /**
@@ -171,6 +161,7 @@ async function decryptSingleRecord(
   model: string,
   piiFields: string[],
   record: unknown,
+  audit: DecryptTally,
 ): Promise<unknown> {
   if (!record || typeof record !== 'object') {
     return record;
@@ -185,12 +176,7 @@ async function decryptSingleRecord(
         decryptedData[field] = await decryptPII(data[field] as string, {
           throwOnError: false,
         });
-
-        logDecryptAccess({
-          model,
-          field,
-          context: { operation: 'decrypt' },
-        });
+        countDecrypt(audit, model, field);
       } catch (error) {
         // Per-field catch: log and use placeholder, never crash the query
         logger.error(`[PII-Middleware] Decrypt failed for ${model}.${field}`, {
@@ -206,10 +192,8 @@ async function decryptSingleRecord(
     const nestedModel = RELATION_TO_MODEL[key];
     if (!nestedModel || !hasPIIFields(nestedModel)) continue;
 
-    if (Array.isArray(value)) {
-      decryptedData[key] = await decryptPIIFields(nestedModel, value);
-    } else if (value && typeof value === 'object') {
-      decryptedData[key] = await decryptPIIFields(nestedModel, value);
+    if (value && typeof value === 'object') {
+      decryptedData[key] = await decryptPIIFields(nestedModel, value, audit);
     }
   }
 

@@ -35,11 +35,12 @@ afterEach(() => {
 
 describe('collector ownership', () => {
   it.each(['1', '', undefined])(
-    'never runs scheduled sources in the timer (VERCEL=%s)',
+    'never runs scheduled sources in the request-bound push (VERCEL=%s)',
     async (vercel) => {
       vi.stubEnv('VERCEL', vercel);
       prometheusPushService.start();
-      await vi.advanceTimersByTimeAsync(60_000);
+      await prometheusPushService.pushIfDue(now.getTime());
+      await prometheusPushService.pushIfDue(now.getTime() + 60_000);
 
       expect(fetchMock).toHaveBeenCalledTimes(2);
       expect(collectServiceLimitsSamples).not.toHaveBeenCalled();

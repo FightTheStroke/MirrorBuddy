@@ -44,7 +44,7 @@ const dbFlag = {
 };
 
 function mockDatabase(flags: unknown[], killSwitch = false): void {
-  vi.mocked(prisma.globalConfig.upsert).mockResolvedValue({
+  vi.mocked(prisma.globalConfig.findUnique).mockResolvedValue({
     id: 'global',
     killSwitch,
     killSwitchReason: killSwitch ? 'incident' : null,
@@ -66,7 +66,7 @@ describe('feature flag startup', () => {
   it('retains the last database kill switch when a reload fails', async () => {
     mockDatabase([dbFlag]);
     await initializeFlags();
-    vi.mocked(prisma.globalConfig.upsert).mockRejectedValue(new Error('db down'));
+    vi.mocked(prisma.globalConfig.findUnique).mockRejectedValue(new Error('db down'));
 
     await reloadFlags();
 
@@ -90,13 +90,13 @@ describe('feature flag startup', () => {
 
     await Promise.all([initializeFlags(), initializeFlags(), initializeFlags()]);
 
-    expect(prisma.globalConfig.upsert).toHaveBeenCalledTimes(1);
+    expect(prisma.globalConfig.findUnique).toHaveBeenCalledTimes(1);
     expect(prisma.featureFlag.findMany).toHaveBeenCalledTimes(1);
   });
 
   it('retries a failed startup load on an active read after five seconds', async () => {
     const clock = vi.spyOn(Date, 'now').mockReturnValue(1_000);
-    vi.mocked(prisma.globalConfig.upsert).mockRejectedValue(new Error('db down'));
+    vi.mocked(prisma.globalConfig.findUnique).mockRejectedValue(new Error('db down'));
     await initializeFlags();
     mockDatabase([dbFlag]);
     clock.mockReturnValue(5_999);
@@ -205,9 +205,10 @@ describe('feature flag startup', () => {
   });
 
   it('applies a database global kill switch after a cold-start check', async () => {
+    mockDatabase([], true);
+    // The first check answers from defaults while it starts the load.
     expect(isFeatureEnabled('quiz').enabled).toBe(true);
 
-    mockDatabase([], true);
     await initializeFlags();
 
     expect(isFeatureEnabled('quiz').reason).toBe('kill_switch');
@@ -215,7 +216,7 @@ describe('feature flag startup', () => {
 
   it('keeps serving defaults and reports an unavailable database exactly once', async () => {
     const failure = new Error('Connection terminated due to connection timeout');
-    vi.mocked(prisma.globalConfig.upsert).mockRejectedValue(failure);
+    vi.mocked(prisma.globalConfig.findUnique).mockRejectedValue(failure);
 
     await initializeFlags();
     await initializeFlags();
@@ -227,7 +228,7 @@ describe('feature flag startup', () => {
   });
 
   it('recovers the database policy on a retry after a failed load', async () => {
-    vi.mocked(prisma.globalConfig.upsert).mockRejectedValue(new Error('db down'));
+    vi.mocked(prisma.globalConfig.findUnique).mockRejectedValue(new Error('db down'));
     await initializeFlags();
     expect(isFeatureEnabled('quiz').enabled).toBe(true);
 

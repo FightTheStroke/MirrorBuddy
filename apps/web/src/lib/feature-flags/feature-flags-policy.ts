@@ -13,7 +13,8 @@ let localGlobalPolicy: typeof globalPolicy | undefined;
 let databaseLoaded = false;
 let loadFailureReported = false;
 let policyLoad: Promise<void> | null = null;
-let nextRefreshAt = Number.POSITIVE_INFINITY;
+// Due immediately: the first read inside a request starts the load under waitUntil.
+let nextRefreshAt = 0;
 let resetGeneration = 0;
 
 export const policyWrites = new PolicyWriteCoordinator(
@@ -76,6 +77,8 @@ function fromDatabase(flag: StoredFlag): FeatureFlag {
 }
 
 function refreshOnRead(): void {
+  // Static generation reads flags with no request to keep alive: stay on defaults.
+  if (process.env.NEXT_PHASE === 'phase-production-build') return;
   if (Date.now() >= nextRefreshAt && !policyLoad) waitUntil(reloadFlags());
 }
 
@@ -151,11 +154,15 @@ export async function initializeFlags(): Promise<void> {
 
 async function loadDatabasePolicy(generation: number): Promise<void> {
   try {
-    const config = await prisma.globalConfig.upsert({
-      where: { id: 'global' },
-      update: {},
-      create: { id: 'global', killSwitch: false },
-    });
+    // Plain reads in the steady state: an upsert opens a write transaction on
+    // every cold start, and reads are the only operations the transient retry replays.
+    const config =
+      (await prisma.globalConfig.findUnique({ where: { id: 'global' } })) ??
+      (await prisma.globalConfig.upsert({
+        where: { id: 'global' },
+        update: {},
+        create: { id: 'global', killSwitch: false },
+      }));
     const dbFlags = await prisma.featureFlag.findMany();
     const dbFlagMap = new Map(dbFlags.map((flag) => [flag.id, flag]));
     const nextFlags = new Map<string, FeatureFlag>();
@@ -219,5 +226,5 @@ export function _resetForTesting(): void {
   databaseLoaded = false;
   loadFailureReported = false;
   policyLoad = null;
-  nextRefreshAt = Number.POSITIVE_INFINITY;
+  nextRefreshAt = 0;
 }

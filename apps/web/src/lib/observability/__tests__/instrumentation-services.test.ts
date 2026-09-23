@@ -33,13 +33,11 @@ describe('Instrumentation Services', () => {
       expect(instrumentationContent).toMatch(/startOpenTelemetry/);
     });
 
-    it('should initialize feature flags from the database', () => {
-      // Without this, every instance answers checks from compiled defaults and
-      // database kill switches never take effect.
-      expect(instrumentationContent).toMatch(
-        /initializeFlags.*=.*await\s+import.*@\/lib\/feature-flags/,
-      );
-      expect(instrumentationContent).toMatch(/void\s+initializeFlags\(\)/);
+    it('does not load feature flags at boot, outside any request (#1157, #1167)', () => {
+      // Boot work is not covered by waitUntil: Vercel suspends the instance and
+      // the frozen connection handshake times out on resume. The first flag read
+      // inside a request loads the policy instead (feature-flags-policy.ts).
+      expect(instrumentationContent).not.toMatch(/initializeFlags\(\)/);
     });
 
     it('should validate environment variables', () => {
