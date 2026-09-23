@@ -5,7 +5,7 @@ import { pushToGrafana } from '../transport';
 const mocks = vi.hoisted(() => ({
   groups: vi.fn(),
   tiers: vi.fn(),
-  count: vi.fn(),
+  activity: vi.fn(),
   changes: vi.fn(),
   vercel: vi.fn(),
   supabase: vi.fn(),
@@ -14,7 +14,8 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock('@/lib/db', () => ({
   prisma: {
-    userSubscription: { groupBy: mocks.groups, count: mocks.count },
+    userSubscription: { groupBy: mocks.groups },
+    $queryRaw: mocks.activity,
     tierDefinition: { findMany: mocks.tiers },
     tierAuditLog: { findMany: mocks.changes },
   },
@@ -43,11 +44,9 @@ beforeEach(() => {
     { id: 'base-id', code: 'base', sortOrder: 1 },
     { id: 'pro-id', code: 'pro', sortOrder: 2 },
   ]);
-  mocks.count
-    .mockResolvedValueOnce(4)
-    .mockResolvedValueOnce(7)
-    .mockResolvedValueOnce(2)
-    .mockResolvedValueOnce(3);
+  mocks.activity.mockResolvedValueOnce([
+    { tierId: 'base-id', wau: BigInt(4), mau: BigInt(7), dau: BigInt(2), churned: BigInt(3) },
+  ]);
   mocks.changes.mockResolvedValue([
     { changes: { from: { tierId: 'base-id' }, to: { tierId: 'pro-id' } } },
     { changes: { from: { tierId: 'pro-id' }, to: { tierId: 'base-id' } } },

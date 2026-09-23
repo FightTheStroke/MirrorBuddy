@@ -38,20 +38,12 @@ describe('Tier Metrics Collector', () => {
         { id: 'tier-3', code: 'pro' },
       ] as any);
 
-      // Mock per-tier queries (activeCount, mauCount, dauCount) for each tier
-      vi.mocked(prisma.userSubscription.count)
-        // tier-1 (trial)
-        .mockResolvedValueOnce(4) // trial activeCount/WAU (7d)
-        .mockResolvedValueOnce(4) // trial mauCount/MAU (30d)
-        .mockResolvedValueOnce(2) // trial dauCount/DAU (1d)
-        // tier-2 (base)
-        .mockResolvedValueOnce(2) // base activeCount/WAU (7d)
-        .mockResolvedValueOnce(3) // base mauCount/MAU (30d)
-        .mockResolvedValueOnce(1) // base dauCount/DAU (1d)
-        // tier-3 (pro)
-        .mockResolvedValueOnce(1) // pro activeCount/WAU (7d)
-        .mockResolvedValueOnce(2) // pro mauCount/MAU (30d)
-        .mockResolvedValueOnce(1); // pro dauCount/DAU (1d)
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(4), mau: BigInt(4), dau: BigInt(2), churned: BigInt(0) },
+        { tierId: 'tier-2', wau: BigInt(2), mau: BigInt(3), dau: BigInt(1), churned: BigInt(0) },
+        { tierId: 'tier-3', wau: BigInt(1), mau: BigInt(2), dau: BigInt(1), churned: BigInt(0) },
+      ] as never);
 
       // Mock tier changes (with JSON parsing for upgrade/downgrade detection)
       vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([
@@ -115,12 +107,10 @@ describe('Tier Metrics Collector', () => {
         { id: 'tier-1', code: 'trial' },
       ] as any);
 
-      // Mock counts for: active (7d), mau (30d), dau (1d), churned (30+ days)
-      vi.mocked(prisma.userSubscription.count)
-        .mockResolvedValueOnce(3) // activeCount/WAU (7d)
-        .mockResolvedValueOnce(4) // mauCount/MAU (30d)
-        .mockResolvedValueOnce(2) // dauCount/DAU (1d)
-        .mockResolvedValueOnce(1); // churned (30+ days)
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(3), mau: BigInt(4), dau: BigInt(2), churned: BigInt(1) },
+      ] as never);
 
       // Mock empty tier changes
       vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([] as any);
@@ -218,11 +208,10 @@ describe('Tier Metrics Collector', () => {
       vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
         { id: 'tier-1', code: 'trial' },
       ] as any);
-      vi.mocked(prisma.userSubscription.count)
-        .mockResolvedValueOnce(3) // activeCount
-        .mockResolvedValueOnce(4) // mauCount
-        .mockResolvedValueOnce(2) // dauCount
-        .mockResolvedValueOnce(1); // churned
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(3), mau: BigInt(4), dau: BigInt(2), churned: BigInt(1) },
+      ] as never);
       vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([
         ...Array(10).fill({
           changes: { from: { tierId: 'tier-1' }, to: { tierId: 'tier-2' } },
@@ -262,18 +251,11 @@ describe('Tier Metrics Collector', () => {
         { id: 'tier-2', code: 'base' },
       ] as any);
 
-      // Mock counts for: active (7d), mau (30d), dau (1d), churned (30+ days inactive)
-      vi.mocked(prisma.userSubscription.count)
-        // tier-1 (trial)
-        .mockResolvedValueOnce(4) // activeCount/WAU (7d)
-        .mockResolvedValueOnce(4) // mauCount/MAU (30d)
-        .mockResolvedValueOnce(2) // dauCount/DAU (1d)
-        .mockResolvedValueOnce(2) // churned (30+ days)
-        // tier-2 (base)
-        .mockResolvedValueOnce(2) // activeCount/WAU (7d)
-        .mockResolvedValueOnce(3) // mauCount/MAU (30d)
-        .mockResolvedValueOnce(1) // dauCount/DAU (1d)
-        .mockResolvedValueOnce(1); // churned (30+ days)
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(4), mau: BigInt(4), dau: BigInt(2), churned: BigInt(2) },
+        { tierId: 'tier-2', wau: BigInt(2), mau: BigInt(3), dau: BigInt(1), churned: BigInt(1) },
+      ] as never);
 
       vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([
         ...Array(10).fill({
@@ -313,11 +295,10 @@ describe('Tier Metrics Collector', () => {
         { id: 'tier-1', code: 'trial' },
       ] as any);
 
-      vi.mocked(prisma.userSubscription.count)
-        .mockResolvedValueOnce(4) // activeCount/WAU (7d)
-        .mockResolvedValueOnce(4) // mauCount/MAU (30d)
-        .mockResolvedValueOnce(2) // dauCount/DAU (1d)
-        .mockResolvedValueOnce(2); // churned (30+ days)
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(4), mau: BigInt(4), dau: BigInt(2), churned: BigInt(2) },
+      ] as never);
 
       vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([] as any);
       vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
@@ -342,11 +323,10 @@ describe('Tier Metrics Collector', () => {
         { id: 'tier-1', code: 'trial' },
       ] as any);
 
-      vi.mocked(prisma.userSubscription.count)
-        .mockResolvedValueOnce(0) // activeCount/WAU (7d)
-        .mockResolvedValueOnce(0) // mauCount/MAU (30d)
-        .mockResolvedValueOnce(0) // dauCount/DAU (1d)
-        .mockResolvedValueOnce(0); // churned (30+ days)
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(0), mau: BigInt(0), dau: BigInt(0), churned: BigInt(0) },
+      ] as never);
 
       vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([] as any);
       vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([

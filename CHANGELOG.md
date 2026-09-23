@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Compute daily, weekly and monthly activity and churn for every subscription tier in one
+  grouped query in the five-minute metrics cron, instead of four queries per tier; the
+  figures are unchanged (#1159 follow-up).
+
 ## [0.41.15] - 2026-09-23
 
 ### Fixed

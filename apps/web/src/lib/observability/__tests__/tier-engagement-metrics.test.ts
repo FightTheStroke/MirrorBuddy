@@ -35,17 +35,11 @@ describe('Tier Engagement Metrics (DAU/WAU/MAU)', () => {
         { id: 'tier-2', code: 'base' },
       ] as any);
 
-      // Mock order: per-tier queries execute sequentially within loop
-      // tier-1: activeCount, mauCount, dauCount, churned | tier-2: activeCount, mauCount, dauCount, churned
-      vi.mocked(prisma.userSubscription.count)
-        .mockResolvedValueOnce(9) // trial activeCount (7d)
-        .mockResolvedValueOnce(10) // trial mauCount (30d)
-        .mockResolvedValueOnce(6) // trial dauCount (1d)
-        .mockResolvedValueOnce(1) // trial churned (30+ days)
-        .mockResolvedValueOnce(7) // base activeCount (7d)
-        .mockResolvedValueOnce(8) // base mauCount (30d)
-        .mockResolvedValueOnce(5) // base dauCount (1d)
-        .mockResolvedValueOnce(1); // base churned (30+ days)
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(9), mau: BigInt(10), dau: BigInt(6), churned: BigInt(1) },
+        { tierId: 'tier-2', wau: BigInt(7), mau: BigInt(8), dau: BigInt(5), churned: BigInt(1) },
+      ] as never);
 
       vi.mocked(prisma.tierAuditLog.count).mockResolvedValueOnce(0).mockResolvedValueOnce(0);
 
@@ -85,17 +79,11 @@ describe('Tier Engagement Metrics (DAU/WAU/MAU)', () => {
         { id: 'tier-2', code: 'base' },
       ] as any);
 
-      // Mock order: per-tier queries execute sequentially within loop
-      // tier-1: activeCount, mauCount, dauCount, churned | tier-2: activeCount, mauCount, dauCount, churned
-      vi.mocked(prisma.userSubscription.count)
-        .mockResolvedValueOnce(9) // trial activeCount/WAU (7d)
-        .mockResolvedValueOnce(10) // trial mauCount/MAU (30d)
-        .mockResolvedValueOnce(6) // trial dauCount/DAU (1d)
-        .mockResolvedValueOnce(1) // trial churned (30+ days)
-        .mockResolvedValueOnce(7) // base activeCount/WAU (7d)
-        .mockResolvedValueOnce(8) // base mauCount/MAU (30d)
-        .mockResolvedValueOnce(5) // base dauCount/DAU (1d)
-        .mockResolvedValueOnce(1); // base churned (30+ days)
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(9), mau: BigInt(10), dau: BigInt(6), churned: BigInt(1) },
+        { tierId: 'tier-2', wau: BigInt(7), mau: BigInt(8), dau: BigInt(5), churned: BigInt(1) },
+      ] as never);
 
       vi.mocked(prisma.tierAuditLog.count).mockResolvedValueOnce(0).mockResolvedValueOnce(0);
 
@@ -135,17 +123,11 @@ describe('Tier Engagement Metrics (DAU/WAU/MAU)', () => {
         { id: 'tier-2', code: 'base' },
       ] as any);
 
-      // Mock order: per-tier queries execute sequentially within loop
-      // tier-1: activeCount, mauCount, dauCount, churned | tier-2: activeCount, mauCount, dauCount, churned
-      vi.mocked(prisma.userSubscription.count)
-        .mockResolvedValueOnce(9) // trial activeCount/WAU (7d)
-        .mockResolvedValueOnce(10) // trial mauCount/MAU (30d)
-        .mockResolvedValueOnce(6) // trial dauCount/DAU (1d)
-        .mockResolvedValueOnce(1) // trial churned (30+ days)
-        .mockResolvedValueOnce(7) // base activeCount/WAU (7d)
-        .mockResolvedValueOnce(8) // base mauCount/MAU (30d)
-        .mockResolvedValueOnce(5) // base dauCount/DAU (1d)
-        .mockResolvedValueOnce(1); // base churned (30+ days)
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(9), mau: BigInt(10), dau: BigInt(6), churned: BigInt(1) },
+        { tierId: 'tier-2', wau: BigInt(7), mau: BigInt(8), dau: BigInt(5), churned: BigInt(1) },
+      ] as never);
 
       vi.mocked(prisma.tierAuditLog.count).mockResolvedValueOnce(0).mockResolvedValueOnce(0);
 
@@ -182,13 +164,10 @@ describe('Tier Engagement Metrics (DAU/WAU/MAU)', () => {
         { id: 'tier-1', code: 'trial' },
       ] as any);
 
-      // Mock order: per-tier queries execute sequentially within loop
-      // tier-1: activeCount, mauCount, dauCount, churned
-      vi.mocked(prisma.userSubscription.count)
-        .mockResolvedValueOnce(4) // trial activeCount/WAU (7d)
-        .mockResolvedValueOnce(5) // trial mauCount/MAU (30d)
-        .mockResolvedValueOnce(3) // trial dauCount/DAU (1d)
-        .mockResolvedValueOnce(1); // trial churned (30+ days)
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(4), mau: BigInt(5), dau: BigInt(3), churned: BigInt(1) },
+      ] as never);
 
       vi.mocked(prisma.tierAuditLog.count).mockResolvedValueOnce(0).mockResolvedValueOnce(0);
 
@@ -222,13 +201,10 @@ describe('Tier Engagement Metrics (DAU/WAU/MAU)', () => {
         { id: 'tier-1', code: 'trial' },
       ] as any);
 
-      // Mock order: per-tier queries execute sequentially within loop
-      // tier-1: activeCount, mauCount, dauCount, churned
-      vi.mocked(prisma.userSubscription.count)
-        .mockResolvedValueOnce(0) // trial activeCount/WAU = 0 (7d)
-        .mockResolvedValueOnce(0) // trial mauCount/MAU = 0 (30d)
-        .mockResolvedValueOnce(0) // trial dauCount/DAU = 0 (1d)
-        .mockResolvedValueOnce(5); // trial churned = 5 (30+ days)
+      // One activity query for every tier: wau (7d), mau (30d), dau (1d), churned (30d+)
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { tierId: 'tier-1', wau: BigInt(0), mau: BigInt(0), dau: BigInt(0), churned: BigInt(5) },
+      ] as never);
 
       vi.mocked(prisma.tierAuditLog.count).mockResolvedValueOnce(0).mockResolvedValueOnce(0);
 
