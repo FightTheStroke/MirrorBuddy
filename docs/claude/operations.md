@@ -62,6 +62,9 @@ not covered by any request, so Vercel may suspend the instance mid-flight and it
 timers fire on resume (DB connect timeouts, minute-long "slow queries", Grafana
 TimeoutErrors). Feature flags load on the first read under `waitUntil`, the PII
 decrypt audit writes under `waitUntil`, and the Grafana push runs after a response.
+Consequence: on a cold instance the first request's flag checks answer from the
+compiled defaults (kill switches off) while the policy loads; every later request
+on that instance sees the database policy. A failed load retries after 5 s.
 
 **Env vars**: `GRAFANA_CLOUD_PROMETHEUS_URL`, `GRAFANA_CLOUD_PROMETHEUS_USER`, `GRAFANA_CLOUD_API_KEY`
 
