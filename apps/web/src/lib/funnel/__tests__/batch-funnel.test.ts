@@ -48,6 +48,7 @@ const mockCreate = vi.mocked(prisma.funnelEvent.create);
 beforeEach(() => {
   vi.resetAllMocks();
   permitOptionalAnalytics();
+  vi.mocked(prisma.profile.findMany).mockResolvedValue([{ userId: 'user-1', age: 18 }] as never);
   mockSettingsFindMany.mockResolvedValue([
     {
       userId: 'user-1',
