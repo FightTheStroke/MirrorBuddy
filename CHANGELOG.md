@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.41.14] - 2026-09-23
+
 ### Security
 
 - Refuse robot device pairing in production (503) when `DEVICE_PAIRING_PEPPER` is not
