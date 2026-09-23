@@ -219,3 +219,23 @@ describe('listDevices / revokeDevice', () => {
     expect(await revokeDevice('user-1', 'd1')).toBe(false);
   });
 });
+
+describe('pairing pepper in production (#1169)', () => {
+  it('refuses to issue a code keyed with the public fallback', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('DEVICE_PAIRING_PEPPER', '');
+    vi.stubEnv('ENCRYPTION_KEY', '');
+    try {
+      await expect(createPairingCode('user-1')).rejects.toMatchObject({
+        name: 'DevicePairingUnavailableError',
+      });
+      await expect(redeemPairingCode('123456')).rejects.toMatchObject({
+        name: 'DevicePairingUnavailableError',
+      });
+      expect(db.robotDevice.create).not.toHaveBeenCalled();
+      expect(db.robotDevice.updateMany).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+});

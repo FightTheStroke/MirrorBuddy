@@ -857,6 +857,7 @@ jobs:
           TOKEN_ENCRYPTION_KEY: ${{ secrets.TOKEN_ENCRYPTION_KEY }}
           PII_ENCRYPTION_KEY: ${{ secrets.PII_ENCRYPTION_KEY }}
           IP_HASH_SALT: ${{ secrets.IP_HASH_SALT }}
+          DEVICE_PAIRING_PEPPER: ${{ secrets.DEVICE_PAIRING_PEPPER }}
           # Azure AI
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
           AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}

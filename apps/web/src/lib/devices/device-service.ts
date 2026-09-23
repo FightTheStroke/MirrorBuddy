@@ -14,17 +14,12 @@ import { createHash, createHmac, randomBytes, randomInt } from 'crypto';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { DEFAULT_BUDDY_ID, DEFAULT_COACH_ID } from '@/lib/characters/defaults';
+import { resolvePairingPepper } from './pairing-pepper';
 
 const CODE_TTL_MS = 10 * 60 * 1000; // pairing code valid for 10 minutes
 const CODE_DIGITS = 6;
 const MAX_CODE_ATTEMPTS = 5; // retries on the (rare) hashed-code collision
 const MAX_LABEL_LEN = 80;
-
-// Pepper for the low-entropy pairing code (used only when DEVICE_PAIRING_PEPPER
-// is unset). A 6-digit code has just 10^6 possibilities, so a bare hash could be
-// brute-forced from a DB leak; a server-side HMAC key makes the stored verifier
-// useless without the secret.
-const FALLBACK_PEPPER = 'mirrorbuddy-device-pairing-fallback-pepper';
 
 function sha256(value: string): string {
   return createHash('sha256').update(value).digest('hex');
@@ -32,12 +27,7 @@ function sha256(value: string): string {
 
 /** Keyed hash for the low-entropy pairing code (HMAC with a server pepper). */
 function hashCode(code: string): string {
-  let pepper = process.env.DEVICE_PAIRING_PEPPER || process.env.ENCRYPTION_KEY;
-  if (!pepper) {
-    logger.warn('DEVICE_PAIRING_PEPPER is not set, using fallback pepper for pairing codes');
-    pepper = FALLBACK_PEPPER;
-  }
-  return createHmac('sha256', pepper).update(code).digest('hex');
+  return createHmac('sha256', resolvePairingPepper()).update(code).digest('hex');
 }
 
 function generateCode(): string {
@@ -85,6 +75,7 @@ export interface DeviceSummary {
 
 /** Generate a fresh pairing code for a user, storing only its hash. */
 export async function createPairingCode(userId: string, label?: string): Promise<PairingCode> {
+  resolvePairingPepper(); // fail closed before touching the database
   const expiresAt = new Date(Date.now() + CODE_TTL_MS);
   const safeLabel = label?.trim().slice(0, MAX_LABEL_LEN) || null;
 

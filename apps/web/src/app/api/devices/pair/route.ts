@@ -4,12 +4,15 @@
  * The robot redeems a 6-digit pairing code for a long-lived device token.
  * Body: { code: string }. Returns { token, deviceId }.
  */
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
-import { RATE_LIMITS, checkRateLimitAsync } from "@/lib/rate-limit";
-import { redeemPairingCode } from "@/lib/devices/device-service";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withRateLimit } from '@/lib/api/middlewares';
+import { RATE_LIMITS, checkRateLimitAsync } from '@/lib/rate-limit';
+import { redeemPairingCode } from '@/lib/devices/device-service';
+import { isDevicePairingUnavailable } from '@/lib/devices/pairing-pepper';
 
 export const revalidate = 0;
+
+const PAIRING_UNAVAILABLE = { error: 'Device pairing is temporarily unavailable' };
 
 // SECURITY: machine endpoint. The robot authenticates with the one-time pairing
 // code itself and has no browser session or cookies, so cookie-based CSRF does not
@@ -18,31 +21,36 @@ export const revalidate = 0;
 // defeated by a spoofed proxy header, and (3) the code's 10-minute expiry. Codes
 // are single-use and stored only as sha256 hashes; redemption is atomic.
 export const POST = pipe(
-  withSentry("/api/devices/pair"),
+  withSentry('/api/devices/pair'),
   withRateLimit(RATE_LIMITS.DEVICE_PAIR),
 )(async (ctx) => {
   // Deployment-independent global brute-force ceiling (constant key, all clients).
-  const global = await checkRateLimitAsync("device-pair:global", RATE_LIMITS.DEVICE_PAIR_GLOBAL);
+  const global = await checkRateLimitAsync('device-pair:global', RATE_LIMITS.DEVICE_PAIR_GLOBAL);
   if (!global.success) {
-    return NextResponse.json({ error: "Too many attempts, try again later" }, { status: 429 });
+    return NextResponse.json({ error: 'Too many attempts, try again later' }, { status: 429 });
   }
 
-  let code = "";
+  let code = '';
   try {
     const body: unknown = await ctx.req.json();
-    if (body && typeof (body as { code?: unknown }).code === "string") {
+    if (body && typeof (body as { code?: unknown }).code === 'string') {
       code = (body as { code: string }).code;
     }
   } catch {
     // Invalid body -> treated as an invalid code below.
   }
 
-  const result = await redeemPairingCode(code);
+  let result: Awaited<ReturnType<typeof redeemPairingCode>>;
+  try {
+    result = await redeemPairingCode(code);
+  } catch (error) {
+    if (isDevicePairingUnavailable(error)) {
+      return NextResponse.json(PAIRING_UNAVAILABLE, { status: 503 });
+    }
+    throw error;
+  }
   if (!result) {
-    return NextResponse.json(
-      { error: "Invalid or expired code" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid or expired code' }, { status: 400 });
   }
   return NextResponse.json({ token: result.token, deviceId: result.deviceId });
 });
