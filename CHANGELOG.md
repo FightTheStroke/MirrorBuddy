@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Refuse robot device pairing in production (503) when `DEVICE_PAIRING_PEPPER` is not
+  configured, instead of keying pairing codes with a fallback published in the repository
+  (#1169). New environment variable: `DEVICE_PAIRING_PEPPER`. Pairing codes issued before
+  the deploy stop verifying (10-minute lifetime); paired devices are unaffected.
+
 ## [0.41.9] - 2026-09-22
 
 - No user-facing changes recorded.

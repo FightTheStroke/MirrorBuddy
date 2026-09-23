@@ -274,6 +274,7 @@ These are required in production but optional for local development:
 PII_ENCRYPTION_KEY=           # AES-256 key for PII encryption — user creation fails without this
 COOKIE_SIGNING_SECRET=        # HMAC-SHA256 secret for signed cookies
 IP_HASH_SALT=                 # Salt for trial mode IP hashing
+DEVICE_PAIRING_PEPPER=        # HMAC key for robot pairing codes — pairing answers 503 without it
 
 # Database SSL (REQUIRED for Supabase production)
 SUPABASE_CA_CERT=             # PEM certificate — app fails fast if missing (ADR 0063)

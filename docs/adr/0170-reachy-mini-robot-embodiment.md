@@ -115,8 +115,10 @@ its own ADR and its own consent, and we are not doing it.
   unexpired) claims the code, closing the double-redeem (TOCTOU) race.
 - **Rate limiting**: per-IP **and** a global brute-force ceiling
   (`DEVICE_PAIR_GLOBAL`, 100/15 min) that is deployment-independent.
-- **Only hashes stored**: `sha256(code)` and `sha256(token)`; plaintext is
-  returned once and never persisted.
+- **Only hashes stored**: `HMAC-SHA256(DEVICE_PAIRING_PEPPER, code)` and
+  `sha256(token)`; plaintext is returned once and never persisted. Production
+  refuses to pair (503) without `DEVICE_PAIRING_PEPPER` rather than use the
+  development fallback published in the repository (#1169, 2026-09-23).
 - `listDevices` returns only `pairedAt != null` rows (no phantom devices).
 
 ## Consequences

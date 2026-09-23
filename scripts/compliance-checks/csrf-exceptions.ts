@@ -13,7 +13,7 @@ export const CSRF_EXCEPTIONS: Record<string, CsrfException> = {
   '/api/devices/pair': {
     method: 'POST',
     authority: 'One-time robot pairing code passed to redeemPairingCode; no browser identity.',
-    sha256: 'd613f28b58ffb6e0c6938c67420ed595db67deec64c468007fda174c0e953bc8',
+    sha256: '5359c801d22ba2ef9597e13f29f92c8a977dcfaa4d801ae8c4fd334a284f2c64',
   },
   '/api/coppa/verify': {
     method: 'POST',
