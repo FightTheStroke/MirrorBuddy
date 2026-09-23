@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Stop reporting the platform loader's Node `ExperimentalWarning` as an application error;
+  other Node process warnings stay visible in Sentry at warning level (#1162).
+- Log the 401 answered to an absent or revoked session as an expected outcome rather
+  than a warning; other handled 4xx responses are still reported (#1165).
+
 ## [0.41.9] - 2026-09-22
 
 - No user-facing changes recorded.
