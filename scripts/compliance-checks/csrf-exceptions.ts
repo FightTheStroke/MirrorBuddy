@@ -94,7 +94,7 @@ export const CSRF_EXCEPTIONS: Record<string, CsrfException> = {
     method: 'POST',
     authority:
       'Stripe constructWebhookEvent verifies the raw body signature before dispatching mutations.',
-    sha256: '5b4d48cecfdf8d8518565ff4d9ffcda839aec04f56f7c844ec4950e0c8b055f8',
+    sha256: '97947646667a3a4cb59eab3e501adbf811f1cdc4d7b9322131ac96c987f42235',
   },
 };
 

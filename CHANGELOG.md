@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (#1169). New environment variable: `DEVICE_PAIRING_PEPPER`. Pairing codes issued before
   the deploy stop verifying (10-minute lifetime); paired devices are unaffected.
 
+### Fixed
+
+- Reject unsigned Stripe webhook requests (still 400, never verified or processed) without
+  raising a Sentry warning; a present but invalid signature is still reported as an error
+  (#1166).
+
 ## [0.41.12] - 2026-09-23
 
 ### Fixed
