@@ -1,5 +1,8 @@
 import { prisma } from '@/lib/db';
 import type { MetricSample } from './http-metrics-collector';
+import { countTierActivity, type TierActivity } from './tier-activity-query';
+
+const NO_ACTIVITY: TierActivity = { dau: 0, wau: 0, mau: 0, churned: 0 };
 
 export async function collectTierMetrics(
   instanceLabels: Record<string, string>,
@@ -22,13 +25,17 @@ export async function collectTierMetrics(
     tierMap.set(tier.id, tier.code);
   }
 
-  // Query: Active users by tier (users with conversations in last 7 days)
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const activityByTier = await countTierActivity();
 
   for (const tierGroup of usersByTier) {
     const tierCode = tierMap.get(tierGroup.tierId) || 'unknown';
     const totalUsers = tierGroup._count.id;
+    const {
+      wau: activeCount,
+      mau: mauCount,
+      dau: dauCount,
+      churned: churnedCount,
+    } = activityByTier.get(tierGroup.tierId) ?? NO_ACTIVITY;
 
     samples.push({
       name: 'mirrorbuddy_users_by_tier',
@@ -38,22 +45,6 @@ export async function collectTierMetrics(
       },
       value: totalUsers,
       timestamp,
-    });
-
-    // Count active users (users with conversations in last 7 days)
-    const activeCount = await prisma.userSubscription.count({
-      where: {
-        tierId: tierGroup.tierId,
-        user: {
-          conversations: {
-            some: {
-              updatedAt: {
-                gte: sevenDaysAgo,
-              },
-            },
-          },
-        },
-      },
     });
 
     samples.push({
@@ -66,7 +57,7 @@ export async function collectTierMetrics(
       timestamp,
     });
 
-    // Add total active count (for easier querying) - reuse activeCount from 7d query
+    // Add total active count (for easier querying) - same 7-day figure
     samples.push({
       name: 'mirrorbuddy_total_active_by_tier',
       labels: {
@@ -88,27 +79,6 @@ export async function collectTierMetrics(
       timestamp,
     });
 
-    const oneDayAgo = new Date();
-    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const mauCount = await prisma.userSubscription.count({
-      where: {
-        tierId: tierGroup.tierId,
-        user: {
-          conversations: {
-            some: {
-              updatedAt: {
-                gte: thirtyDaysAgo,
-              },
-            },
-          },
-        },
-      },
-    });
-
     samples.push({
       name: 'mirrorbuddy_mau_by_tier',
       labels: {
@@ -117,21 +87,6 @@ export async function collectTierMetrics(
       },
       value: mauCount,
       timestamp,
-    });
-
-    const dauCount = await prisma.userSubscription.count({
-      where: {
-        tierId: tierGroup.tierId,
-        user: {
-          conversations: {
-            some: {
-              updatedAt: {
-                gte: oneDayAgo,
-              },
-            },
-          },
-        },
-      },
     });
 
     samples.push({
@@ -144,32 +99,7 @@ export async function collectTierMetrics(
       timestamp,
     });
 
-    // Count churned users (inactive for 30+ days - no conversation activity in 30+ days)
-    const churnedCount = await prisma.userSubscription.count({
-      where: {
-        tierId: tierGroup.tierId,
-        user: {
-          OR: [
-            {
-              conversations: {
-                none: {},
-              },
-            },
-            {
-              // Users whose last conversation was 30+ days ago
-              conversations: {
-                every: {
-                  updatedAt: {
-                    lt: thirtyDaysAgo,
-                  },
-                },
-              },
-            },
-          ],
-        },
-      },
-    });
-
+    // Churned: no conversation activity in the last 30 days (tier-activity-query.ts)
     samples.push({
       name: 'mirrorbuddy_churned_users_by_tier',
       labels: {
