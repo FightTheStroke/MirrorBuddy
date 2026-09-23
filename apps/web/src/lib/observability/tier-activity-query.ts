@@ -8,6 +8,8 @@
  *   the last 1 / 7 / 30 days (latest conversation update >= cut-off);
  * - churned: subscriptions whose user has no conversation updated in the last
  *   30 days, including users with no conversation at all.
+ * Only the last 30 days of conversations are scanned: older activity cannot
+ * change any of the four figures, so the cost stays bounded as history grows.
  */
 import { prisma } from '@/lib/db';
 
@@ -50,6 +52,7 @@ export async function countTierActivity(
     LEFT JOIN (
       SELECT "userId", MAX("updatedAt") AS last_update
       FROM "Conversation"
+      WHERE "updatedAt" >= ${thirtyDaysAgo}
       GROUP BY "userId"
     ) a ON a."userId" = s."userId"
     GROUP BY s."tierId"
