@@ -6,6 +6,11 @@
  * - WARN: >1000ms (logged as warning)
  * - CRITICAL: >3000ms (logged as error)
  *
+ * Cold start: queries started before the first query of the process succeeds
+ * also pay one-time startup (Prisma engine initialisation and the first pooler
+ * connection), ~1-1.5 s on a new Vercel instance against ~20-170 ms warm. They
+ * are logged at info instead of WARN; CRITICAL still applies to them (#1163).
+ *
  * @module db/slow-query-monitor
  */
 
@@ -14,6 +19,8 @@ import { logger } from '@mirrorbuddy/logger';
 
 const SLOW_QUERY_WARN_MS = 1000;
 const SLOW_QUERY_CRITICAL_MS = 3000;
+
+let stackWarm = false;
 
 /**
  * Creates a Prisma extension that monitors and logs slow queries.
@@ -25,24 +32,18 @@ export function createSlowQueryMonitor() {
     query: {
       $allModels: {
         async $allOperations({ model, operation, args, query }) {
+          const coldStart = !stackWarm;
           const start = performance.now();
           const result = await query(args);
           const durationMs = Math.round(performance.now() - start);
+          stackWarm = true;
+          const details = { model, operation, durationMs, coldStart, args: summarizeArgs(args) };
 
           if (durationMs >= SLOW_QUERY_CRITICAL_MS) {
-            logger.error('[SlowQuery] CRITICAL', {
-              model,
-              operation,
-              durationMs,
-              args: summarizeArgs(args),
-            });
+            logger.error('[SlowQuery] CRITICAL', details);
           } else if (durationMs >= SLOW_QUERY_WARN_MS) {
-            logger.warn('[SlowQuery] WARN', {
-              model,
-              operation,
-              durationMs,
-              args: summarizeArgs(args),
-            });
+            if (coldStart) logger.info('[SlowQuery] Cold start', details);
+            else logger.warn('[SlowQuery] WARN', details);
           }
 
           return result;
