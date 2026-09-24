@@ -139,8 +139,9 @@ describe.each(['ADMIN_READONLY', 'ADMIN'] as const)(
       };
       expect(response.status).toBe(200);
       expect(await response.json()).toMatchObject(expected);
+      // Sentry MIRRORBUDDY-3J (N+1): alerts used to re-run every usage query.
       expect(mocks.usage).toHaveBeenCalledOnce();
-      expect(mocks.alerts).toHaveBeenCalledOnce();
+      expect(mocks.alerts).not.toHaveBeenCalled();
     });
   },
 );
@@ -151,7 +152,6 @@ describe('data failures remain failures rather than successful empty analytics',
     { route: routes[0], source: 'groupBy', read: mocks.groupBy },
     { route: routes[0], source: 'cost statistics', read: mocks.costStats },
     { route: routes[1], source: 'service usage', read: mocks.usage },
-    { route: routes[1], source: 'service alerts', read: mocks.alerts },
   ];
   it.each(failures)(
     'normalizes $source failure without exposing details',

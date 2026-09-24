@@ -10,7 +10,6 @@ import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { metricTruth, snapshotContext, type MetricTruth } from '@/lib/admin/metric-truth';
 import {
   getAllExternalServiceUsage,
-  getServiceAlerts,
   EXTERNAL_SERVICE_QUOTAS,
 } from '@/lib/metrics/external-service-metrics';
 
@@ -19,7 +18,10 @@ export const GET = pipe(
   withSentry('/api/dashboard/external-services'),
   withAdminReadOnly,
 )(async (_ctx) => {
-  const [allUsage, alerts] = await Promise.all([getAllExternalServiceUsage(), getServiceAlerts()]);
+  // One read: alerts are the same usage rows, filtered. Reading them again ran
+  // every usage query twice per request (Sentry MIRRORBUDDY-3J, N+1).
+  const allUsage = await getAllExternalServiceUsage();
+  const alerts = allUsage.filter((usage) => usage.status !== 'ok');
 
   // Group by service
   const byService: Record<
