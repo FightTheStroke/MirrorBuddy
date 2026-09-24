@@ -139,11 +139,42 @@ describe.each(['ADMIN_READONLY', 'ADMIN'] as const)(
       };
       expect(response.status).toBe(200);
       expect(await response.json()).toMatchObject(expected);
+      // Sentry MIRRORBUDDY-3J (N+1): alerts used to re-run every usage query.
       expect(mocks.usage).toHaveBeenCalledOnce();
-      expect(mocks.alerts).toHaveBeenCalledOnce();
+      expect(mocks.alerts).not.toHaveBeenCalled();
     });
   },
 );
+
+describe('external-services alerts', () => {
+  it('lists only services that need attention, from the single usage read', async () => {
+    setCaller('ADMIN');
+    mocks.usage.mockResolvedValueOnce([
+      ...usage,
+      {
+        service: 'Google Drive',
+        metric: 'Queries/day',
+        currentValue: 10,
+        limit: 1000,
+        usagePercent: 1,
+        status: 'ok',
+        period: '24h',
+      },
+    ]);
+
+    const response = await getServices(
+      new NextRequest('http://localhost/api/dashboard/external-services'),
+    );
+    const body = await response.json();
+
+    expect(body.summary.totalServices).toBe(3);
+    expect(body.summary.alertDetails.map((a: { service: string }) => a.service)).toEqual([
+      'Azure OpenAI',
+      'Brave Search',
+    ]);
+    expect(mocks.usage).toHaveBeenCalledOnce();
+  });
+});
 
 describe('data failures remain failures rather than successful empty analytics', () => {
   const failures = [
@@ -151,7 +182,6 @@ describe('data failures remain failures rather than successful empty analytics',
     { route: routes[0], source: 'groupBy', read: mocks.groupBy },
     { route: routes[0], source: 'cost statistics', read: mocks.costStats },
     { route: routes[1], source: 'service usage', read: mocks.usage },
-    { route: routes[1], source: 'service alerts', read: mocks.alerts },
   ];
   it.each(failures)(
     'normalizes $source failure without exposing details',

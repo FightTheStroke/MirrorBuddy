@@ -192,23 +192,18 @@ export async function getGoogleDriveUsage(): Promise<ExternalServiceUsage[]> {
   const minuteAgo = new Date(now.getTime() - 60000);
   const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-  // Minute-level metrics
-  const driveMinuteEvents = await prisma.telemetryEvent.count({
-    where: {
-      category: 'external_api',
-      label: 'google_drive',
-      timestamp: { gte: minuteAgo },
-    },
-  });
-
-  // Daily aggregate
-  const driveDayEvents = await prisma.telemetryEvent.count({
-    where: {
-      category: 'external_api',
-      label: 'google_drive',
-      timestamp: { gte: dayAgo },
-    },
-  });
+  // Both windows in one query: two same-shape counts per call were part of the
+  // N+1 Sentry reported on the external-services dashboard (MIRRORBUDDY-3J).
+  const rows = await prisma.$queryRaw<
+    Array<{ minute: bigint | number | null; day: bigint | number | null }>
+  >`
+    SELECT COUNT(*) FILTER (WHERE "timestamp" >= ${minuteAgo}) AS minute, COUNT(*) AS day
+    FROM "TelemetryEvent"
+    WHERE category = 'external_api' AND label = 'google_drive' AND "timestamp" >= ${dayAgo}
+  `;
+  const counts = Array.isArray(rows) ? rows[0] : undefined;
+  const driveMinuteEvents = Number(counts?.minute ?? 0);
+  const driveDayEvents = Number(counts?.day ?? 0);
 
   const quotas = EXTERNAL_SERVICE_QUOTAS.GOOGLE_DRIVE;
 

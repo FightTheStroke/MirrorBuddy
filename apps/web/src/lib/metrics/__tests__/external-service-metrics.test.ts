@@ -144,15 +144,25 @@ describe('external-service-metrics', () => {
 
   describe('getGoogleDriveUsage', () => {
     it('returns query count for time period', async () => {
-      const countMock = prisma.telemetryEvent.count as ReturnType<typeof vi.fn>;
-      countMock.mockResolvedValueOnce(50); // minute count
-      countMock.mockResolvedValueOnce(1000); // day count
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([
+        { minute: BigInt(50), day: BigInt(1000) },
+      ] as never);
 
       const usage = await getGoogleDriveUsage();
 
       expect(usage).toHaveLength(2);
       expect(usage[0].currentValue).toBe(50);
       expect(usage[1].currentValue).toBe(1000);
+    });
+
+    it('counts both windows in one query (Sentry MIRRORBUDDY-3J, N+1)', async () => {
+      vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([] as never);
+
+      const usage = await getGoogleDriveUsage();
+
+      expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
+      expect(prisma.telemetryEvent.count).not.toHaveBeenCalled();
+      expect(usage.map((u) => u.currentValue)).toEqual([0, 0]);
     });
   });
 

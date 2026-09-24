@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Read external-service usage once per request on the admin external-services dashboard;
+  its alerts re-ran every usage query a second time, and Google Drive's two windows are now
+  counted in one query (Sentry N+1).
+
 ## [0.42.0] - 2026-09-24
 
 ### Added
