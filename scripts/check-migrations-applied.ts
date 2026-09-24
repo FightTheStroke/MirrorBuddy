@@ -11,11 +11,12 @@
  * Run against production with:
  *   DIRECT_URL=... npm run script -- scripts/check-migrations-applied.ts
  */
-import { readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { Client } from 'pg';
 import { probeVectorSearchFunction } from './lib/vector-search-probe';
 import { createPgClient, connectWithRetry } from './lib/pg-connection';
+import { findChecksumDrift, type AppliedMigrationRow } from './lib/migration-checksums';
 
 const MIGRATIONS_DIR = join(process.cwd(), 'apps/web/prisma/migrations');
 
@@ -26,14 +27,47 @@ function localMigrations(): string[] {
     .sort();
 }
 
-async function appliedMigrations(client: Client): Promise<Set<string>> {
-  const { rows } = await client.query<{
-    migration_name: string;
-    finished_at: Date | null;
-    rolled_back_at: Date | null;
-  }>('SELECT migration_name, finished_at, rolled_back_at FROM _prisma_migrations');
+async function migrationRows(client: Client): Promise<AppliedMigrationRow[]> {
+  const { rows } = await client.query<AppliedMigrationRow>(
+    'SELECT migration_name, checksum, finished_at, rolled_back_at FROM _prisma_migrations',
+  );
+  return rows;
+}
+
+function appliedMigrations(rows: AppliedMigrationRow[]): Set<string> {
   return new Set(
     rows.filter((r) => r.finished_at && !r.rolled_back_at).map((r) => r.migration_name),
+  );
+}
+
+/**
+ * Reported, not blocking: production checksums were never compared before, so
+ * the first runs establish the baseline instead of stopping every release.
+ */
+function reportChecksumDrift(local: string[], rows: AppliedMigrationRow[]): void {
+  const files: { name: string; sql: string }[] = [];
+  for (const name of local) {
+    const path = join(MIGRATIONS_DIR, name, 'migration.sql');
+    if (!existsSync(path)) continue;
+    try {
+      files.push({ name, sql: readFileSync(path, 'utf8') });
+    } catch {
+      console.log(`::warning title=Migration unreadable::${name}/migration.sql could not be read`);
+    }
+  }
+  const drifted = findChecksumDrift(files, rows);
+  if (drifted.length === 0) {
+    console.log('✓ Every applied migration file still matches the checksum production recorded.');
+    return;
+  }
+  for (const name of drifted) {
+    console.log(
+      `::warning title=Migration edited after apply::${name} no longer matches the checksum production recorded`,
+    );
+  }
+  console.warn(
+    `\n⚠ ${drifted.length} applied migration(s) were edited after production ran them. ` +
+      'Production holds the schema of the original file; ship the change as a new migration.',
   );
 }
 
@@ -57,7 +91,8 @@ async function main(): Promise<void> {
 
   try {
     const local = localMigrations();
-    const applied = await appliedMigrations(client);
+    const rows = await migrationRows(client);
+    const applied = appliedMigrations(rows);
     const pending = local.filter((m) => !applied.has(m));
 
     console.log(
@@ -70,6 +105,8 @@ async function main(): Promise<void> {
       console.error('\nRun `npx prisma migrate deploy` against this database before shipping.');
       process.exit(1);
     }
+
+    reportChecksumDrift(local, rows);
 
     // A migration row says a file was run, not that its body took effect.
     // Production listed 20260117183800_pgvector as applied since 20 Jan 2026

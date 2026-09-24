@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Report, during promotion to production, any applied database migration whose file was
+  edited after production ran it (checksum drift), which `prisma migrate deploy` never
+  checks. Reported as a warning until the production baseline is confirmed.
+
 ## [0.41.16] - 2026-09-23
 
 ### Fixed

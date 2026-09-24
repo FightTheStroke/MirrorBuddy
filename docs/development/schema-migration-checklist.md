@@ -140,6 +140,15 @@ This simulates Vercel's fresh Prisma generation and catches migration issues.
 
 **Prevention**: Use templates above.
 
+### Issue 4: Migration edited after it was applied
+
+`prisma migrate deploy` does not compare checksums: an edited `migration.sql` that already
+ran is still reported as applied, while production keeps the schema of the original file.
+Never edit an applied migration; ship the change as a new migration.
+`scripts/check-migrations-applied.ts` (run by `promote-to-production.yml`) compares every
+applied file with the checksum recorded in `_prisma_migrations` and emits a GitHub warning
+for each mismatch. It reports without blocking until the production baseline is confirmed.
+
 ## Verification Commands
 
 ```bash
