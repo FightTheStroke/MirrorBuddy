@@ -7,6 +7,34 @@ Corrected — 2026-08-31 (historical lifecycle evidence: **Public Preview**, not
 Corrected — 2026-09-17 (retirement dates: published schedule and regional catalogue disagree)
 Audited — 2026-09-21 (lifecycle sources conflict; production configuration and device alignment)
 Verified — 2026-09-21 (legacy variable is a real GA deployment; every configured rung mints, both GA rungs answer)
+Re-verified — 2026-09-24 (all three sources now label `gpt-realtime-2.1` GA; the `gpt-realtime-2` rung retires regionally 2026-10-31)
+
+## Current state (read-only re-verification, 2026-09-24 06:46 UTC)
+
+The three lifecycle sources, which conflicted on September 19 and 21, now agree on the
+production model. Read without any cloud or flag change:
+
+| Model / version                      | Learn overview (updated 09-23)   | Learn schedule (updated 09-23) | `swedencentral` catalogue           |
+| ------------------------------------ | -------------------------------- | ------------------------------ | ----------------------------------- |
+| `gpt-realtime-2.1` `2026-07-07`      | 2.x series "generally available" | **GA**, retires 2027-06-25     | **GA**, retires 2027-07-31          |
+| `gpt-realtime-2.1-mini` `2026-07-07` | same                             | **GA**, retires 2027-06-25     | **GA** (was Preview 09-21)          |
+| `gpt-realtime-2` `2026-05-06`        | same                             | **Preview**, replacement 2.1   | **Preview**, retires **2026-10-31** |
+| `gpt-realtime-1.5` `2026-02-23`      | —                                | GA, retires 2027-08-24         | GA, retires 2027-08-24              |
+| `gpt-realtime` `2025-08-28`          | —                                | GA, retires 2027-03-02         | GA, retires 2027-03-02              |
+
+- The overview <https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/realtime-2> no
+  longer carries the "(preview) … without a service-level agreement" wording quoted below. The
+  **accepted Preview risk recorded for 2.1 is therefore resolved**; SLA terms themselves were not
+  re-read. It still applies to the `gpt-realtime-2` rung.
+- Production still selects `gpt-realtime-2.1` (`/api/provider/status`), and the resource deploys
+  every rung of the chain (`az cognitiveservices account deployment list`); `gpt-realtime-2.1-mini`
+  is still not deployed (see the mini watch item).
+- **Watch item — `gpt-realtime-2` after 2026-10-31.** The kill-switch rollback in this ADR lands
+  on V2. After its regional retirement that rollback would land on a retired deployment. Before
+  2026-10-31, disable `voice_realtime_2` (or unset `AZURE_OPENAI_REALTIME_DEPLOYMENT_V2`) so the
+  rollback lands on the GA `gpt-realtime-15`. The request retry already walks only GA rungs.
+- `gpt-realtime-mini` now has four schedule rows (2025-10-06: 2027-04-06 / 2026-09-21;
+  2025-12-15: 2027-06-15 / 2026-12-15). The deployed 2025-12-15 keeps the regional 2026-12-15 date.
 
 ## Historical correction (2026-08-31; evidence refreshed 2026-09-17)
 
