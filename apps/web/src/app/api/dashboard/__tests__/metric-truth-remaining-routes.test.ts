@@ -11,6 +11,7 @@ const db = vi.hoisted(() => ({
   sessionMetrics: { findMany: vi.fn() },
   safetyEvent: { findMany: vi.fn() },
   telemetryEvent: { findMany: vi.fn(), count: vi.fn() },
+  $queryRaw: vi.fn(),
 }));
 vi.mock('@/lib/db', () => ({ prisma: db }));
 vi.mock('@mirrorbuddy/db', () => ({ prisma: db }));
@@ -37,6 +38,7 @@ beforeEach(() => {
   db.safetyEvent.findMany.mockResolvedValue([]);
   db.telemetryEvent.findMany.mockResolvedValue([]);
   db.telemetryEvent.count.mockResolvedValue(0);
+  db.$queryRaw.mockResolvedValue([{ minute: BigInt(0), day: BigInt(0) }]);
 });
 afterEach(() => vi.useRealTimers());
 
