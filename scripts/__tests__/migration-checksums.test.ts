@@ -37,6 +37,8 @@ describe('findChecksumDrift', () => {
     const lf = 'CREATE TABLE "A" (id text);\nSELECT 1;\n';
     const crlf = lf.replace(/\n/g, '\r\n');
     expect(findChecksumDrift([{ name: 'm1', sql: crlf }], [applied('m1', sha(lf))])).toEqual([]);
+    const cr = lf.replace(/\n/g, '\r');
+    expect(findChecksumDrift([{ name: 'm1', sql: cr }], [applied('m1', sha(lf))])).toEqual([]);
   });
 
   it('checks only finished, not rolled-back rows, and ignores migrations not yet applied', () => {

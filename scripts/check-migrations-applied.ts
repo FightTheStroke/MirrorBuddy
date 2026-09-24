@@ -45,10 +45,16 @@ function appliedMigrations(rows: AppliedMigrationRow[]): Set<string> {
  * the first runs establish the baseline instead of stopping every release.
  */
 function reportChecksumDrift(local: string[], rows: AppliedMigrationRow[]): void {
-  const files = local
-    .map((name) => ({ name, path: join(MIGRATIONS_DIR, name, 'migration.sql') }))
-    .filter(({ path }) => existsSync(path))
-    .map(({ name, path }) => ({ name, sql: readFileSync(path, 'utf8') }));
+  const files: { name: string; sql: string }[] = [];
+  for (const name of local) {
+    const path = join(MIGRATIONS_DIR, name, 'migration.sql');
+    if (!existsSync(path)) continue;
+    try {
+      files.push({ name, sql: readFileSync(path, 'utf8') });
+    } catch {
+      console.log(`::warning title=Migration unreadable::${name}/migration.sql could not be read`);
+    }
+  }
   const drifted = findChecksumDrift(files, rows);
   if (drifted.length === 0) {
     console.log('✓ Every applied migration file still matches the checksum production recorded.');

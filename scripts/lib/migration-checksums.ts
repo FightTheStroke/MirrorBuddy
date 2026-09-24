@@ -39,7 +39,7 @@ export function findChecksumDrift(
   for (const migration of Array.isArray(local) ? local : []) {
     const checksums = recorded.get(migration?.name);
     if (!checksums || typeof migration.sql !== 'string') continue;
-    const candidates = [sha256(migration.sql), sha256(migration.sql.replace(/\r\n/g, '\n'))];
+    const candidates = [sha256(migration.sql), sha256(migration.sql.replace(/\r\n?/g, '\n'))];
     if (!candidates.some((candidate) => checksums.has(candidate))) drifted.push(migration.name);
   }
   return drifted.sort();
