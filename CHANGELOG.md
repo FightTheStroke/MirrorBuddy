@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.42.4] - 2026-09-29
+
 ### Security
 
 - Raise pinned dependency overrides to patched versions: `fast-uri` 3.1.7 (high),
