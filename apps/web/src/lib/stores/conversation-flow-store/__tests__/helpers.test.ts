@@ -3,10 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  saveCurrentConversation,
-  loadConversationMessages,
-} from '../helpers';
+import { saveCurrentConversation, loadConversationMessages } from '../helpers';
 import type { ConversationFlowState, FlowMessage, CharacterConversation } from '../types';
 
 describe('conversation-flow-store helpers', () => {

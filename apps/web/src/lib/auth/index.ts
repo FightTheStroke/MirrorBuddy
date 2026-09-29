@@ -16,6 +16,8 @@ export {
   requireIdentityRefresh,
   requireClientUserId,
   subscribeClientIdentity,
+  isSameAccount,
+  whenIdentitySettled,
   logoutClient,
   IdentityUnavailableError,
   type ClientIdentity,

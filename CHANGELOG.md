@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `undici` 6.28.1, `ip-address` 10.5.1 (Dependabot alerts #299–#301). The old pins kept
   the vulnerable versions in place and made Dependabot's own updates fail.
 
+### Fixed
+
+- Consent answers given while the startup sign-in check is still running now wait for it
+  instead of failing with "Consent identity" (Sentry MIRRORBUDDY-3M/3K, #1201, #1202).
+- Conversation summaries no longer fail with "Conversation identity changed" when the
+  sign-in check refreshes the same account (Sentry MIRRORBUDDY-33, #1200).
+
 ## [0.42.2] - 2026-09-29
 
 ### Fixed

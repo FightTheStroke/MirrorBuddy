@@ -14,7 +14,9 @@ import {
   getClientIdentity,
   getUserIdFromCookie,
   IdentityUnavailableError,
+  isSameAccount,
   requireClientUserId,
+  whenIdentitySettled,
 } from '@/lib/auth/client-auth';
 import type { CharacterType } from '@/types';
 import type { ConversationSummary } from './types';
@@ -111,7 +113,9 @@ export async function loadConversationSummariesFromDB(): Promise<ConversationSum
     }
 
     const data = await response.json();
-    if (getClientIdentity() !== identity) throw new Error('Conversation identity changed');
+    // Another hook may re-check /api/auth/me meanwhile: same account, new object.
+    const current = await whenIdentitySettled();
+    if (!isSameAccount(identity, current)) throw new Error('Conversation identity changed');
 
     // API might return error object instead of array
     if (!Array.isArray(data)) {
