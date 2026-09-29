@@ -4,8 +4,7 @@
 // SECURITY: API key is NEVER exposed to client
 // ============================================================================
 
-import { sanitizeUpstreamError, describeUpstreamError } from '@/lib/ai/providers/azure-errors';
-import type { SanitizedUpstreamError } from '@/lib/ai/providers/azure-errors';
+import { describeUpstreamError } from '@/lib/ai/providers/azure-errors';
 import { NextResponse } from 'next/server';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 import {
@@ -25,7 +24,7 @@ import {
   parseGAResponse,
   parsePreviewResponse,
 } from './payload-builders';
-import { isDeploymentUnavailable, resolveGaFallbackChain } from './voice-deployment-fallback';
+import { requestTokenWithFallback } from './azure-token-attempt';
 
 export const revalidate = 0;
 
@@ -218,84 +217,55 @@ export const POST = pipe(
     headers['OpenAI-Beta'] = 'realtime=v1';
   }
 
-  const requestToken = (deployment: string) =>
-    fetch(azureUrl, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(
-        useGAProtocol.enabled
-          ? buildGAPayload(deployment, requestBody)
-          : buildPreviewPayload(deployment),
-      ),
-    });
-
-  const attemptToken = async (deployment: string) => {
-    const attemptResponse = await requestToken(deployment);
-    if (attemptResponse.ok) {
-      return { response: attemptResponse, failure: null as SanitizedUpstreamError | null };
-    }
-    const errorData = await attemptResponse.text();
-    const failure = sanitizeUpstreamError(attemptResponse.status, errorData);
-    return { response: attemptResponse, failure };
-  };
-
-  let activeDeployment = azureDeployment;
-  let attempt = await attemptToken(activeDeployment);
-
-  // The preferred realtime deployments are preview models with a fixed Azure
-  // retirement date. When one stops answering, degrade through the GA
-  // deployments in turn rather than taking voice away from the student: a
-  // single retry stops at the first stale name left in cloud configuration.
-  if (attempt.failure && isDeploymentUnavailable(attempt.failure)) {
-    const fallbackChain = resolveGaFallbackChain({
-      tried: [activeDeployment],
-      gaCandidates: [azureDeploymentV15, azureDeploymentLegacy],
-    });
-
-    for (const fallbackDeployment of fallbackChain) {
-      log.error('Realtime deployment unavailable, retrying on GA deployment', {
-        failedDeployment: activeDeployment,
+  // The preferred realtime deployments are preview models. When one is gone,
+  // refuses the operation or hangs, degrade through the GA deployments in turn
+  // (under a hard deadline) rather than taking voice away from the student.
+  const attempt = await requestTokenWithFallback({
+    url: azureUrl,
+    headers,
+    buildBody: (deployment) =>
+      useGAProtocol.enabled
+        ? buildGAPayload(deployment, requestBody)
+        : buildPreviewPayload(deployment),
+    primary: azureDeployment,
+    gaCandidates: [azureDeploymentV15, azureDeploymentLegacy],
+    onFallback: ({ failedDeployment, fallbackDeployment, failure }) =>
+      log.warn('Realtime deployment unavailable, retrying on GA deployment', {
+        failedDeployment,
         fallbackDeployment,
-        ...attempt.failure,
-      });
-      activeDeployment = fallbackDeployment;
-      attempt = await attemptToken(activeDeployment);
-      if (!attempt.failure || !isDeploymentUnavailable(attempt.failure)) break;
-    }
-  }
+        ...failure,
+      }),
+  });
 
-  const response = attempt.response;
-
-  // Handle Azure API errors
-  if (attempt.failure) {
+  if (!attempt.ok) {
     const sanitized = attempt.failure;
-    const azureRequestMs = Date.now() - azureRequestStartMs;
-    const totalMs = Date.now() - requestStartMs;
     log.error('Azure ephemeral token request failed', {
       ...sanitized,
       protocol: useGAProtocol.enabled ? 'GA' : 'preview',
-      deployment: activeDeployment,
-      azureRequestMs,
-      totalMs,
+      deployment: attempt.deployment,
+      azureRequestMs: Date.now() - azureRequestStartMs,
+      totalMs: Date.now() - requestStartMs,
     });
 
-    // Map Azure 401/403 (expired/invalid key) to 503 with a structured error —
-    // callers must not receive a raw upstream 401 (no auth context on this endpoint).
+    // Map Azure 401/403 (expired/invalid key) and 5xx/timeouts to 503 with a
+    // structured error — callers must not receive a raw upstream 401.
+    const upstreamStatus = sanitized.status;
     const outStatus =
-      response.status === 401 || response.status === 403 || response.status >= 500
+      upstreamStatus === 401 || upstreamStatus === 403 || upstreamStatus >= 500
         ? 503
-        : response.status;
+        : upstreamStatus;
     return json(
       {
         error: 'Failed to get ephemeral token from Azure',
         code: 'AZURE_ERROR',
-        status: response.status,
+        status: upstreamStatus,
         details: describeUpstreamError(sanitized),
       },
       outStatus,
     );
   }
 
+  const response = attempt.response;
   const azureRequestMs = Date.now() - azureRequestStartMs;
   const responseData = await response.json();
 

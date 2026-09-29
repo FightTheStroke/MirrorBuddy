@@ -428,4 +428,69 @@ describe('POST /api/realtime/ephemeral-token - preview deployment retirement', (
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(response.status).toBe(404);
   });
+
+  it('falls back when Azure rejects the preview deployment with OperationNotSupported', async () => {
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        text: async () => '{"error":{"code":"OpperationNotSupported"}}',
+      })
+      .mockResolvedValueOnce(successResponse());
+    global.fetch = mockFetch;
+
+    const response = await POST(buildRequest() as any);
+
+    expect(response.status).toBe(200);
+    expect(JSON.parse(mockFetch.mock.calls[1][1].body).session.model).toBe('gpt-realtime-15');
+  });
+
+  it('cuts a hanging Azure call and falls back before the browser gives up', async () => {
+    vi.useFakeTimers();
+    try {
+      const hang = (_url: string, init: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          init.signal?.addEventListener('abort', () =>
+            reject(new DOMException('aborted', 'AbortError')),
+          );
+        });
+      const mockFetch = vi
+        .fn()
+        .mockImplementationOnce(hang)
+        .mockResolvedValueOnce(successResponse());
+      global.fetch = mockFetch as unknown as typeof fetch;
+
+      const pending = POST(buildRequest() as any);
+      await vi.advanceTimersByTimeAsync(5000);
+      const response = await pending;
+
+      expect(response.status).toBe(200);
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockFetch.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('answers 503 instead of hanging when every deployment times out', async () => {
+    vi.useFakeTimers();
+    try {
+      const hang = (_url: string, init: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          init.signal?.addEventListener('abort', () =>
+            reject(new DOMException('aborted', 'AbortError')),
+          );
+        });
+      global.fetch = vi.fn().mockImplementation(hang) as unknown as typeof fetch;
+
+      const pending = POST(buildRequest() as any);
+      await vi.advanceTimersByTimeAsync(20000);
+      const response = await pending;
+
+      expect(response.status).toBe(503);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

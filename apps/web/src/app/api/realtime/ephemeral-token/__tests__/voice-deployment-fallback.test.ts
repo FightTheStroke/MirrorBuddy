@@ -9,6 +9,7 @@ import { describe, it, expect } from 'vitest';
 import { sanitizeUpstreamError } from '@/lib/ai/providers/azure-errors';
 import {
   isDeploymentUnavailable,
+  shouldTryNextDeployment,
   resolveGaFallbackChain,
   resolveGaFallbackDeployment,
 } from '../voice-deployment-fallback';
@@ -136,5 +137,37 @@ describe('resolveGaFallbackChain', () => {
     });
 
     expect(chain).toEqual([]);
+  });
+});
+
+describe('shouldTryNextDeployment', () => {
+  it('moves on when Azure says the deployment cannot run the operation (MIRRORBUDDY-3N)', () => {
+    expect(
+      shouldTryNextDeployment(sanitize(400, '{"error":{"code":"OperationNotSupported"}}')),
+    ).toBe(true);
+  });
+
+  it('accepts the misspelled code Azure actually returned in production', () => {
+    expect(
+      shouldTryNextDeployment(sanitize(400, '{"error":{"code":"OpperationNotSupported"}}')),
+    ).toBe(true);
+  });
+
+  it('moves on when our own deadline cut a hanging deployment', () => {
+    expect(
+      shouldTryNextDeployment({ status: 504, category: 'server', code: 'UpstreamTimeout' }),
+    ).toBe(true);
+  });
+
+  it('still moves on when the deployment is gone', () => {
+    expect(shouldTryNextDeployment(sanitize(404, '{"error":{"code":"DeploymentNotFound"}}'))).toBe(
+      true,
+    );
+  });
+
+  it('does not move on for rate limits, auth failures or generic server errors', () => {
+    expect(shouldTryNextDeployment(sanitize(429, 'Too many requests'))).toBe(false);
+    expect(shouldTryNextDeployment(sanitize(401, 'invalid subscription key'))).toBe(false);
+    expect(shouldTryNextDeployment(sanitize(500, 'Internal server error'))).toBe(false);
   });
 });

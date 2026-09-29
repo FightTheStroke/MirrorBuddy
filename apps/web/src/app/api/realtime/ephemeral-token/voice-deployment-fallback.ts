@@ -94,3 +94,29 @@ export function resolveGaFallbackDeployment({
 }): string | undefined {
   return resolveGaFallbackChain({ tried: [current], gaCandidates })[0];
 }
+
+/**
+ * Azure codes meaning "this deployment cannot serve this operation right now".
+ * Azure returned the misspelled `OpperationNotSupported` in production
+ * (Sentry MIRRORBUDDY-3N, 2026-09-29) after a 32s hang, so both spellings count.
+ */
+const OPERATION_UNSUPPORTED_CODES = ['operationnotsupported', 'opperationnotsupported'];
+
+/** Code we attach when our own deadline aborts a hanging Azure call. */
+export const UPSTREAM_TIMEOUT_CODE = 'UpstreamTimeout';
+
+/**
+ * Whether the next configured deployment is worth trying.
+ *
+ * Wider than {@link isDeploymentUnavailable} by two deployment-scoped cases —
+ * the deployment refused the operation, or it hung past our deadline — both
+ * seen in production. Rate limits, auth failures and generic server errors
+ * still stop the chain.
+ */
+export function shouldTryNextDeployment(error: SanitizedUpstreamError): boolean {
+  if (isDeploymentUnavailable(error)) return true;
+  const code = error.code?.toLowerCase();
+  if (!code) return false;
+  if (code === UPSTREAM_TIMEOUT_CODE.toLowerCase()) return true;
+  return error.status === 400 && OPERATION_UNSUPPORTED_CODES.includes(code);
+}
