@@ -9,14 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Voice no longer fails when Azure hangs or refuses the preferred realtime model
-  (Sentry MIRRORBUDDY-3N: 32s hang, then `OperationNotSupported`). Every token request now
-  has a 4s deadline inside an 8.5s budget, and a refusal or timeout falls back to the GA
-  realtime deployments before the browser's 10s limit.
 - Consent answers given while the startup sign-in check is still running now wait for it
   instead of failing with "Consent identity" (Sentry MIRRORBUDDY-3M/3K, #1201, #1202).
 - Conversation summaries no longer fail with "Conversation identity changed" when the
   sign-in check refreshes the same account (Sentry MIRRORBUDDY-33, #1200).
+
+## [0.42.2] - 2026-09-29
+
+### Fixed
+
+- Voice no longer fails when Azure hangs or refuses the preferred realtime model
+  (Sentry MIRRORBUDDY-3N: 32s hang, then `OperationNotSupported`). Every token request now
+  has a 4s deadline inside an 8.5s budget, and a refusal or timeout falls back to the GA
+  realtime deployments before the browser's 10s limit.
 
 ## [0.42.1] - 2026-09-24
 
