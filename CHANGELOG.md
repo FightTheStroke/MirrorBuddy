@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.42.2] - 2026-09-29
+
 ### Fixed
 
 - Voice no longer fails when Azure hangs or refuses the preferred realtime model
