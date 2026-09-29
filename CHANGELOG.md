@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.42.5] - 2026-09-29
+
 ### Security
 
 - Raise the `markdown-it` override to 14.3.1: the old pin held 14.2.0, vulnerable to a
