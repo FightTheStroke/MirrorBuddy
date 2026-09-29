@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { clientLogger } from '@/lib/logger/client';
+import { getClientIdentity, whenIdentitySettled } from '@/lib/auth';
 import {
   getConsentSyncSnapshot,
   getServerConsentSyncSnapshot,
@@ -76,6 +77,8 @@ export function useConsentUI() {
         }
       };
       try {
+        // A click during the startup /api/auth/me check must not fail on a pending identity.
+        if (getClientIdentity().status === 'pending') await whenIdentitySettled();
         await operation();
         releasePreviousIntent();
         return true;

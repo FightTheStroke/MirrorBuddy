@@ -23,6 +23,34 @@ export function subscribeClientIdentity(listener: () => void): () => void {
   };
 }
 
+/**
+ * Whether two identity snapshots describe the same account. A refresh swaps in
+ * a new object even when the account is unchanged, so never compare by reference.
+ */
+export function isSameAccount(a: ClientIdentity, b: ClientIdentity): boolean {
+  if (a.status === 'authenticated') return b.status === 'authenticated' && a.userId === b.userId;
+  return a.status === 'anonymous' && b.status === 'anonymous';
+}
+
+/**
+ * Resolve once an in-flight /api/auth/me refresh has settled, or after
+ * `timeoutMs` with whatever identity is current (possibly still pending).
+ */
+export function whenIdentitySettled(timeoutMs = 5000): Promise<ClientIdentity> {
+  if (identity.status !== 'pending') return Promise.resolve(identity);
+  return new Promise((resolve) => {
+    const finish = () => {
+      clearTimeout(timer);
+      unsubscribe();
+      resolve(identity);
+    };
+    const timer = setTimeout(finish, timeoutMs);
+    const unsubscribe = subscribeClientIdentity(() => {
+      if (identity.status !== 'pending') finish();
+    });
+  });
+}
+
 /** Called only with server projections or a successful durable logout acknowledgement. */
 export function setClientIdentity(next: ClientIdentity | null | undefined): void {
   generation++;
