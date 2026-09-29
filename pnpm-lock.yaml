@@ -27,7 +27,7 @@ overrides:
   eslint-plugin-react-hooks: 7.0.1
   basic-ftp: 5.3.1
   postcss@<8.5.23: 8.5.23
-  markdown-it@<14.2.0: 14.2.0
+  markdown-it@<14.3.1: 14.3.1
   qs@<6.16.0: 6.16.0
   ip-address@<10.5.1: 10.5.1
   uuid@<11.1.1: 11.1.1
@@ -6884,8 +6884,8 @@ packages:
   markdown-it-sup@2.0.0:
     resolution: {integrity: sha1-aDuTkJKfMCT81SkXmcRmzj02f0Q=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/markdown-it-sup/-/markdown-it-sup-2.0.0.tgz}
 
-  markdown-it@14.2.0:
-    resolution: {integrity: sha1-BtSNkDXnfVscha2zFUgvyCQCie8=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/markdown-it/-/markdown-it-14.2.0.tgz}
+  markdown-it@14.3.1:
+    resolution: {integrity: sha1-iXTiRzd5Nj7VaC6jd/MVZO5R4pI=, tarball: https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/markdown-it/-/markdown-it-14.3.1.tgz}
     hasBin: true
 
   markdown-table@3.0.4:
@@ -16227,7 +16227,7 @@ snapshots:
 
   markdown-it-sup@2.0.0: {}
 
-  markdown-it@14.2.0:
+  markdown-it@14.3.1:
     dependencies:
       argparse: 2.0.1
       entities: 4.5.0
@@ -16258,7 +16258,7 @@ snapshots:
       '@vscode/markdown-it-katex': 1.1.2
       highlight.js: 11.11.1
       katex: 0.16.45
-      markdown-it: 14.2.0
+      markdown-it: 14.3.1
       markdown-it-ins: 4.0.0
       markdown-it-mark: 4.0.0
       markdown-it-sub: 2.0.0
