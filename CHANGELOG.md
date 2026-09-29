@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Raise pinned dependency overrides to patched versions: `fast-uri` 3.1.7 (high),
+  `undici` 6.28.1, `ip-address` 10.5.1 (Dependabot alerts #299–#301). The old pins kept
+  the vulnerable versions in place and made Dependabot's own updates fail.
+
 ## [0.42.1] - 2026-09-24
 
 ### Fixed
