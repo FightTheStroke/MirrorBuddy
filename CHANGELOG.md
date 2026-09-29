@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Voice no longer fails when Azure hangs or refuses the preferred realtime model
+  (Sentry MIRRORBUDDY-3N: 32s hang, then `OperationNotSupported`). Every token request now
+  has a 4s deadline inside an 8.5s budget, and a refusal or timeout falls back to the GA
+  realtime deployments before the browser's 10s limit.
+
 ## [0.42.1] - 2026-09-24
 
 ### Fixed
