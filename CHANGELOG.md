@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `undici` 6.28.1, `ip-address` 10.5.1 (Dependabot alerts #299–#301). The old pins kept
   the vulnerable versions in place and made Dependabot's own updates fail.
 
+## [0.42.3] - 2026-09-29
+
 ### Fixed
 
 - Consent answers given while the startup sign-in check is still running now wait for it
