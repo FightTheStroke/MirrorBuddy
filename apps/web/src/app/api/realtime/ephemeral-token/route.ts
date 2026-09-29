@@ -265,9 +265,8 @@ export const POST = pipe(
     );
   }
 
-  const response = attempt.response;
   const azureRequestMs = Date.now() - azureRequestStartMs;
-  const responseData = await response.json();
+  const responseData = attempt.data;
 
   // Parse response — GA and preview have different shapes
   const parsed = useGAProtocol.enabled

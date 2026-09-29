@@ -23,7 +23,7 @@ export const TOTAL_BUDGET_MS = 8500;
 const MIN_ATTEMPT_MS = 1000;
 
 export type TokenAttemptResult =
-  | { ok: true; response: Response; deployment: string }
+  | { ok: true; data: unknown; deployment: string }
   | { ok: false; failure: SanitizedUpstreamError; deployment: string };
 
 export interface TokenAttemptOptions {
@@ -37,6 +37,27 @@ export interface TokenAttemptOptions {
     fallbackDeployment: string;
     failure: SanitizedUpstreamError;
   }) => void;
+}
+
+class DeadlineExceeded extends Error {}
+
+/** Body reads can stall after headers arrive; keep them under the same deadline. */
+function beforeDeadline<T>(signal: AbortSignal, read: () => Promise<T>): Promise<T> {
+  if (signal.aborted) return Promise.reject(new DeadlineExceeded());
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(new DeadlineExceeded());
+    signal.addEventListener('abort', onAbort, { once: true });
+    read().then(
+      (value) => {
+        signal.removeEventListener('abort', onAbort);
+        resolve(value);
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', onAbort);
+        reject(error);
+      },
+    );
+  });
 }
 
 async function attemptOnce(
@@ -53,12 +74,32 @@ async function attemptOnce(
       body: JSON.stringify(options.buildBody(deployment)),
       signal: controller.signal,
     });
-    if (response.ok) return { ok: true, response, deployment };
-    const errorText = await response.text().catch(() => '');
+    if (response.ok) {
+      let data: unknown;
+      try {
+        data = await beforeDeadline(controller.signal, () => response.json());
+      } catch (error) {
+        if (error instanceof DeadlineExceeded) throw error;
+        return {
+          ok: false,
+          failure: { status: 502, category: 'server', code: 'UpstreamInvalidResponse' },
+          deployment,
+        };
+      }
+      return { ok: true, data, deployment };
+    }
+    const errorText = await beforeDeadline(controller.signal, () => response.text()).catch(
+      (error: unknown) => {
+        if (error instanceof DeadlineExceeded) throw error;
+        return '';
+      },
+    );
     return { ok: false, failure: sanitizeUpstreamError(response.status, errorText), deployment };
   } catch (error) {
     const timedOut =
-      controller.signal.aborted || (error instanceof Error && error.name === 'AbortError');
+      controller.signal.aborted ||
+      error instanceof DeadlineExceeded ||
+      (error instanceof Error && error.name === 'AbortError');
     const failure: SanitizedUpstreamError = timedOut
       ? { status: 504, category: 'server', code: UPSTREAM_TIMEOUT_CODE }
       : { status: 502, category: 'server', code: 'UpstreamNetworkError' };

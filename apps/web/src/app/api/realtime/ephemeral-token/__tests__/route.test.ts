@@ -493,4 +493,47 @@ describe('POST /api/realtime/ephemeral-token - preview deployment retirement', (
       vi.useRealTimers();
     }
   });
+  it('keeps the deadline while Azure stalls the body of a successful answer', async () => {
+    vi.useFakeTimers();
+    try {
+      const stalledBody = () =>
+        Promise.resolve({ ok: true, json: () => new Promise(() => undefined) });
+      const mockFetch = vi
+        .fn()
+        .mockImplementationOnce(stalledBody)
+        .mockResolvedValueOnce(successResponse());
+      global.fetch = mockFetch as unknown as typeof fetch;
+
+      const pending = POST(buildRequest() as any);
+      await vi.advanceTimersByTimeAsync(5000);
+      const response = await pending;
+
+      expect(response.status).toBe(200);
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('treats a stalled error body as a timeout and falls back', async () => {
+    vi.useFakeTimers();
+    try {
+      const stalledError = () =>
+        Promise.resolve({ ok: false, status: 400, text: () => new Promise(() => undefined) });
+      const mockFetch = vi
+        .fn()
+        .mockImplementationOnce(stalledError)
+        .mockResolvedValueOnce(successResponse());
+      global.fetch = mockFetch as unknown as typeof fetch;
+
+      const pending = POST(buildRequest() as any);
+      await vi.advanceTimersByTimeAsync(5000);
+      const response = await pending;
+
+      expect(response.status).toBe(200);
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
