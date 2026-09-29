@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `undici` 6.28.1, `ip-address` 10.5.1 (Dependabot alerts #299–#301). The old pins kept
   the vulnerable versions in place and made Dependabot's own updates fail.
 
+## [0.42.2] - 2026-09-29
+
+### Fixed
+
+- Voice no longer fails when Azure hangs or refuses the preferred realtime model
+  (Sentry MIRRORBUDDY-3N: 32s hang, then `OperationNotSupported`). Every token request now
+  has a 4s deadline inside an 8.5s budget, and a refusal or timeout falls back to the GA
+  realtime deployments before the browser's 10s limit.
+
 ## [0.42.1] - 2026-09-24
 
 ### Fixed
