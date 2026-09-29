@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.42.3] - 2026-09-29
+
 ### Fixed
 
 - Consent answers given while the startup sign-in check is still running now wait for it
