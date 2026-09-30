@@ -228,7 +228,7 @@
         "timeAt": "Hora a"
       },
       "sidebar": {
-        "title": "Título",
+        "title": "Conversaciones",
         "new": "Nueva Conversación",
         "search": {
           "placeholder": "Buscar conversaciones..."
@@ -249,7 +249,7 @@
         "msg": "msg"
       },
       "history": {
-        "title": "Título",
+        "title": "Historial",
         "empty": {
           "filtered": "No se encontraron conversaciones con estos filtros",
           "all": "Aún no hay conversaciones. ¡Empieza a chatear con un Maestro!"
@@ -263,7 +263,7 @@
         "loading": "Cargando..."
       },
       "inactivity": {
-        "title": "Título",
+        "title": "Inactividad",
         "message": "Mensaje",
         "continue": "Continuar",
         "end": "Terminar Sesión",
@@ -273,7 +273,7 @@
         "description": "Descripción"
       },
       "toolSelection": {
-        "title": "Título",
+        "title": "Selección de herramienta",
         "description": "Elige una herramienta para continuar",
         "closeAriaLabel": "Cerrar Etiqueta Aria",
         "empty": "Vacío",

@@ -679,7 +679,7 @@
       "calls": "Llamadas",
       "configureAzure": "Configurar Azure",
       "dailyCosts": "Costes diarios",
-      "description": "Descripción",
+      "description": "Resumen de las métricas de la plataforma",
       "estimatedCost": "Coste estimado",
       "last30Days": "Últimos 30 días",
       "loading": "Cargando...",
@@ -708,7 +708,7 @@
       "topServices": "Servicios principales",
       "total": "Total",
       "maestroUsageChart": {
-        "title": "Título"
+        "title": "Uso por maestro"
       },
       "timeStudyChart": {
         "chartAriaLabel": "Gráfico de tiempo de estudio por materia"
