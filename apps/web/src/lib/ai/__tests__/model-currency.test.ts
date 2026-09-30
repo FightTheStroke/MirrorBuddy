@@ -59,6 +59,35 @@ describe('model currency', () => {
     });
   });
 
+  describe('gpt-6.1-sol default (2026-09-30 eval)', () => {
+    it('maps gpt-6.1-sol to the EU data-zone deployment by default', async () => {
+      delete process.env.AZURE_OPENAI_GPT61_SOL_DEPLOYMENT;
+
+      const { getDeploymentForModel, getAvailableModels } =
+        await import('@/lib/ai/providers/deployment-mapping');
+
+      expect(getDeploymentForModel('gpt-6.1-sol')).toBe('mb-gpt-61-sol');
+      expect(getAvailableModels()).toContain('gpt-6.1-sol');
+    });
+
+    it('routes retired aliases to gpt-6.1-sol when no chat deployment is configured', async () => {
+      delete process.env.AZURE_OPENAI_CHAT_DEPLOYMENT;
+      delete process.env.AZURE_OPENAI_GPT4O_MINI_DEPLOYMENT;
+
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+
+      expect(getDeploymentForModel('gpt-4o-mini')).toBe('mb-gpt-61-sol');
+    });
+
+    it('keeps gpt-5.6-terra on its own deployment after the chat default moves', async () => {
+      process.env.AZURE_OPENAI_CHAT_DEPLOYMENT = 'mb-gpt-61-sol';
+
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+
+      expect(getDeploymentForModel('gpt-5.6-terra')).toBe('gpt-5.6-terra');
+    });
+  });
+
   describe('current Azure models are selectable', () => {
     it('does not expose gpt-6-astra: decided 2026-09-16 that its price is not worth it', async () => {
       const { getAvailableModels, hasDeploymentMapping } =

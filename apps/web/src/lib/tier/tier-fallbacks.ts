@@ -10,10 +10,9 @@ import { TierCode } from './types';
 
 // Model defaults from env vars (change in .env to migrate without code changes)
 // Must agree with tier-seed.ts: this is what the app serves when the database
-// row is missing. Every tier chats on the same model.
-const CHAT_DEFAULT = 'gpt-5.6-terra';
+// row is missing. Every tier uses the same model for every AI feature.
+const CHAT_DEFAULT = 'gpt-6.1-sol';
 const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || CHAT_DEFAULT;
-const CHAT_MODEL_EDU = process.env.DEFAULT_CHAT_MODEL_EDU || CHAT_DEFAULT;
 const DEMO_MODEL = process.env.DEFAULT_DEMO_MODEL || 'gpt-5-nano';
 
 /**
@@ -86,16 +85,16 @@ export function createFallbackTier(code: TierCode): TierDefinition {
     videoVisionSecondsPerSession: 0,
     videoVisionMinutesMonthly: 0,
     // Per-feature models (ADR 0073) - env-driven defaults
-    chatModel: CHAT_MODEL_EDU,
+    chatModel: CHAT_MODEL,
     pdfModel: CHAT_MODEL,
     mindmapModel: CHAT_MODEL,
-    quizModel: CHAT_MODEL_EDU,
+    quizModel: CHAT_MODEL,
     flashcardsModel: CHAT_MODEL,
     summaryModel: CHAT_MODEL,
-    formulaModel: CHAT_MODEL_EDU,
+    formulaModel: CHAT_MODEL,
     chartModel: CHAT_MODEL,
-    homeworkModel: CHAT_MODEL_EDU,
-    webcamModel: CHAT_MODEL_EDU,
+    homeworkModel: CHAT_MODEL,
+    webcamModel: CHAT_MODEL,
     demoModel: DEMO_MODEL,
     featureConfigs: null, // No overrides, use DEFAULT_FEATURE_CONFIGS
     features: {

@@ -831,7 +831,7 @@ describe('TierService', () => {
 
       // The inline fallback serves the same model as every tier: a database
       // outage must not silently downgrade the tutor.
-      expect(model).toBe('gpt-5.6-terra');
+      expect(model).toBe('gpt-6.1-sol');
     });
 
     it('should handle all model types correctly', async () => {

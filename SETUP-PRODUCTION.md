@@ -159,10 +159,11 @@ Create accounts and have credentials ready:
 
 4. **Deployment Names**
    - Set environment variables:
-     - `AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5.6-terra` (primary chat model, GA)
+     - `AZURE_OPENAI_CHAT_DEPLOYMENT=mb-gpt-61-sol` (primary chat model: gpt-6.1-sol, EU data zone, GA)
      - `AZURE_OPENAI_GPT5_NANO_DEPLOYMENT=gpt-5-nano`
      - `AZURE_OPENAI_GPT5_MINI_DEPLOYMENT=gpt-5-edu-mini`
      - `AZURE_OPENAI_GPT56_SOL_DEPLOYMENT=gpt-5.6-sol`
+     - `AZURE_OPENAI_GPT61_SOL_DEPLOYMENT=mb-gpt-61-sol` _(gpt-6.1-sol, every tier and feature)_
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15=gpt-realtime-15` _(voice v1.5, behind feature flag)_

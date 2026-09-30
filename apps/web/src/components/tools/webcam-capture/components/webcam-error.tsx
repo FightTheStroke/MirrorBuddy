@@ -4,7 +4,7 @@
  */
 
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ErrorType } from '../constants';
@@ -29,7 +29,9 @@ export function WebcamError({
   const t = useTranslations('tools.webcam');
   const importButtonRef = useRef<HTMLButtonElement>(null);
   const wasImportingRef = useRef(isImporting);
-  useEffect(() => {
+  // Layout effect: focus lands in the same commit that re-enables the button,
+  // so keyboard and screen-reader users never see focus lag behind it.
+  useLayoutEffect(() => {
     if (wasImportingRef.current && !isImporting) importButtonRef.current?.focus();
     wasImportingRef.current = isImporting;
   }, [isImporting]);

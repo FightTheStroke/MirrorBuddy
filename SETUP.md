@@ -106,7 +106,7 @@ expose `memoryLimitMB` and `limitSource` (`function` or `system`).
 # Chat
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini
+AZURE_OPENAI_CHAT_DEPLOYMENT=mb-gpt-61-sol
 AZURE_OPENAI_GPT4O_DEPLOYMENT=gpt-5-mini
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
 
@@ -243,7 +243,7 @@ Key variables:
 # Azure OpenAI (Chat + Voice)
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini
+AZURE_OPENAI_CHAT_DEPLOYMENT=mb-gpt-61-sol
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
 AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini
 
