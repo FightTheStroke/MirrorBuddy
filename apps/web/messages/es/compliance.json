@@ -4,7 +4,7 @@
       "conformity": "Conformity"
     },
     "contact": {
-      "text": "Text",
+      "text": "Para cualquier pregunta sobre el cumplimiento normativo de MirrorBuddy, contáctenos en roberdan@fightthestroke.org",
       "title": "Contacto para Cumplimiento Normativo",
       "backButton": "Volver al inicio",
       "page": {
@@ -377,134 +377,134 @@
       },
       "sections": {
         "section1": {
-          "para1": "Para1",
-          "para2": "Para2",
-          "title": "Título"
+          "para1": "De conformidad con el Artículo 50 del Reglamento de IA de la UE (Reglamento 2024/1689), MirrorBuddy divulga que los 32 maestros educativos disponibles en la plataforma utilizan inteligencia artificial generativa. Estos sistemas de IA están diseñados para personalizar la enseñanza y apoyar a estudiantes con dificultades de aprendizaje.",
+          "para2": "Los sistemas de IA de MirrorBuddy incluyen: Sistemas de Personalización Educativa (Azure OpenAI GPT), Sistemas de Análisis del Progreso (algoritmos FSRS de repetición espaciada) y Sistemas de Apoyo Emocional (generación de retroalimentación personalizada y motivación).",
+          "title": "1. Divulgación de los Sistemas de IA"
         },
         "section10": {
-          "faq1Answer": "Respuesta Faq1",
-          "faq1Title": "Título Faq1",
-          "faq2Answer": "Respuesta Faq2",
-          "faq2Title": "Título Faq2",
-          "faq3Answer": "Respuesta Faq3",
-          "faq3Title": "Título Faq3",
-          "faq4Answer": "Respuesta Faq4",
-          "faq4Title": "Título Faq4",
-          "faq5Answer": "Respuesta Faq5",
-          "faq5Title": "Título Faq5",
-          "title": "Título"
+          "faq1Answer": "Cuando la IA recomienda un maestro, el Panel para Padres muestra el razonamiento (por ejemplo, 'Recomendado en función del rendimiento en matemáticas'). Puede contactar con roberdan@fightthestroke.org para obtener una explicación detallada.",
+          "faq1Title": "¿Cómo puedo saber por qué la IA ha recomendado un maestro en particular?",
+          "faq2Answer": "No. La IA no utiliza la discapacidad como factor directo de recomendación. Solo usamos el perfil de aprendizaje del estudiante (ritmo, estilos preferidos) para una enseñanza universal e inclusiva.",
+          "faq2Title": "¿Mi discapacidad influye en las recomendaciones de la IA?",
+          "faq3Answer": "Sí. Puede desactivar la personalización de la IA en la configuración de privacidad. Todos los datos de personalización se eliminarán, pero su cuenta y los contenidos educativos permanecerán intactos.",
+          "faq3Title": "¿Puedo eliminar mis datos de IA sin eliminar mi cuenta?",
+          "faq4Answer": "MirrorBuddy utiliza Azure OpenAI (GPT-4o mini para Trial, GPT-5.2-edu para Base, GPT-5.2-chat para Pro) y algoritmos FSRS propios para el seguimiento de la memoria. Ningún modelo se entrena con los datos de los estudiantes de MirrorBuddy.",
+          "faq4Title": "¿Qué modelos de IA utilizan?",
+          "faq5Answer": "Si detectamos discriminación (sesgo), el sistema se desactiva de inmediato. Los datos se someten a una auditoría humana. Se notifica a estudiantes y padres. Si la discriminación ha causado un perjuicio educativo, ofrecemos apoyo correctivo prioritario.",
+          "faq5Title": "¿Qué ocurre si descubren que la IA está discriminando a los estudiantes?",
+          "title": "10. Preguntas Frecuentes sobre la Transparencia de la IA"
         },
         "section11": {
-          "intro": "Introducción",
-          "nextReview": "Próxima Revisión",
-          "title": "Título"
+          "intro": "Este documento de transparencia de la IA se ha preparado de conformidad con el Artículo 50 del Reglamento de IA de la UE (Reglamento 2024/1689) y la Ley italiana 132/2025. Está disponible públicamente en italiano, inglés, francés, alemán y español.",
+          "nextReview": "Próxima Revisión: 27 de julio de 2026 (trimestral)",
+          "title": "11. Información de Conformidad y Revisión"
         },
         "section2": {
-          "intro": "Introducción",
-          "item1Desc": "Descripción Ítem1",
-          "item1Title": "Título Ítem1",
-          "item2Desc": "Descripción Ítem2",
-          "item2Title": "Título Ítem2",
-          "item3Desc": "Descripción Ítem3",
-          "item3Title": "Título Ítem3",
-          "subtitle": "Subtítulo",
-          "title": "Título"
+          "intro": "El Reglamento de IA de la UE clasifica los sistemas de IA según el riesgo. MirrorBuddy ha realizado una Evaluación de Impacto sobre la Protección de Datos (DPIA) y una Evaluación del Riesgo de IA para determinar el nivel de conformidad requerido.",
+          "item1Desc": "Los sistemas de personalización educativa (recomendación de maestros, adaptación del nivel de dificultad) se clasifican como riesgo limitado. Utilizamos advertencias transparentes y permitimos que los padres supervisen las decisiones de la IA.",
+          "item1Title": "Riesgo Limitado - Sistemas de Personalización",
+          "item2Desc": "Si en el futuro MirrorBuddy integra funciones de evaluación automática que puedan influir significativamente en la trayectoria educativa del estudiante (Art. 6 del Reglamento de IA), implementaremos controles de riesgo elevado, incluida la supervisión humana obligatoria.",
+          "item2Title": "Riesgo Elevado - Cuando Sea Aplicable",
+          "item3Desc": "MirrorBuddy, de conformidad con la Ley 132/2025 (implementación nacional italiana del Reglamento de IA de la UE), mantiene registros de conformidad disponibles públicamente y sujetos a revisión periódica por parte de la Autoridad de Protección de Datos.",
+          "item3Title": "Conformidad con la Ley Italiana 132/2025",
+          "subtitle": "Clasificación del Riesgo de MirrorBuddy",
+          "title": "2. Clasificación de la IA y Conformidad Normativa"
         },
         "section3": {
-          "category1": "Categoría1",
-          "category1Label": "Etiqueta Categoría1",
-          "category2": "Categoría2",
-          "category2Label": "Etiqueta Categoría2",
-          "category3": "Categoría3",
-          "category3Label": "Etiqueta Categoría3",
-          "category4": "Categoría4",
-          "category4Label": "Etiqueta Categoría4",
-          "category5": "Categoría5",
-          "category5Label": "Etiqueta Categoría5",
-          "intro": "Introducción",
-          "outro": "Conclusión",
-          "subtitle": "Subtítulo",
-          "title": "Título"
+          "category1": "Datos conversacionales (mensajes con los maestros), analizados en tiempo real para personalizar respuestas y tono",
+          "category1Label": "Motor de Personalización Educativa",
+          "category2": "Rendimiento histórico en tarjetas de estudio y cuestionarios, utilizado para calcular intervalos de repetición óptimos",
+          "category2Label": "Sistema FSRS de Seguimiento del Progreso",
+          "category3": "Contexto emocional de la sesión de estudio, utilizado para generar mensajes de motivación personalizados",
+          "category3Label": "Generador de Mensajes de Ánimo",
+          "category4": "Patrones de dificultad recurrentes, monitorizados para enviar avisos a los educadores sin categorización automática de los estudiantes",
+          "category4Label": "Detector de Dificultades de Aprendizaje",
+          "category5": "Embeddings vectoriales de los documentos cargados, utilizados para la búsqueda semántica sin almacenar el contenido original en los vectores",
+          "category5Label": "Búsqueda Semántica de Documentos",
+          "intro": "Los siguientes sistemas de IA se utilizan en MirrorBuddy para apoyar la enseñanza inclusiva:",
+          "outro": "Todos estos sistemas están diseñados con supervisión humana integrada y pueden desactivarse en la configuración de privacidad.",
+          "subtitle": "Sistemas de IA Descritos",
+          "title": "3. Funciones Principales del Sistema de IA"
         },
         "section4": {
-          "protection1Desc": "Descripción Protección1",
-          "protection1Title": "Título Protección1",
-          "protection2Desc": "Descripción Protección2",
-          "protection2Title": "Título Protección2",
-          "protection3Desc": "Descripción Protección3",
-          "protection3Title": "Título Protección3",
-          "protection4Desc": "Descripción Protección4",
-          "protection4Title": "Título Protección4",
-          "protection5Desc": "Descripción Protección5",
-          "protection5Title": "Título Protección5",
-          "subtitle": "Subtítulo",
-          "title": "Título"
+          "protection1Desc": "Los padres tienen acceso a un Panel para Padres que muestra todas las decisiones de IA relativas a su hijo, incluidas las recomendaciones de maestros y las rutas de aprendizaje sugeridas.",
+          "protection1Title": "Supervisión de los Padres",
+          "protection2Desc": "Los profesores y coordinadores escolares pueden ver y modificar manualmente las decisiones del sistema de IA. Ninguna decisión de la IA es definitiva sin aprobación humana.",
+          "protection2Title": "Supervisión de los Educadores",
+          "protection3Desc": "Si el sistema identifica dificultades significativas, un educador humano debe intervenir en un plazo de 7 días para ofrecer apoyo personalizado. La IA solo proporciona sugerencias, no decisiones.",
+          "protection3Title": "Intervención Humana Obligatoria",
+          "protection4Desc": "Realizamos auditorías trimestrales para verificar que las recomendaciones de la IA no discriminen a los estudiantes por motivos de género, etnia, discapacidad o nivel socioeconómico.",
+          "protection4Title": "Auditoría de Equidad y Transparencia",
+          "protection5Desc": "Los estudiantes y los padres pueden desactivar por completo la personalización de la IA en cualquier momento. MirrorBuddy seguirá ofreciendo todas las funciones educativas fundamentales con configuraciones genéricas.",
+          "protection5Title": "Desactivación de la IA - Derecho de Oposición",
+          "subtitle": "Controles de Supervisión Humana Implementados",
+          "title": "4. Supervisión Humana y Control (Artículo 14 - Reglamento de IA)"
         },
         "section5": {
-          "intro": "Introducción",
-          "right1Desc": "Descripción Derecho1",
-          "right1Title": "Título Derecho1",
-          "right2Desc": "Descripción Derecho2",
-          "right2Title": "Título Derecho2",
-          "right3Desc": "Descripción Derecho3",
-          "right3Title": "Título Derecho3",
-          "right4Desc": "Descripción Derecho4",
-          "right4Title": "Título Derecho4",
-          "right5Desc": "Descripción Derecho5",
-          "right5Title": "Título Derecho5",
-          "right6Desc": "Descripción Derecho6",
-          "right6Title": "Título Derecho6",
-          "title": "Título"
+          "intro": "El Reglamento de IA de la UE y el RGPD le garantizan derechos específicos relativos a los sistemas de IA. Esto es lo que puede hacer:",
+          "right1Desc": "Puede solicitar conocer cómo la IA tomó una decisión que le afecta, incluida la lógica utilizada y los factores considerados. Contacte con roberdan@fightthestroke.org para ejercer este derecho.",
+          "right1Title": "Derecho de Acceso y Explicación",
+          "right2Desc": "Puede exportar todos los datos utilizados en nuestras decisiones de IA (conversaciones, progresos, preferencias) en un formato legible (JSON, CSV) para transferirlos a otra plataforma.",
+          "right2Title": "Derecho a la Portabilidad de los Datos",
+          "right3Desc": "Puede oponerse al tratamiento de los datos para la personalización de la IA y la elaboración de perfiles educativos. MirrorBuddy desactivará inmediatamente todos los sistemas de IA para su cuenta.",
+          "right3Title": "Derecho de Oposición",
+          "right4Desc": "Si considera que los datos utilizados por la IA son inexactos (por ejemplo, el nivel de dificultad asignado), puede solicitar su corrección restableciendo los perfiles de IA con datos precisos.",
+          "right4Title": "Derecho de Rectificación",
+          "right5Desc": "Puede solicitar la eliminación de todos sus datos de IA. Esto incluirá el historial de personalización, manteniendo operativas las funciones educativas básicas.",
+          "right5Title": "Derecho al Olvido - Supresión",
+          "right6Desc": "Si considera que una decisión de la IA le ha discriminado ilegalmente, puede presentar una reclamación ante la Autoridad de Protección de Datos italiana (www.garanteprivacy.it) en un plazo de 30 días.",
+          "right6Title": "Derecho de Recurso",
+          "title": "5. Sus Derechos Relativos a la IA"
         },
         "section6": {
-          "intro": "Introducción",
-          "protection1Desc": "Descripción Protección1",
-          "protection1Title": "Título Protección1",
-          "protection2Desc": "Descripción Protección2",
-          "protection2Title": "Título Protección2",
-          "protection3Desc": "Descripción Protección3",
-          "protection3Title": "Título Protección3",
-          "protection4Desc": "Descripción Protección4",
-          "protection4Title": "Título Protección4",
-          "protection5Desc": "Descripción Protección5",
-          "protection5Title": "Título Protección5",
-          "title": "Título"
+          "intro": "Implementamos medidas de seguridad específicas para proteger cómo la IA utiliza sus datos:",
+          "protection1Desc": "Los datos utilizados para personalizar la IA (historial de chat, progresos, preferencias) se cifran de extremo a extremo durante la transmisión a Azure OpenAI.",
+          "protection1Title": "Cifrado de Datos",
+          "protection2Desc": "Los modelos de IA generativa de MirrorBuddy nunca se entrenan con los datos personales de los estudiantes. Solo utilizamos entradas en tiempo real para adaptar las respuestas.",
+          "protection2Title": "Anonimización de los Modelos",
+          "protection3Desc": "La IA no crea perfiles que categoricen a los estudiantes por capacidad cognitiva, discapacidad, etnia o nivel socioeconómico de forma que pueda influir en las oportunidades educativas.",
+          "protection3Title": "Sin Elaboración de Perfiles Discriminatoria",
+          "protection4Desc": "Solo nuestro equipo italiano de ingenieros de seguridad y delegados de protección de datos pueden ver los datos utilizados por la IA con fines de auditoría. El acceso queda registrado y sujeto a revisión.",
+          "protection4Title": "Acceso Humano Limitado",
+          "protection5Desc": "Los datos de personalización de la IA se conservan únicamente durante la sesión activa del estudiante. Los datos históricos se agregan y seudonimizan en un plazo de 90 días.",
+          "protection5Title": "Conservación Limitada",
+          "title": "6. Protección de Datos y Seguridad"
         },
         "section7": {
-          "intro": "Introducción",
-          "mitigation1": "Mitigación1",
-          "mitigation2": "Mitigación2",
-          "mitigation3": "Mitigación3",
-          "mitigation4": "Mitigación4",
-          "mitigation5": "Mitigación5",
-          "risk1": "Riesgo1",
-          "risk2": "Riesgo2",
-          "risk3": "Riesgo3",
-          "risk4": "Riesgo4",
-          "risk5": "Riesgo5",
-          "tableHeader1": "Encabezado Tabla1",
-          "tableHeader2": "Encabezado Tabla2",
-          "title": "Título"
+          "intro": "MirrorBuddy ha identificado los siguientes riesgos potenciales de la IA e implementado medidas de mitigación conformes al Artículo 29 del Reglamento de IA de la UE:",
+          "mitigation1": "Auditorías bimestrales de equidad utilizando conjuntos de datos diversos. Pruebas con estudiantes de distinto género, etnia y discapacidad para verificar recomendaciones imparciales.",
+          "mitigation2": "MirrorBuddy fomenta la interacción humana y el control manual. Los maestros son la interfaz principal. La IA solo proporciona sugerencias no vinculantes.",
+          "mitigation3": "Cifrado de extremo a extremo, segregación de datos, políticas de acceso basadas en roles, registros de auditoría permanentes, sin transferencias fuera de la UE sin consentimiento.",
+          "mitigation4": "Filtros de seguridad integrados en Azure OpenAI, revisión humana de los contenidos generados, bucle de retroalimentación para señalar problemas, desactivación instantánea si se detecta un problema.",
+          "mitigation5": "Este documento ofrece divulgación completa. El panel para padres muestra el razonamiento de la IA. Derecho garantizado de explicación previa solicitud.",
+          "risk1": "Sesgo en los Algoritmos de Personalización",
+          "risk2": "Dependencia Excesiva de la IA",
+          "risk3": "Divulgación No Autorizada de Datos Sensibles",
+          "risk4": "Generación de Contenidos Dañinos",
+          "risk5": "Falta de Transparencia en las Decisiones de la IA",
+          "tableHeader1": "Riesgo Identificado",
+          "tableHeader2": "Medida de Mitigación",
+          "title": "7. Análisis de Riesgos de IA y Medidas de Mitigación"
         },
         "section8": {
-          "classification": "Clasificación",
-          "intro": "Introducción",
-          "law1": "Ley1",
-          "law2": "Ley2",
-          "law3": "Ley3",
-          "law4": "Ley4",
-          "title": "Título"
+          "classification": "MirrorBuddy cumple todos los requisitos del Reglamento de IA de la UE 2024/1689 y de la Ley italiana 132/2025.",
+          "intro": "La Autoridad de Protección de Datos italiana tiene derecho a inspeccionar MirrorBuddy en cualquier momento para verificar la conformidad.",
+          "law1": "Reglamento de IA de la UE (Reglamento 2024/1689) - Clasificación del riesgo y obligaciones de transparencia para los sistemas de IA en el ámbito educativo",
+          "law2": "RGPD (Reglamento UE 2016/679) - Protección de datos personales, derecho a la explicación de las decisiones automatizadas (Art. 22)",
+          "law3": "Ley 132/2025 (Italia) - Implementación nacional del Reglamento de IA de la UE con requisitos específicos para la educación",
+          "law4": "WCAG 2.1 Nivel AA - Estándar de accesibilidad para usuarios con discapacidad, conforme a la Ley Stanca italiana (L. 4/2004)",
+          "title": "8. Conformidad Normativa y Supervisión"
         },
         "section9": {
-          "authorityLabel": "Etiqueta Autoridad",
-          "authorityValue": "Valor Autoridad",
-          "commitment": "Compromiso",
-          "emailLabel": "Etiqueta Correo",
-          "emailValue": "Valor Correo",
-          "formLabel": "Etiqueta Formulario",
-          "formValue": "Valor Formulario",
-          "intro": "Introducción",
-          "title": "Título"
+          "authorityLabel": "Autoridad de Supervisión",
+          "authorityValue": "Autoridad de Protección de Datos italiana (garante@gpdp.it)",
+          "commitment": "Estamos mejorando continuamente la transparencia de la IA. Sus comentarios nos ayudan a construir una plataforma educativa más responsable e inclusiva.",
+          "emailLabel": "Correo de Conformidad de la IA",
+          "emailValue": "roberdan@fightthestroke.org",
+          "formLabel": "Formulario de Notificación",
+          "formValue": "Utilice el formulario de contacto en www.mirrorbuddy.com/contact para enviarnos comentarios sobre la transparencia de la IA. Respondemos a todas las solicitudes en un plazo de 5 días laborables.",
+          "intro": "¿Tiene preguntas sobre nuestro uso de la IA? Puede contactarnos de las siguientes maneras:",
+          "title": "9. Contáctenos - Preguntas sobre la Transparencia de la IA"
         },
         "importante": "Importante:",
         "mirrorbuddyUtilizza": "MirrorBuddy utilizza Azure OpenAI (GPT-4),",
@@ -688,103 +688,103 @@
           "contactQuestion": "Pregunta de Contacto",
           "lastUpdated": "Última Actualización: {date}",
           "pageNavAriaLabel": "Etiqueta Aria Navegación Página",
-          "title": "Título",
+          "title": "Política de Cookies",
           "version": "Versión {version}"
         },
         "sections": {
           "changes": {
-            "importantChanges": "Cambios Importantes",
-            "intro": "Introducción",
-            "title": "Título",
-            "updateDate": "Fecha de Actualización",
-            "updatePage": "Página de Actualización"
+            "importantChanges": "Los cambios importantes se comunicarán mediante un aviso en la aplicación y, si es necesario, por correo electrónico.",
+            "intro": "Nos reservamos el derecho de actualizar esta política de cookies para reflejar cambios en nuestros servicios o cambios normativos. Cualquier modificación entrará en vigor en el momento de su publicación en esta página.",
+            "title": "Cambios en Esta Política",
+            "updateDate": "Fecha de la última actualización: consulte la fecha indicada en la parte superior de esta página.",
+            "updatePage": "Esta página se actualizará cada vez que se modifiquen las cookies utilizadas o sus finalidades."
           },
           "cookieManagement": {
-            "chromeInstructions": "Instrucciones Chrome",
-            "edgeInstructions": "Instrucciones Edge",
-            "firefoxInstructions": "Instrucciones Firefox",
-            "h3Browser": "H3 Navegador",
-            "h3InApp": "H3 En Aplicación",
-            "pBrowser": "P Navegador",
-            "pInApp": "P En Aplicación",
-            "safariInstructions": "Instrucciones Safari",
-            "title": "Título",
+            "chromeInstructions": "Chrome: Configuración > Privacidad y seguridad > Cookies y otros datos de sitios",
+            "edgeInstructions": "Edge: Configuración > Cookies y permisos del sitio > Administrar y eliminar cookies y datos del sitio",
+            "firefoxInstructions": "Firefox: Configuración > Privacidad y seguridad > Cookies y datos del sitio",
+            "h3Browser": "Gestión de Cookies desde el Navegador",
+            "h3InApp": "Gestión de Cookies en la Aplicación",
+            "pBrowser": "Puede gestionar y eliminar las cookies a través de la configuración de su navegador. Tenga en cuenta que deshabilitar las cookies esenciales puede impedir el correcto funcionamiento de MirrorBuddy.",
+            "pInApp": "Puede gestionar sus preferencias de cookies directamente en la configuración de MirrorBuddy, en la sección Privacidad. Desde allí puede revocar el consentimiento a las cookies opcionales en cualquier momento.",
+            "safariInstructions": "Safari: Preferencias > Privacidad > Gestionar datos del sitio web",
+            "title": "Gestión de Cookies",
             "warningAriaLabel": "Etiqueta Aria Advertencia",
-            "warningText": "Texto de Advertencia",
+            "warningText": "Si deshabilita las cookies esenciales, algunas funciones de MirrorBuddy (como la autenticación y las preferencias de accesibilidad) no funcionarán correctamente.",
             "warningTitle": "Título de Advertencia"
           },
           "duration": {
-            "clearCookies": "Eliminar Cookies",
-            "intro": "Introducción",
+            "clearCookies": "Puede eliminar todas las cookies en cualquier momento desde la configuración de su navegador o desde la página de Privacidad en la configuración de MirrorBuddy.",
+            "intro": "Las cookies utilizadas por MirrorBuddy tienen distintas duraciones según su función:",
             "persistentCookies": "Cookies Persistentes",
-            "persistentCookiesDesc": "Descripción Cookies Persistentes",
+            "persistentCookiesDesc": "Permanecen en su dispositivo durante un período predefinido (de 30 días a 1 año). Incluyen las preferencias de accesibilidad, el consentimiento de cookies y la preferencia de tema.",
             "sessionCookies": "Cookies de Sesión",
             "sessionCookiesDesc": "Descripción Cookies de Sesión",
-            "title": "Título"
+            "title": "Duración de las Cookies"
           },
           "essentialCookies": {
-            "intro": "Introducción",
-            "note": "Nota",
-            "title": "Título"
+            "intro": "Las cookies esenciales son necesarias para el funcionamiento básico de MirrorBuddy. No recopilan datos personales y no pueden deshabilitarse sin comprometer las funciones principales del sitio.",
+            "note": "Nota: Todas las cookies esenciales de MirrorBuddy son HTTP-only (no accesibles desde JavaScript) para mayor seguridad, con excepción de la cookie de consentimiento y de tema, que deben ser leídas por el cliente.",
+            "title": "Cookies Esenciales (Estrictamente Necesarias)"
           },
           "links": {
-            "intro": "Introducción",
+            "intro": "Para más información sobre la protección de sus datos, consulte los siguientes documentos:",
             "privacyPolicyDesc": "Descripción Política de Privacidad",
             "privacyPolicyLabel": "Etiqueta Política de Privacidad",
             "termsDesc": "Descripción Términos",
-            "termsLabel": "Etiqueta Términos",
-            "title": "Título"
+            "termsLabel": "Términos y Condiciones",
+            "title": "Documentos Relacionados"
           },
           "metricsAnalytics": {
             "aggregated": "Agregado",
-            "aggregatedDesc": "Descripción Agregado",
+            "aggregatedDesc": "Todos los datos de analítica se agregan y se anonimizan. No es posible rastrear a un usuario individual.",
             "gdprCompliant": "Conforme RGPD",
-            "gdprCompliantDesc": "Descripción Conforme RGPD",
-            "h3Collection": "H3 Recopilación",
-            "p1": "P1",
-            "p2": "P2",
-            "readMore": "Leer Más",
+            "gdprCompliantDesc": "Vercel Analytics y Sentry cumplen con el RGPD y no requieren consentimiento para las cookies técnicas.",
+            "h3Collection": "Recopilación de Datos de Analítica",
+            "p1": "MirrorBuddy utiliza Vercel Analytics para monitorizar el rendimiento del sitio web. Vercel Analytics funciona del lado del servidor y no instala cookies de seguimiento en el navegador del usuario.",
+            "p2": "También utilizamos Sentry para la monitorización de errores y rendimiento. Sentry solo recopila datos técnicos (trazas de pila, métricas de rendimiento) sin información personal identificable.",
+            "readMore": "Para más información, consulte la documentación sobre privacidad de Vercel Analytics y Sentry.",
             "serverSide": "Del Lado del Servidor",
             "serverSideDesc": "Descripción Del Lado del Servidor",
             "technicalOnly": "Solo Técnico",
-            "technicalOnlyDesc": "Descripción Solo Técnico",
-            "title": "Título"
+            "technicalOnlyDesc": "Recopilamos solo métricas técnicas (tiempos de carga, errores) y no datos personales o de comportamiento.",
+            "title": "Métricas y Analítica"
           },
           "thirdParty": {
-            "completeList": "Lista Completa",
-            "googleDriveLabel": "Etiqueta Google Drive",
-            "googleDriveNote": "Nota Google Drive",
-            "noThirdParty": "Sin Terceros",
-            "noThirdPartyReason": "Razón Sin Terceros",
-            "title": "Título",
+            "completeList": "Lista completa de los servicios de terceros utilizados por MirrorBuddy:",
+            "googleDriveLabel": "Google Drive (opcional)",
+            "googleDriveNote": "Google Drive solo se utiliza si el usuario decide voluntariamente vincular su cuenta para cargar documentos. En ese caso, se aplican las cookies de Google según su política de privacidad.",
+            "noThirdParty": "Sin cookies de seguimiento publicitario",
+            "noThirdPartyReason": "MirrorBuddy no utiliza cookies de terceros con fines publicitarios, de perfilado comercial o de seguimiento entre sitios. No compartimos datos con redes publicitarias.",
+            "title": "Servicios de Terceros",
             "vendors": {
-              "azureOpenAI": "Azure OpenAI",
-              "resend": "Resend",
-              "sentry": "Sentry",
-              "supabase": "Supabase",
-              "upstash": "Upstash",
-              "vercel": "Vercel"
+              "azureOpenAI": "Azure OpenAI (procesamiento de conversaciones con los maestros, sin cookies instaladas)",
+              "resend": "Resend (envío de correos transaccionales, sin cookies instaladas)",
+              "sentry": "Sentry (monitorización de errores y rendimiento, sin cookies de seguimiento)",
+              "supabase": "Supabase (base de datos PostgreSQL, sin cookies del lado del cliente)",
+              "upstash": "Upstash (caché Redis para limitación de tasa, sin cookies instaladas)",
+              "vercel": "Vercel (alojamiento y analítica del lado del servidor, sin cookies de seguimiento)"
             },
-            "vendorsIntro": "Introducción Proveedores",
-            "vendorsNoInstall": "Proveedores Sin Instalación"
+            "vendorsIntro": "Los siguientes servicios de terceros son utilizados por MirrorBuddy para el funcionamiento de la plataforma. Ninguno de ellos instala cookies de seguimiento en su navegador:",
+            "vendorsNoInstall": "Ninguno de los servicios mencionados anteriormente instala cookies de seguimiento en el navegador del usuario. Los datos se procesan del lado del servidor de conformidad con el RGPD."
           },
           "whatAreCookies": {
-            "p1": "P1",
-            "p2": "P2",
-            "title": "Título"
+            "p1": "Las cookies son pequeños archivos de texto que se almacenan en su dispositivo (ordenador, smartphone o tableta) al visitar un sitio web. Se utilizan para recordar sus preferencias, mantenerlo autenticado y garantizar la seguridad de la navegación.",
+            "p2": "MirrorBuddy utiliza exclusivamente cookies técnicas esenciales para el funcionamiento del servicio. No utilizamos cookies de perfilado, seguimiento publicitario o marketing. No instalamos cookies de terceros con fines comerciales.",
+            "title": "Qué Son las Cookies"
           },
           "whichCookies": {
-            "analytics": "Analytics",
-            "analyticsDesc": "Descripción Analytics",
-            "disclaimer": "Descargo de responsabilidad",
-            "essential": "Esencial",
-            "essentialDesc": "Descripción Esencial",
-            "intro": "Introducción",
-            "title": "Título"
+            "analytics": "Cookies de Analítica (Opcionales)",
+            "analyticsDesc": "Previsto: actualmente MirrorBuddy no utiliza cookies de analítica. Las métricas se recopilan del lado del servidor mediante Vercel Analytics sin instalar cookies.",
+            "disclaimer": "MirrorBuddy utiliza el número mínimo de cookies necesarias para el funcionamiento del servicio. No utilizamos cookies con fines publicitarios, de perfilado comercial o de seguimiento entre sitios.",
+            "essential": "Cookies Esenciales (Necesarias)",
+            "essentialDesc": "Cookies estrictamente necesarias para el funcionamiento de MirrorBuddy: autenticación del usuario, protección CSRF, preferencias de accesibilidad, consentimiento de cookies y preferencia de tema.",
+            "intro": "MirrorBuddy utiliza dos categorías de cookies:",
+            "title": "Qué Cookies Utilizamos"
           }
         },
         "table": {
-          "ariaLabel": "Etiqueta Aria",
+          "ariaLabel": "Tabla de las cookies utilizadas por MirrorBuddy con nombre, finalidad y duración",
           "headers": {
             "duration": "Duración",
             "name": "Nombre",
@@ -793,19 +793,19 @@
           "rows": {
             "a11y": {
               "duration": "Duración",
-              "purpose": "Propósito"
+              "purpose": "Almacena las preferencias de accesibilidad del usuario (perfil DSA, tamaño de texto, contraste) para garantizar una experiencia personalizada sin necesidad de configuraciones repetidas."
             },
             "admin": {
-              "duration": "Duración",
-              "purpose": "Propósito"
+              "duration": "Sesión (expira al cerrar el navegador)",
+              "purpose": "Cookie de autenticación administrativa. Cookie HTTP-only firmada por seguridad. Utilizada únicamente por administradores autorizados para acceder al panel de administración."
             },
             "userId": {
               "duration": "Duración",
-              "purpose": "Propósito"
+              "purpose": "Cookie de autenticación de usuario principal. Cookie HTTP-only firmada criptográficamente por seguridad. Permite acceder a la propia cuenta sin tener que iniciar sesión en cada visita."
             },
             "userIdClient": {
               "duration": "Duración",
-              "purpose": "Propósito"
+              "purpose": "Versión cliente de la cookie de autenticación del usuario. Accesible desde JavaScript para mostrar información del usuario en la interfaz (por ejemplo, nombre, avatar). No contiene datos sensibles."
             },
             "theme": {
               "duration": "1 año",
@@ -831,10 +831,10 @@
         },
         "tldr": {
           "heading": "Encabezado",
-          "point1": "Punto1",
-          "point2": "Punto2",
-          "point3": "Punto3",
-          "point4": "Punto4"
+          "point1": "MirrorBuddy utiliza solo cookies técnicas esenciales para el funcionamiento del servicio (autenticación, seguridad, accesibilidad)",
+          "point2": "No utilizamos cookies de seguimiento publicitario, perfilado comercial ni marketing de terceros",
+          "point3": "La analítica se recopila del lado del servidor (Vercel Analytics) sin instalar cookies en su navegador",
+          "point4": "Puede gestionar las cookies a través de la configuración del navegador o desde la sección Privacidad de MirrorBuddy"
         },
         "notaTecnica": "Nota tecnica:",
         "privacyPolicy": "Privacy Policy",
@@ -871,7 +871,7 @@
             "backToHome": "Back To Home",
             "title": "Title",
             "version": "Version",
-            "k24Gennaio2026": "K24 Gennaio2026",
+            "k24Gennaio2026": "24 de enero de 2026",
             "tldrHeading": "Tldr Heading",
             "questionText": "Question Text",
             "questionAriaLabel": "Question Aria Label"
@@ -1255,145 +1255,145 @@
       },
       "terms": {
         "backToHome": "Volver al inicio",
-        "backToHomeAriaLabel": "Etiqueta aria volver al inicio",
-        "lastUpdated": "Última actualización {date}",
-        "pageNavAriaLabel": "Etiqueta aria de navegación de página",
-        "questionsEmail": "Correo electrónico para preguntas",
-        "questionsPrefix": "Prefijo de preguntas",
-        "title": "Título",
-        "tldrHeading": "Encabezado resumen",
+        "backToHomeAriaLabel": "Volver a la página principal de MirrorBuddy",
+        "lastUpdated": "Última actualización: {date}",
+        "pageNavAriaLabel": "Navegación de la página de términos y condiciones",
+        "questionsEmail": "roberdan@fightthestroke.org",
+        "questionsPrefix": "¿Tiene preguntas sobre nuestros términos? Contáctenos en:",
+        "title": "Términos y Condiciones de Uso",
+        "tldrHeading": "Resumen Rápido (TL;DR)",
         "tldrItems": {
-          "feedback": "Retroalimentación",
-          "free": "Gratis",
-          "notSchool": "No es escuela",
-          "respect": "Respeto",
-          "supervised": "Supervisado"
+          "feedback": "Sus comentarios nos ayudan a mejorar MirrorBuddy. Repórtenos problemas o sugerencias a roberdan@fightthestroke.org",
+          "free": "MirrorBuddy ofrece un nivel Base gratuito con acceso a 20 maestros y funciones educativas completas",
+          "notSchool": "MirrorBuddy no sustituye a la escuela, a los profesores ni a los profesionales sanitarios. Es una herramienta de apoyo al estudio",
+          "respect": "Respete a los demás usuarios y use MirrorBuddy de forma responsable. Los contenidos están protegidos por derechos de autor",
+          "supervised": "Los menores deben usar MirrorBuddy bajo la supervisión de un padre, madre o tutor legal"
         },
         "version": "Versión {version}",
         "jurisdictions": "Jurisdicciones: Italia, Francia, Alemania, España, Reino Unido",
         "sections": {
           "section1": {
-            "content1": "Contenido1",
-            "content2": "Contenido2",
-            "title": "Título"
+            "content1": "MirrorBuddy es una plataforma educativa basada en inteligencia artificial, diseñada para apoyar a estudiantes con dificultades de aprendizaje (DSA). La plataforma ofrece 32 maestros virtuales (personajes educativos con personalidad y conocimientos propios), tarjetas de estudio con algoritmo de repetición espaciada (FSRS), cuestionarios adaptativos, mapas mentales y herramientas de gamificación.",
+            "content2": "MirrorBuddy es desarrollada por la Fightthestroke Foundation con el objetivo de hacer que el aprendizaje sea inclusivo y accesible para todos. La plataforma cumple con la normativa europea sobre protección de datos (RGPD), inteligencia artificial (Reglamento de IA de la UE 2024/1689) y accesibilidad (WCAG 2.1 AA).",
+            "title": "1. Qué es MirrorBuddy"
           },
           "section10": {
-            "intro": "Introducción",
-            "item1": "Elemento1",
-            "item2": "Elemento2",
-            "item3": "Elemento3",
-            "title": "Título"
+            "intro": "Nos reservamos el derecho de modificar estos términos para reflejar actualizaciones del servicio, cambios normativos o comentarios de los usuarios. En caso de cambios significativos:",
+            "item1": "Publicaremos los términos actualizados en esta página con la nueva fecha de actualización",
+            "item2": "Le notificaremos mediante un aviso en la aplicación y, para cambios sustanciales, por correo electrónico",
+            "item3": "El uso continuado de MirrorBuddy tras la notificación constituye la aceptación de los nuevos términos. Si no acepta los cambios, puede dejar de usar el servicio y eliminar su cuenta",
+            "title": "10. Cambios en los Términos"
           },
           "section11": {
-            "line1": "Línea1",
-            "line2": "Línea2",
-            "title": "Título"
+            "line1": "Para preguntas, sugerencias o informes sobre los términos de uso, contáctenos en roberdan@fightthestroke.org",
+            "line2": "Fightthestroke Foundation - Equipo MirrorBuddy. Estos términos se rigen por la legislación italiana. Para controversias, el fuero competente es el de Milán, Italia.",
+            "title": "11. Contacto"
           },
           "section2": {
-            "item1": "Elemento1",
-            "item2": "Elemento2",
-            "item3": "Elemento3",
-            "item4": "Elemento4",
-            "title": "Título"
+            "item1": "MirrorBuddy está abierta a todos los estudiantes. Los menores de 14 años deben utilizar la plataforma bajo la supervisión de un padre, madre o tutor legal, según lo exigen el RGPD Art. 8 y la normativa italiana",
+            "item2": "Para crear una cuenta (nivel Base o Pro) es necesario proporcionar una dirección de correo electrónico válida y un nombre. El nivel Trial es accesible sin registro",
+            "item3": "Los padres pueden supervisar la actividad de sus hijos a través del Panel para Padres, donde pueden ver los progresos, las conversaciones y las recomendaciones de la IA",
+            "item4": "Cada usuario es responsable de la seguridad de su propia cuenta. No comparta sus credenciales de acceso con otras personas",
+            "title": "2. Quién Puede Usar MirrorBuddy"
           },
           "section3": {
             "ai": {
-              "content": "Contenido",
-              "heading": "Encabezado"
+              "content": "MirrorBuddy utiliza inteligencia artificial (Azure OpenAI) para personalizar la enseñanza. La IA puede generar respuestas inexactas o incompletas. Las respuestas de la IA no constituyen asesoramiento profesional (médico, legal, psicológico). Todos los contenidos generados por la IA están señalados como tales.",
+              "heading": "Inteligencia Artificial"
             },
             "beta": {
-              "content": "Contenido",
-              "heading": "Encabezado"
+              "content": "Algunas funciones de MirrorBuddy pueden estar en fase de desarrollo (beta). Las funciones beta se identifican como tales y pueden presentar limitaciones, errores o cambios sin previo aviso. Sus comentarios sobre las funciones beta son valiosos y nos ayudan a mejorar.",
+              "heading": "Funciones en Fase Beta"
             },
-            "intro": "Introducción",
+            "intro": "Al utilizar MirrorBuddy, usted comprende y acepta las siguientes limitaciones:",
             "school": {
-              "content": "Contenido",
-              "heading": "Encabezado"
+              "content": "MirrorBuddy es una herramienta de apoyo al estudio y NO sustituye a la escuela, a los profesores, a los tutores ni a los profesionales sanitarios. No proporciona diagnósticos médicos o psicológicos. Ante dificultades de aprendizaje, consulte siempre a un profesional cualificado.",
+              "heading": "No Sustituye a la Escuela"
             },
-            "title": "Título"
+            "title": "3. Advertencias y Limitaciones del Servicio"
           },
           "section4": {
             "changeable": {
-              "content": "Contenido",
-              "heading": "Encabezado"
+              "content": "Las funciones, los maestros y los contenidos de MirrorBuddy pueden cambiar con el tiempo. Nos comprometemos a mejorar constantemente la plataforma, pero algunas funciones podrían añadirse, modificarse o eliminarse sin previo aviso.",
+              "heading": "Servicio en Evolución"
             },
             "demo": {
-              "content": "Contenido",
-              "heading": "Encabezado"
+              "content": "MirrorBuddy se encuentra actualmente en fase de desarrollo activo. Algunos contenidos educativos y funciones pueden estar incompletos o en fase de pruebas. Estamos trabajando para ampliar continuamente la oferta educativa.",
+              "heading": "Plataforma en Desarrollo Activo"
             },
             "educational": {
-              "content": "Contenido",
-              "heading": "Encabezado"
+              "content": "Los contenidos educativos ofrecidos por los maestros de MirrorBuddy son generados por la IA con bases de conocimiento integradas. Aunque están diseñados para ser educativamente precisos, no garantizamos la exhaustividad o la corrección absoluta de cada información. Verifique siempre la información importante con fuentes fiables.",
+              "heading": "Contenidos Educativos"
             },
-            "intro": "Introducción",
-            "title": "Título"
+            "intro": "Comprender estas limitaciones le ayudará a utilizar MirrorBuddy de la forma más eficaz:",
+            "title": "4. Limitaciones"
           },
           "section5": {
-            "intro": "Introducción",
-            "item1": "Elemento1",
-            "item2": "Elemento2",
-            "item3": "Elemento3",
-            "item4": "Elemento4",
-            "note": "Nota",
-            "title": "Título"
+            "intro": "Todos los contenidos de MirrorBuddy están protegidos por derechos de autor y propiedad intelectual:",
+            "item1": "El código fuente, el diseño, los logotipos, los iconos y los contenidos originales de MirrorBuddy son propiedad de la Fightthestroke Foundation",
+            "item2": "Los personajes de los maestros (nombres, personalidades, bases de conocimiento) son obras creativas protegidas por derechos de autor",
+            "item3": "Los contenidos generados por la IA durante las conversaciones se proporcionan bajo una licencia de uso personal y no comercial",
+            "item4": "Sus datos personales y sus contenidos (documentos cargados, tarjetas de estudio creadas) siguen siendo de su propiedad",
+            "note": "No está permitido copiar, reproducir, distribuir ni crear obras derivadas de los contenidos de MirrorBuddy sin la autorización por escrito de la Fightthestroke Foundation.",
+            "title": "5. Propiedad Intelectual"
           },
           "section6": {
-            "intro": "Introducción",
+            "intro": "Para garantizar un entorno de aprendizaje seguro y respetuoso para todos, le pedimos que siga estas normas de comportamiento:",
             "noAbuse": {
-              "content": "Contenido",
-              "label": "Etiqueta"
+              "content": "No utilice MirrorBuddy para generar contenidos ofensivos, discriminatorios, violentos o ilegales. No intente eludir los filtros de seguridad de los maestros.",
+              "label": "Sin Abusos"
             },
             "notShare": {
-              "content": "Contenido",
-              "label": "Etiqueta"
+              "content": "No comparta información personal sensible (dirección, teléfono, datos bancarios) en las conversaciones con los maestros. La IA no está diseñada para gestionar dichos datos.",
+              "label": "No Compartir Datos Sensibles"
             },
             "report": {
-              "content": "Contenido",
-              "label": "Etiqueta"
+              "content": "Si encuentra contenidos inapropiados, errores o problemas de seguridad, repórtelos de inmediato a roberdan@fightthestroke.org. Agradecemos su colaboración para mantener MirrorBuddy segura.",
+              "label": "Reportar Problemas"
             },
             "respect": {
-              "content": "Contenido",
-              "label": "Etiqueta"
+              "content": "Respete a los demás usuarios y a los maestros virtuales. MirrorBuddy está diseñada para el aprendizaje inclusivo y no tolera ningún tipo de discriminación.",
+              "label": "Respeto Mutuo"
             },
-            "title": "Título"
+            "title": "6. Código de Conducta"
           },
           "section7": {
             "check": {
-              "content": "Contenido",
-              "label": "Etiqueta"
+              "content": "Revise regularmente el progreso de su hijo a través del Panel para Padres. Consulte las conversaciones con los maestros y las recomendaciones de la IA.",
+              "label": "Supervisar el Progreso"
             },
             "contact": {
-              "content": "Contenido",
-              "label": "Etiqueta"
+              "content": "Si tiene dudas sobre el uso de la IA o sobre la privacidad de su hijo, contáctenos en roberdan@fightthestroke.org. Respondemos en un plazo de 5 días laborables.",
+              "label": "Contáctenos ante Dudas"
             },
-            "intro": "Introducción",
+            "intro": "Si su hijo utiliza MirrorBuddy, le recomendamos seguir estas pautas:",
             "responsible": {
-              "content": "Contenido",
-              "label": "Etiqueta"
+              "content": "Como padre o madre, usted es responsable del uso de MirrorBuddy por parte de su hijo menor de edad. Asegúrese de que comprenda las normas de comportamiento y las limitaciones del servicio.",
+              "label": "Responsabilidad Parental"
             },
             "supervise": {
-              "content": "Contenido",
-              "label": "Etiqueta"
+              "content": "Los menores de 14 años deben utilizar MirrorBuddy bajo su supervisión. Puede desactivar la personalización de la IA en la configuración de privacidad si lo considera oportuno.",
+              "label": "Supervisión Activa"
             },
-            "title": "Título"
+            "title": "7. Pautas para Padres"
           },
           "section8": {
-            "brief": "Breve",
-            "intro": "Introducción",
-            "item1": "Elemento1",
-            "item2": "Elemento2",
-            "item3": "Elemento3",
-            "item4": "Elemento4",
-            "privacyLink": "Enlace de privacidad",
-            "title": "Título"
+            "brief": "Su privacidad es importante para nosotros. Aquí tiene un resumen de cómo protegemos sus datos:",
+            "intro": "Para obtener información completa sobre la recopilación, el uso y la protección de sus datos personales, consulte nuestra Política de Privacidad completa.",
+            "item1": "Recopilamos solo los datos necesarios para prestarle el servicio educativo (correo electrónico, nombre, conversaciones, progresos)",
+            "item2": "Nunca vendemos sus datos a terceros ni utilizamos cookies de seguimiento publicitario",
+            "item3": "Sus datos están protegidos por el RGPD y puede ejercer sus derechos (acceso, rectificación, supresión) en cualquier momento",
+            "item4": "Los modelos de IA no se entrenan con sus datos personales. Microsoft no utiliza sus datos para el entrenamiento de modelos",
+            "privacyLink": "Leer la Política de Privacidad completa",
+            "title": "8. Privacidad en Resumen"
           },
           "section9": {
-            "intro": "Introducción",
-            "item1": "Elemento1",
-            "item2": "Elemento2",
-            "item3": "Elemento3",
-            "note": "Nota",
-            "title": "Título"
+            "intro": "MirrorBuddy se proporciona 'tal cual' y 'según disponibilidad'. En la medida permitida por la legislación aplicable:",
+            "item1": "La Fightthestroke Foundation no garantiza que MirrorBuddy esté libre de errores, interrupciones o defectos. Nos comprometemos a mantener el servicio disponible, pero no podemos garantizar un tiempo de actividad del 100 %",
+            "item2": "No somos responsables de daños directos, indirectos o consecuentes derivados del uso o de la imposibilidad de utilizar MirrorBuddy, incluidos, entre otros, la pérdida de datos o la falta de aprendizaje",
+            "item3": "Nuestra responsabilidad total frente a usted no excederá el importe que haya pagado por el servicio en los últimos 12 meses (o cero para los usuarios del nivel gratuito)",
+            "note": "Esta limitación no se aplica en los casos en que la legislación italiana o europea no permita la exclusión o limitación de responsabilidad, incluidos los daños derivados de dolo o negligencia grave.",
+            "title": "9. Limitación de Responsabilidad"
           }
         }
       }

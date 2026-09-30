@@ -377,134 +377,134 @@
       },
       "sections": {
         "section1": {
-          "para1": "Absatz1",
-          "para2": "Absatz2",
-          "title": "Titel"
+          "para1": "Gemäß Artikel 50 der KI-Verordnung der EU (Verordnung 2024/1689) legt MirrorBuddy offen, dass die 32 pädagogischen Maestros auf der Plattform generative Künstliche Intelligenz nutzen. Diese KI-Systeme sind darauf ausgelegt, den Unterricht zu personalisieren und Schüler mit Lernschwierigkeiten zu unterstützen.",
+          "para2": "Die KI-Systeme in MirrorBuddy umfassen: Systeme zur pädagogischen Personalisierung (Azure OpenAI GPT), Systeme zur Fortschrittsanalyse (FSRS-Algorithmen für Spaced Repetition) und Systeme zur emotionalen Unterstützung (Erzeugung personalisierter Rückmeldungen und Ermutigung).",
+          "title": "1. Offenlegung der KI-Systeme"
         },
         "section10": {
-          "faq1Answer": "FAQ1 Antwort",
-          "faq1Title": "FAQ1 Titel",
-          "faq2Answer": "FAQ2 Antwort",
-          "faq2Title": "FAQ2 Titel",
-          "faq3Answer": "FAQ3 Antwort",
-          "faq3Title": "FAQ3 Titel",
-          "faq4Answer": "FAQ4 Antwort",
-          "faq4Title": "FAQ4 Titel",
-          "faq5Answer": "FAQ5 Antwort",
-          "faq5Title": "FAQ5 Titel",
-          "title": "Titel"
+          "faq1Answer": "Wenn die KI einen Maestro empfiehlt, zeigt das Eltern-Dashboard die Begründung an (z. B. 'Empfohlen basierend auf den Leistungen in Mathematik'). Sie können sich unter roberdan@fightthestroke.org an uns wenden, um eine ausführliche Erklärung zu erhalten.",
+          "faq1Title": "Woher weiß ich, warum die KI einen bestimmten Maestro empfohlen hat?",
+          "faq2Answer": "Nein. Die KI verwendet die Behinderung nicht als direkten Empfehlungsfaktor. Wir nutzen ausschließlich das Lernprofil des Schülers (Lerntempo, bevorzugte Lernstile) für einen inklusiven, universellen Unterricht.",
+          "faq2Title": "Beeinflusst meine Behinderung die Empfehlungen der KI?",
+          "faq3Answer": "Ja. Sie können die KI-Personalisierung in den Datenschutzeinstellungen deaktivieren. Alle Personalisierungsdaten werden gelöscht, Ihr Konto und die Bildungsinhalte bleiben jedoch erhalten.",
+          "faq3Title": "Kann ich meine KI-Daten löschen, ohne mein Konto zu löschen?",
+          "faq4Answer": "MirrorBuddy verwendet Azure OpenAI (GPT-4o mini für Trial, GPT-5.2-edu für Base, GPT-5.2-chat für Pro) sowie firmeneigene FSRS-Algorithmen zur Gedächtnisverfolgung. Kein Modell wird mit den Daten der MirrorBuddy-Schüler trainiert.",
+          "faq4Title": "Welche KI-Modelle verwenden Sie?",
+          "faq5Answer": "Stellen wir eine Diskriminierung (Verzerrung) fest, wird das System sofort deaktiviert. Die Daten werden einem menschlichen Audit unterzogen. Schüler und Eltern werden benachrichtigt. Hat die Diskriminierung einen Bildungsschaden verursacht, bieten wir vorrangige korrektive Unterstützung an.",
+          "faq5Title": "Was geschieht, wenn Sie feststellen, dass die KI Schüler diskriminiert?",
+          "title": "10. Häufig gestellte Fragen zur KI-Transparenz"
         },
         "section11": {
-          "intro": "Einleitung",
+          "intro": "Dieses Dokument zur KI-Transparenz wurde gemäß Artikel 50 der KI-Verordnung der EU (Verordnung 2024/1689) und dem italienischen Gesetz 132/2025 erstellt. Es ist öffentlich in Italienisch, Englisch, Französisch, Deutsch und Spanisch verfügbar.",
           "nextReview": "Nächste Überprüfung: 27. Juli 2026 (vierteljährlich)",
-          "title": "Titel"
+          "title": "11. Konformitäts- und Überprüfungsinformationen"
         },
         "section2": {
-          "intro": "Einleitung",
-          "item1Desc": "Punkt1 Beschreibung",
-          "item1Title": "Punkt1 Titel",
-          "item2Desc": "Punkt2 Beschreibung",
-          "item2Title": "Punkt2 Titel",
-          "item3Desc": "Punkt3 Beschreibung",
-          "item3Title": "Punkt3 Titel",
+          "intro": "Die KI-Verordnung der EU klassifiziert KI-Systeme nach Risikostufen. MirrorBuddy hat eine Datenschutz-Folgenabschätzung (DPIA) und eine KI-Risikobewertung durchgeführt, um das erforderliche Konformitätsniveau zu bestimmen.",
+          "item1Desc": "Systeme zur pädagogischen Personalisierung (Empfehlung von Maestros, Anpassung des Schwierigkeitsgrads) werden als begrenztes Risiko eingestuft. Wir verwenden transparente Hinweise und ermöglichen es Eltern, die Entscheidungen der KI zu überwachen.",
+          "item1Title": "Begrenztes Risiko - Personalisierungssysteme",
+          "item2Desc": "Sollte MirrorBuddy künftig automatisierte Bewertungsfunktionen integrieren, die den Bildungsweg des Schülers erheblich beeinflussen könnten (Art. 6 der KI-Verordnung), werden wir Kontrollen für hohes Risiko einführen, einschließlich verpflichtender menschlicher Aufsicht.",
+          "item2Title": "Hohes Risiko - Falls Anwendbar",
+          "item3Desc": "MirrorBuddy führt in Übereinstimmung mit dem italienischen Gesetz 132/2025 (nationale Umsetzung der KI-Verordnung der EU) öffentlich zugängliche Konformitätsverzeichnisse, die regelmäßig von der Datenschutzbehörde überprüft werden.",
+          "item3Title": "Konformität mit dem italienischen Gesetz 132/2025",
           "subtitle": "Risikoeinstufung von MirrorBuddy",
-          "title": "Titel"
+          "title": "2. KI-Klassifizierung und regulatorische Konformität"
         },
         "section3": {
-          "category1": "Gesprächsdaten (Nachrichten mit den Maestros), in Echtzeit analysiert, um Antworten und Ton zu personalisieren",
-          "category1Label": "Kategorie1 Bezeichnung",
+          "category1": "Konversationsdaten (Nachrichten mit den Maestros), in Echtzeit analysiert, um Antworten und Tonfall zu personalisieren",
+          "category1Label": "Engine für pädagogische Personalisierung",
           "category2": "Historische Leistungen bei Karteikarten und Quizzen, verwendet zur Berechnung optimaler Wiederholungsintervalle",
-          "category2Label": "Kategorie2 Bezeichnung",
-          "category3": "Emotionaler Kontext der Lernsitzung, verwendet zur Generierung personalisierter Motivationsnachrichten",
-          "category3Label": "Kategorie3 Bezeichnung",
+          "category2Label": "FSRS-System zur Fortschrittsverfolgung",
+          "category3": "Emotionaler Kontext der Lernsitzung, verwendet zur Erzeugung personalisierter Motivationsnachrichten",
+          "category3Label": "Generator für Ermutigungsnachrichten",
           "category4": "Wiederkehrende Schwierigkeitsmuster, überwacht, um Lehrkräfte zu benachrichtigen, ohne automatische Kategorisierung der Schüler",
-          "category4Label": "Kategorie4 Bezeichnung",
-          "category5": "Vektor-Embeddings der hochgeladenen Dokumente, verwendet für semantische Suche ohne Speicherung des Originalinhalts in den Vektoren",
-          "category5Label": "Kategorie5 Bezeichnung",
-          "intro": "Einleitung",
-          "outro": "Schluss",
+          "category4Label": "Erkennung von Lernschwierigkeiten",
+          "category5": "Vektor-Embeddings der hochgeladenen Dokumente, verwendet für die semantische Suche, ohne den Originalinhalt in den Vektoren zu speichern",
+          "category5Label": "Semantische Suche für Dokumente",
+          "intro": "Die folgenden KI-Systeme werden in MirrorBuddy eingesetzt, um inklusiven Unterricht zu unterstützen:",
+          "outro": "Alle diese Systeme sind mit integrierter menschlicher Aufsicht konzipiert und können in den Datenschutzeinstellungen deaktiviert werden.",
           "subtitle": "Beschriebene KI-Systeme",
-          "title": "Titel"
+          "title": "3. Hauptfunktionen des KI-Systems"
         },
         "section4": {
-          "protection1Desc": "Schutz1 Beschreibung",
-          "protection1Title": "Schutz1 Titel",
-          "protection2Desc": "Schutz2 Beschreibung",
-          "protection2Title": "Schutz2 Titel",
-          "protection3Desc": "Schutz3 Beschreibung",
-          "protection3Title": "Schutz3 Titel",
-          "protection4Desc": "Schutz4 Beschreibung",
-          "protection4Title": "Schutz4 Titel",
-          "protection5Desc": "Schutz5 Beschreibung",
-          "protection5Title": "Schutz5 Titel",
-          "subtitle": "Implementierte Kontrollen für menschliche Aufsicht",
-          "title": "Titel"
+          "protection1Desc": "Eltern haben Zugriff auf ein Eltern-Dashboard, das alle KI-Entscheidungen zu ihrem Kind anzeigt, einschließlich der Maestro-Empfehlungen und der vorgeschlagenen Lernpfade.",
+          "protection1Title": "Elterliche Aufsicht",
+          "protection2Desc": "Lehrkräfte und schulische Koordinatoren können die Entscheidungen des KI-Systems einsehen und manuell ändern. Keine KI-Entscheidung ist ohne menschliche Genehmigung endgültig.",
+          "protection2Title": "Aufsicht durch Lehrkräfte",
+          "protection3Desc": "Stellt das System erhebliche Schwierigkeiten fest, muss eine menschliche Lehrkraft innerhalb von 7 Tagen eingreifen, um individuelle Unterstützung zu bieten. Die KI liefert nur Vorschläge, keine Entscheidungen.",
+          "protection3Title": "Verpflichtendes menschliches Eingreifen",
+          "protection4Desc": "Wir führen vierteljährliche Audits durch, um sicherzustellen, dass die Empfehlungen der KI Schüler nicht aufgrund von Geschlecht, ethnischer Herkunft, Behinderung oder sozioökonomischem Status diskriminieren.",
+          "protection4Title": "Audit für Fairness und Transparenz",
+          "protection5Desc": "Schüler und Eltern können die KI-Personalisierung jederzeit vollständig deaktivieren. MirrorBuddy stellt weiterhin alle grundlegenden Bildungsfunktionen mit generischen Einstellungen bereit.",
+          "protection5Title": "Deaktivierung der KI - Widerspruchsrecht",
+          "subtitle": "Implementierte Kontrollen zur menschlichen Aufsicht",
+          "title": "4. Menschliche Aufsicht und Kontrolle (Artikel 14 - KI-Verordnung)"
         },
         "section5": {
-          "intro": "Einleitung",
-          "right1Desc": "Recht1 Beschreibung",
-          "right1Title": "Recht1 Titel",
-          "right2Desc": "Recht2 Beschreibung",
-          "right2Title": "Recht2 Titel",
-          "right3Desc": "Recht3 Beschreibung",
-          "right3Title": "Recht3 Titel",
-          "right4Desc": "Recht4 Beschreibung",
-          "right4Title": "Recht4 Titel",
-          "right5Desc": "Recht5 Beschreibung",
-          "right5Title": "Recht5 Titel",
-          "right6Desc": "Recht6 Beschreibung",
-          "right6Title": "Recht6 Titel",
-          "title": "Titel"
+          "intro": "Die KI-Verordnung der EU und die DSGVO garantieren Ihnen spezifische Rechte in Bezug auf KI-Systeme. Das können Sie tun:",
+          "right1Desc": "Sie können erfragen, wie die KI eine Sie betreffende Entscheidung getroffen hat, einschließlich der verwendeten Logik und der berücksichtigten Faktoren. Kontaktieren Sie roberdan@fightthestroke.org, um dieses Recht auszuüben.",
+          "right1Title": "Recht auf Zugang und Erläuterung",
+          "right2Desc": "Sie können alle für unsere KI-Entscheidungen verwendeten Daten (Gespräche, Fortschritte, Präferenzen) in einem lesbaren Format (JSON, CSV) exportieren, um sie auf eine andere Plattform zu übertragen.",
+          "right2Title": "Recht auf Datenübertragbarkeit",
+          "right3Desc": "Sie können der Verarbeitung Ihrer Daten zur KI-Personalisierung und pädagogischen Profilbildung widersprechen. MirrorBuddy deaktiviert daraufhin sofort alle KI-Systeme für Ihr Konto.",
+          "right3Title": "Widerspruchsrecht",
+          "right4Desc": "Wenn Sie der Ansicht sind, dass die von der KI verwendeten Daten unrichtig sind (z. B. der zugewiesene Schwierigkeitsgrad), können Sie deren Berichtigung verlangen, indem die KI-Profile mit korrekten Daten zurückgesetzt werden.",
+          "right4Title": "Recht auf Berichtigung",
+          "right5Desc": "Sie können die Löschung all Ihrer KI-Daten verlangen. Dies umfasst den Personalisierungsverlauf, wobei die grundlegenden Bildungsfunktionen weiterhin funktionsfähig bleiben.",
+          "right5Title": "Recht auf Vergessenwerden - Löschung",
+          "right6Desc": "Wenn Sie der Ansicht sind, dass eine KI-Entscheidung Sie rechtswidrig diskriminiert hat, können Sie innerhalb von 30 Tagen eine Beschwerde bei der italienischen Datenschutzbehörde (www.garanteprivacy.it) einreichen.",
+          "right6Title": "Beschwerderecht",
+          "title": "5. Ihre Rechte in Bezug auf KI"
         },
         "section6": {
-          "intro": "Einleitung",
-          "protection1Desc": "Schutz1 Beschreibung",
-          "protection1Title": "Schutz1 Titel",
-          "protection2Desc": "Schutz2 Beschreibung",
-          "protection2Title": "Schutz2 Titel",
-          "protection3Desc": "Schutz3 Beschreibung",
-          "protection3Title": "Schutz3 Titel",
-          "protection4Desc": "Schutz4 Beschreibung",
-          "protection4Title": "Schutz4 Titel",
-          "protection5Desc": "Schutz5 Beschreibung",
-          "protection5Title": "Schutz5 Titel",
-          "title": "Titel"
+          "intro": "Wir setzen spezifische Sicherheitsmaßnahmen ein, um zu schützen, wie die KI Ihre Daten verwendet:",
+          "protection1Desc": "Die zur KI-Personalisierung verwendeten Daten (Chatverlauf, Fortschritte, Präferenzen) werden bei der Übertragung an Azure OpenAI Ende-zu-Ende verschlüsselt.",
+          "protection1Title": "Datenverschlüsselung",
+          "protection2Desc": "Die generativen KI-Modelle von MirrorBuddy werden niemals mit den persönlichen Daten der Schüler trainiert. Wir verwenden nur Echtzeit-Eingaben, um die Antworten anzupassen.",
+          "protection2Title": "Anonymisierung der Modelle",
+          "protection3Desc": "Die KI erstellt keine Profile, die Schüler nach kognitiven Fähigkeiten, Behinderung, ethnischer Herkunft oder sozioökonomischem Status kategorisieren und dadurch Bildungschancen beeinflussen könnten.",
+          "protection3Title": "Keine diskriminierende Profilbildung",
+          "protection4Desc": "Nur unser italienisches Team aus Sicherheitsingenieuren und Datenschutzbeauftragten kann die von der KI verwendeten Daten zu Audit-Zwecken einsehen. Der Zugriff wird protokolliert und überprüft.",
+          "protection4Title": "Eingeschränkter menschlicher Zugriff",
+          "protection5Desc": "Die Personalisierungsdaten der KI werden nur während der aktiven Sitzung des Schülers gespeichert. Historische Daten werden innerhalb von 90 Tagen aggregiert und pseudonymisiert.",
+          "protection5Title": "Begrenzte Speicherdauer",
+          "title": "6. Datenschutz und Sicherheit"
         },
         "section7": {
-          "intro": "Einleitung",
-          "mitigation1": "Minderung1",
-          "mitigation2": "Minderung2",
-          "mitigation3": "Minderung3",
-          "mitigation4": "Minderung4",
-          "mitigation5": "Minderung5",
-          "risk1": "Risiko1",
-          "risk2": "Risiko2",
-          "risk3": "Risiko3",
-          "risk4": "Risiko4",
-          "risk5": "Risiko5",
-          "tableHeader1": "Tabellenüberschrift1",
-          "tableHeader2": "Tabellenüberschrift2",
-          "title": "Titel"
+          "intro": "MirrorBuddy hat die folgenden potenziellen KI-Risiken identifiziert und Minderungsmaßnahmen gemäß Artikel 29 der KI-Verordnung der EU umgesetzt:",
+          "mitigation1": "Zweimonatliche Fairness-Audits anhand vielfältiger Datensätze. Tests mit Schülern unterschiedlichen Geschlechts, ethnischer Herkunft und Behinderung, um unvoreingenommene Empfehlungen zu überprüfen.",
+          "mitigation2": "MirrorBuddy fördert menschliche Interaktion und manuelle Kontrolle. Die Maestros sind die Hauptschnittstelle. Die KI liefert nur unverbindliche Vorschläge.",
+          "mitigation3": "Ende-zu-Ende-Verschlüsselung, Datentrennung, rollenbasierte Zugriffsrichtlinien, dauerhafte Audit-Protokolle, keine Übermittlung außerhalb der EU ohne Einwilligung.",
+          "mitigation4": "Integrierte Sicherheitsfilter bei Azure OpenAI, menschliche Überprüfung generierter Inhalte, Feedback-Schleife zur Meldung von Problemen, sofortige Deaktivierung bei Erkennung.",
+          "mitigation5": "Dieses Dokument bietet vollständige Offenlegung. Das Eltern-Dashboard zeigt die Argumentation der KI. Das Recht auf Erläuterung auf Anfrage ist garantiert.",
+          "risk1": "Verzerrung in den Personalisierungsalgorithmen",
+          "risk2": "Übermäßige Abhängigkeit von der KI",
+          "risk3": "Unbefugte Offenlegung sensibler Daten",
+          "risk4": "Erzeugung schädlicher Inhalte",
+          "risk5": "Mangelnde Transparenz bei KI-Entscheidungen",
+          "tableHeader1": "Identifiziertes Risiko",
+          "tableHeader2": "Minderungsmaßnahme",
+          "title": "7. KI-Risikoanalyse und Minderungsmaßnahmen"
         },
         "section8": {
-          "classification": "Klassifizierung",
-          "intro": "Einleitung",
-          "law1": "Gesetz1",
-          "law2": "Gesetz2",
-          "law3": "Gesetz3",
-          "law4": "Gesetz4",
-          "title": "Titel"
+          "classification": "MirrorBuddy erfüllt alle Anforderungen der KI-Verordnung der EU 2024/1689 und des italienischen Gesetzes 132/2025.",
+          "intro": "Die italienische Datenschutzbehörde hat das Recht, MirrorBuddy jederzeit zu inspizieren, um die Konformität zu überprüfen.",
+          "law1": "KI-Verordnung der EU (Verordnung 2024/1689) - Risikoklassifizierung und Transparenzpflichten für KI-Systeme im Bildungsbereich",
+          "law2": "DSGVO (Verordnung (EU) 2016/679) - Schutz personenbezogener Daten, Recht auf Erläuterung automatisierter Entscheidungen (Art. 22)",
+          "law3": "Gesetz 132/2025 (Italien) - Nationale Umsetzung der KI-Verordnung der EU mit spezifischen Anforderungen für den Bildungsbereich",
+          "law4": "WCAG 2.1 Stufe AA - Barrierefreiheitsstandard für Nutzer mit Behinderungen, konform mit dem italienischen Stanca-Gesetz (Gesetz 4/2004)",
+          "title": "8. Regulatorische Konformität und Aufsicht"
         },
         "section9": {
-          "authorityLabel": "Behördenbezeichnung",
-          "authorityValue": "Behördenwert",
-          "commitment": "Verpflichtung",
-          "emailLabel": "E-Mail-Bezeichnung",
-          "emailValue": "E-Mail-Wert",
-          "formLabel": "Formularbezeichnung",
-          "formValue": "Formularwert",
-          "intro": "Einleitung",
-          "title": "Titel"
+          "authorityLabel": "Aufsichtsbehörde",
+          "authorityValue": "Italienische Datenschutzbehörde (garante@gpdp.it)",
+          "commitment": "Wir verbessern die Transparenz der KI kontinuierlich. Ihr Feedback hilft uns, eine verantwortungsvollere und inklusivere Bildungsplattform aufzubauen.",
+          "emailLabel": "E-Mail für KI-Konformität",
+          "emailValue": "roberdan@fightthestroke.org",
+          "formLabel": "Meldeformular",
+          "formValue": "Nutzen Sie das Kontaktformular unter www.mirrorbuddy.com/contact, um uns Feedback zur KI-Transparenz zu senden. Wir beantworten alle Anfragen innerhalb von 5 Werktagen.",
+          "intro": "Haben Sie Fragen zu unserer Nutzung von KI? Sie können uns auf folgende Weise kontaktieren:",
+          "title": "9. Kontaktieren Sie uns - Fragen zur KI-Transparenz"
         },
         "importante": "Importante:",
         "mirrorbuddyUtilizza": "MirrorBuddy utilizza Azure OpenAI (GPT-4),",
@@ -732,59 +732,59 @@
             "privacyPolicyDesc": "Vollständige Informationen darüber, wie wir Ihre persönlichen Daten sammeln, verwenden und schützen",
             "privacyPolicyLabel": "Datenschutzerklärung",
             "termsDesc": "Die Nutzungsbedingungen des MirrorBuddy-Dienstes",
-            "termsLabel": "AGB Bezeichnung",
-            "title": "Titel"
+            "termsLabel": "Nutzungsbedingungen",
+            "title": "Verwandte Dokumente"
           },
           "metricsAnalytics": {
             "aggregated": "Aggregiert",
-            "aggregatedDesc": "Aggregiert Beschreibung",
+            "aggregatedDesc": "Alle Analysedaten werden aggregiert und anonymisiert. Ein Rückschluss auf einzelne Nutzer ist nicht möglich.",
             "gdprCompliant": "GDPR-konform",
-            "gdprCompliantDesc": "GDPR-konform Beschreibung",
-            "h3Collection": "H3 Sammlung",
-            "p1": "P1",
-            "p2": "P2",
-            "readMore": "Mehr lesen",
+            "gdprCompliantDesc": "Vercel Analytics und Sentry sind DSGVO-konform und erfordern keine Einwilligung für technische Cookies.",
+            "h3Collection": "Erhebung von Analysedaten",
+            "p1": "MirrorBuddy verwendet Vercel Analytics, um die Leistung der Website zu überwachen. Vercel Analytics arbeitet serverseitig und installiert keine Tracking-Cookies im Browser des Nutzers.",
+            "p2": "Wir verwenden außerdem Sentry zur Überwachung von Fehlern und Performance. Sentry erfasst nur technische Daten (Stack-Traces, Leistungskennzahlen) ohne personenbezogene Informationen.",
+            "readMore": "Weitere Informationen finden Sie in der Datenschutzdokumentation von Vercel Analytics und Sentry.",
             "serverSide": "Serverseitig",
-            "serverSideDesc": "Serverseitig Beschreibung",
+            "serverSideDesc": "Die Analysedaten werden serverseitig erfasst, ohne Cookies oder Tracking-Skripte in Ihrem Browser zu installieren.",
             "technicalOnly": "Nur technisch",
-            "technicalOnlyDesc": "Nur technisch Beschreibung",
-            "title": "Titel"
+            "technicalOnlyDesc": "Wir erfassen nur technische Kennzahlen (Ladezeiten, Fehler) und keine personenbezogenen oder verhaltensbezogenen Daten.",
+            "title": "Metriken und Analysen"
           },
           "thirdParty": {
-            "completeList": "Vollständige Liste",
-            "googleDriveLabel": "Google Drive Bezeichnung",
-            "googleDriveNote": "Google Drive Hinweis",
-            "noThirdParty": "Keine Drittanbieter",
-            "noThirdPartyReason": "Grund für keine Drittanbieter",
-            "title": "Titel",
+            "completeList": "Vollständige Liste der von MirrorBuddy genutzten Drittanbieterdienste:",
+            "googleDriveLabel": "Google Drive (optional)",
+            "googleDriveNote": "Google Drive wird nur genutzt, wenn der Nutzer freiwillig sein Konto verknüpft, um Dokumente hochzuladen. In diesem Fall gelten die Cookies von Google gemäß dessen Datenschutzerklärung.",
+            "noThirdParty": "Keine Werbe-Tracking-Cookies",
+            "noThirdPartyReason": "MirrorBuddy verwendet keine Cookies von Drittanbietern zu Werbezwecken, für kommerzielles Profiling oder standortübergreifendes Tracking. Wir geben keine Daten an Werbenetzwerke weiter.",
+            "title": "Dienste von Drittanbietern",
             "vendors": {
-              "azureOpenAI": "Azure OpenAI",
-              "resend": "Resend",
-              "sentry": "Sentry",
-              "supabase": "Supabase",
-              "upstash": "Upstash",
-              "vercel": "Vercel"
+              "azureOpenAI": "Azure OpenAI (Verarbeitung der Gespräche mit den Maestros, keine Cookies installiert)",
+              "resend": "Resend (Versand transaktionaler E-Mails, keine Cookies installiert)",
+              "sentry": "Sentry (Fehler- und Performance-Überwachung, keine Tracking-Cookies)",
+              "supabase": "Supabase (PostgreSQL-Datenbank, keine clientseitigen Cookies)",
+              "upstash": "Upstash (Redis-Cache für Rate Limiting, keine Cookies installiert)",
+              "vercel": "Vercel (Hosting und serverseitige Analysen, keine Tracking-Cookies)"
             },
-            "vendorsIntro": "Anbieter Einleitung",
-            "vendorsNoInstall": "Anbieter keine Installation"
+            "vendorsIntro": "Die folgenden Dienste von Drittanbietern werden von MirrorBuddy für den Betrieb der Plattform genutzt. Keiner von ihnen installiert Tracking-Cookies in Ihrem Browser:",
+            "vendorsNoInstall": "Keiner der oben genannten Dienste installiert Tracking-Cookies im Browser des Nutzers. Die Daten werden serverseitig unter Einhaltung der DSGVO verarbeitet."
           },
           "whatAreCookies": {
-            "p1": "P1",
-            "p2": "P2",
+            "p1": "Cookies sind kleine Textdateien, die beim Besuch einer Website auf Ihrem Gerät (Computer, Smartphone oder Tablet) gespeichert werden. Sie dienen dazu, Ihre Präferenzen zu speichern, Sie angemeldet zu halten und die Sicherheit der Navigation zu gewährleisten.",
+            "p2": "MirrorBuddy verwendet ausschließlich technisch essentielle Cookies für den Betrieb des Dienstes. Wir verwenden keine Profiling-, Werbe-Tracking- oder Marketing-Cookies. Wir installieren keine Drittanbieter-Cookies für kommerzielle Zwecke.",
             "title": "Was sind Cookies"
           },
           "whichCookies": {
-            "analytics": "Analytics",
-            "analyticsDesc": "Analytics-Beschreibung",
-            "disclaimer": "Haftungsausschluss",
+            "analytics": "Analyse-Cookies (Optional)",
+            "analyticsDesc": "Geplant: Derzeit verwendet MirrorBuddy keine Analyse-Cookies. Die Kennzahlen werden serverseitig über Vercel Analytics erfasst, ohne Cookies zu installieren.",
+            "disclaimer": "MirrorBuddy verwendet die minimal notwendige Anzahl an Cookies für den Betrieb des Dienstes. Wir verwenden keine Cookies für Werbung, kommerzielles Profiling oder standortübergreifendes Tracking.",
             "essential": "Essenziell",
-            "essentialDesc": "Essenzielle Beschreibung",
-            "intro": "Einleitung",
-            "title": "Titel"
+            "essentialDesc": "Cookies, die für den Betrieb von MirrorBuddy unbedingt erforderlich sind: Nutzerauthentifizierung, CSRF-Schutz, Barrierefreiheitseinstellungen, Cookie-Einwilligung und Theme-Präferenz.",
+            "intro": "MirrorBuddy verwendet zwei Kategorien von Cookies:",
+            "title": "Welche Cookies Wir Verwenden"
           }
         },
         "table": {
-          "ariaLabel": "Aria-Bezeichnung",
+          "ariaLabel": "Tabelle der von MirrorBuddy verwendeten Cookies mit Name, Zweck und Dauer",
           "headers": {
             "duration": "Dauer",
             "name": "Name",
@@ -793,19 +793,19 @@
           "rows": {
             "a11y": {
               "duration": "Dauer",
-              "purpose": "Zweck"
+              "purpose": "Speichert die Barrierefreiheitseinstellungen des Nutzers (DSA-Profil, Textgröße, Kontrast), um ein personalisiertes Erlebnis ohne wiederholte Einstellungen zu gewährleisten."
             },
             "admin": {
-              "duration": "Dauer",
-              "purpose": "Zweck"
+              "duration": "Sitzung (verfällt beim Schließen des Browsers)",
+              "purpose": "Cookie zur administrativen Authentifizierung. Signiertes HTTP-only-Cookie für Sicherheit. Wird nur von autorisierten Administratoren zum Zugriff auf das Admin-Panel verwendet."
             },
             "userId": {
               "duration": "Dauer",
-              "purpose": "Zweck"
+              "purpose": "Cookie zur primären Nutzerauthentifizierung. Kryptografisch signiertes HTTP-only-Cookie für Sicherheit. Ermöglicht den Zugriff auf das eigene Konto, ohne sich bei jedem Besuch anmelden zu müssen."
             },
             "userIdClient": {
               "duration": "Dauer",
-              "purpose": "Zweck"
+              "purpose": "Client-Version des Nutzerauthentifizierungs-Cookies. Von JavaScript zugänglich, um Nutzerinformationen in der Oberfläche anzuzeigen (z. B. Name, Avatar). Enthält keine sensiblen Daten."
             },
             "theme": {
               "duration": "1 Jahr",
@@ -831,10 +831,10 @@
         },
         "tldr": {
           "heading": "Überschrift",
-          "point1": "Punkt1",
-          "point2": "Punkt2",
-          "point3": "Punkt3",
-          "point4": "Punkt4"
+          "point1": "MirrorBuddy verwendet nur technisch essentielle Cookies für den Betrieb des Dienstes (Authentifizierung, Sicherheit, Barrierefreiheit)",
+          "point2": "Wir verwenden keine Werbe-Tracking-Cookies, kein kommerzielles Profiling und kein Marketing von Drittanbietern",
+          "point3": "Die Analysen werden serverseitig erfasst (Vercel Analytics), ohne Cookies in Ihrem Browser zu installieren",
+          "point4": "Sie können Cookies über die Browsereinstellungen oder den Datenschutzbereich von MirrorBuddy verwalten"
         },
         "notaTecnica": "Nota tecnica:",
         "privacyPolicy": "Privacy Policy",
@@ -871,7 +871,7 @@
             "backToHome": "Back To Home",
             "title": "Title",
             "version": "Version",
-            "k24Gennaio2026": "K24 Gennaio2026",
+            "k24Gennaio2026": "24. Januar 2026",
             "tldrHeading": "Tldr Heading",
             "questionText": "Question Text",
             "questionAriaLabel": "Question Aria Label"
@@ -1255,145 +1255,145 @@
       },
       "terms": {
         "backToHome": "Zurück zur Startseite",
-        "backToHomeAriaLabel": "Zurück zur Startseite Aria-Bezeichnung",
-        "lastUpdated": "Zuletzt aktualisiert {date}",
-        "pageNavAriaLabel": "Seitennavigation Aria-Bezeichnung",
-        "questionsEmail": "Fragen E-Mail",
-        "questionsPrefix": "Fragen Präfix",
-        "title": "Titel",
-        "tldrHeading": "Kurzzusammenfassung Überschrift",
+        "backToHomeAriaLabel": "Zurück zur Startseite von MirrorBuddy",
+        "lastUpdated": "Zuletzt aktualisiert: {date}",
+        "pageNavAriaLabel": "Seitennavigation Nutzungsbedingungen",
+        "questionsEmail": "roberdan@fightthestroke.org",
+        "questionsPrefix": "Haben Sie Fragen zu unseren Bedingungen? Kontaktieren Sie uns unter:",
+        "title": "Allgemeine Nutzungsbedingungen",
+        "tldrHeading": "Kurzzusammenfassung (TL;DR)",
         "tldrItems": {
-          "feedback": "Feedback",
-          "free": "Kostenlos",
-          "notSchool": "Kein Schulersatz",
-          "respect": "Respekt",
-          "supervised": "Überwacht"
+          "feedback": "Ihr Feedback hilft uns, MirrorBuddy zu verbessern. Melden Sie Probleme oder Vorschläge an roberdan@fightthestroke.org",
+          "free": "MirrorBuddy bietet eine kostenlose Basis-Stufe mit Zugang zu 20 Maestros und vollständigen Bildungsfunktionen",
+          "notSchool": "MirrorBuddy ersetzt nicht die Schule, Lehrkräfte oder medizinisches Fachpersonal. Es ist ein Werkzeug zur Unterstützung des Lernens",
+          "respect": "Respektieren Sie andere Nutzer und verwenden Sie MirrorBuddy verantwortungsvoll. Die Inhalte sind urheberrechtlich geschützt",
+          "supervised": "Minderjährige müssen MirrorBuddy unter der Aufsicht eines Elternteils oder gesetzlichen Vertreters nutzen"
         },
         "version": "Version {version}",
         "jurisdictions": "Rechtsordnungen: Italien, Frankreich, Deutschland, Spanien, Vereinigtes Königreich",
         "sections": {
           "section1": {
-            "content1": "Inhalt1",
-            "content2": "Inhalt2",
-            "title": "Titel"
+            "content1": "MirrorBuddy ist eine auf künstlicher Intelligenz basierende Bildungsplattform, die Schüler mit Lernschwierigkeiten (DSA) unterstützen soll. Die Plattform bietet 32 virtuelle Maestros (Bildungscharaktere mit eigener Persönlichkeit und Wissen), Karteikarten mit Spaced-Repetition-Algorithmus (FSRS), adaptive Quizze, Mindmaps und Gamification-Werkzeuge.",
+            "content2": "MirrorBuddy wird von der Fightthestroke Foundation entwickelt, mit dem Ziel, Lernen inklusiv und für alle zugänglich zu machen. Die Plattform entspricht den europäischen Vorschriften zum Datenschutz (DSGVO), zur künstlichen Intelligenz (EU-KI-Verordnung 2024/1689) und zur Barrierefreiheit (WCAG 2.1 AA).",
+            "title": "1. Was ist MirrorBuddy"
           },
           "section10": {
-            "intro": "Einleitung",
-            "item1": "Punkt1",
-            "item2": "Punkt2",
-            "item3": "Punkt3",
-            "title": "Titel"
+            "intro": "Wir behalten uns das Recht vor, diese Bedingungen zu ändern, um Aktualisierungen des Dienstes, regulatorische Änderungen oder Nutzerfeedback widerzuspiegeln. Bei wesentlichen Änderungen:",
+            "item1": "Veröffentlichen wir die aktualisierten Bedingungen auf dieser Seite mit dem neuen Aktualisierungsdatum",
+            "item2": "Benachrichtigen wir Sie über ein Banner in der App und, bei wesentlichen Änderungen, per E-Mail",
+            "item3": "Stellt die fortgesetzte Nutzung von MirrorBuddy nach der Benachrichtigung eine Annahme der neuen Bedingungen dar. Wenn Sie die Änderungen nicht akzeptieren, können Sie die Nutzung beenden und Ihr Konto löschen",
+            "title": "10. Änderungen der Bedingungen"
           },
           "section11": {
-            "line1": "Zeile1",
-            "line2": "Zeile2",
-            "title": "Titel"
+            "line1": "Bei Fragen, Anregungen oder Meldungen zu den Nutzungsbedingungen kontaktieren Sie uns unter roberdan@fightthestroke.org",
+            "line2": "Fightthestroke Foundation - MirrorBuddy Team. Diese Bedingungen unterliegen italienischem Recht. Für Streitigkeiten ist das Gericht in Mailand, Italien, zuständig.",
+            "title": "11. Kontakt"
           },
           "section2": {
-            "item1": "Punkt1",
-            "item2": "Punkt2",
-            "item3": "Punkt3",
-            "item4": "Punkt4",
-            "title": "Titel"
+            "item1": "MirrorBuddy steht allen Schülern offen. Kinder unter 14 Jahren müssen die Plattform unter der Aufsicht eines Elternteils oder gesetzlichen Vertreters nutzen, wie es die DSGVO Art. 8 und die italienischen Vorschriften vorschreiben",
+            "item2": "Um ein Konto zu erstellen (Basis- oder Pro-Stufe), müssen Sie eine gültige E-Mail-Adresse und einen Namen angeben. Die Trial-Stufe ist ohne Registrierung zugänglich",
+            "item3": "Eltern können die Aktivität ihrer Kinder über das Eltern-Dashboard überwachen, wo sie Fortschritte, Gespräche und Empfehlungen der KI einsehen können",
+            "item4": "Jeder Nutzer ist für die Sicherheit seines eigenen Kontos verantwortlich. Geben Sie Ihre Zugangsdaten nicht an andere weiter",
+            "title": "2. Wer MirrorBuddy Nutzen Darf"
           },
           "section3": {
             "ai": {
-              "content": "Inhalt",
-              "heading": "Überschrift"
+              "content": "MirrorBuddy nutzt künstliche Intelligenz (Azure OpenAI), um den Unterricht zu personalisieren. Die KI kann ungenaue oder unvollständige Antworten erzeugen. Die Antworten der KI stellen keine professionelle Beratung dar (medizinisch, rechtlich, psychologisch). Alle von der KI erzeugten Inhalte sind als solche gekennzeichnet.",
+              "heading": "Künstliche Intelligenz"
             },
             "beta": {
-              "content": "Inhalt",
-              "heading": "Überschrift"
+              "content": "Einige Funktionen von MirrorBuddy können sich in der Entwicklung (Beta) befinden. Beta-Funktionen sind als solche gekennzeichnet und können Einschränkungen, Fehler oder Änderungen ohne Vorankündigung aufweisen. Ihr Feedback zu Beta-Funktionen ist wertvoll und hilft uns, uns zu verbessern.",
+              "heading": "Funktionen in der Beta-Phase"
             },
-            "intro": "Einleitung",
+            "intro": "Mit der Nutzung von MirrorBuddy verstehen und akzeptieren Sie die folgenden Einschränkungen:",
             "school": {
-              "content": "Inhalt",
-              "heading": "Überschrift"
+              "content": "MirrorBuddy ist ein Werkzeug zur Unterstützung des Lernens und ersetzt NICHT die Schule, Lehrkräfte, Nachhilfelehrer oder medizinisches Fachpersonal. Es stellt keine medizinischen oder psychologischen Diagnosen. Wenden Sie sich bei Lernschwierigkeiten immer an eine qualifizierte Fachperson.",
+              "heading": "Kein Ersatz für die Schule"
             },
-            "title": "Titel"
+            "title": "3. Hinweise und Einschränkungen des Dienstes"
           },
           "section4": {
             "changeable": {
-              "content": "Inhalt",
-              "heading": "Überschrift"
+              "content": "Die Funktionen, Maestros und Inhalte von MirrorBuddy können sich im Laufe der Zeit ändern. Wir bemühen uns, die Plattform kontinuierlich zu verbessern, doch einige Funktionen können ohne Vorankündigung hinzugefügt, geändert oder entfernt werden.",
+              "heading": "Sich Weiterentwickelnder Dienst"
             },
             "demo": {
-              "content": "Inhalt",
-              "heading": "Überschrift"
+              "content": "MirrorBuddy befindet sich derzeit in aktiver Entwicklung. Einige Bildungsinhalte und Funktionen können unvollständig sein oder sich in der Testphase befinden. Wir arbeiten daran, das Bildungsangebot kontinuierlich zu erweitern.",
+              "heading": "Plattform in Aktiver Entwicklung"
             },
             "educational": {
-              "content": "Inhalt",
-              "heading": "Überschrift"
+              "content": "Die von den Maestros von MirrorBuddy bereitgestellten Bildungsinhalte werden von der KI mit integrierten Wissensdatenbanken erzeugt. Obwohl sie auf Bildungsgenauigkeit ausgelegt sind, garantieren wir nicht die Vollständigkeit oder absolute Richtigkeit jeder Information. Überprüfen Sie wichtige Informationen stets anhand verlässlicher Quellen.",
+              "heading": "Bildungsinhalte"
             },
-            "intro": "Einleitung",
-            "title": "Titel"
+            "intro": "Das Verständnis dieser Einschränkungen hilft Ihnen, MirrorBuddy möglichst effektiv zu nutzen:",
+            "title": "4. Einschränkungen"
           },
           "section5": {
-            "intro": "Einleitung",
-            "item1": "Punkt1",
-            "item2": "Punkt2",
-            "item3": "Punkt3",
-            "item4": "Punkt4",
-            "note": "Hinweis",
-            "title": "Titel"
+            "intro": "Alle Inhalte von MirrorBuddy sind durch Urheberrecht und geistiges Eigentum geschützt:",
+            "item1": "Der Quellcode, das Design, die Logos, die Symbole und die Originalinhalte von MirrorBuddy sind Eigentum der Fightthestroke Foundation",
+            "item2": "Die Maestro-Charaktere (Namen, Persönlichkeiten, Wissensdatenbanken) sind kreative Werke, die urheberrechtlich geschützt sind",
+            "item3": "Die während der Gespräche von der KI erzeugten Inhalte werden unter einer persönlichen, nicht-kommerziellen Nutzungslizenz bereitgestellt",
+            "item4": "Ihre persönlichen Daten und Ihre Inhalte (hochgeladene Dokumente, erstellte Karteikarten) bleiben Ihr Eigentum",
+            "note": "Es ist nicht gestattet, Inhalte von MirrorBuddy ohne schriftliche Genehmigung der Fightthestroke Foundation zu kopieren, zu vervielfältigen, zu verbreiten oder daraus abgeleitete Werke zu erstellen.",
+            "title": "5. Geistiges Eigentum"
           },
           "section6": {
-            "intro": "Einleitung",
+            "intro": "Um eine sichere und respektvolle Lernumgebung für alle zu gewährleisten, bitten wir Sie, diese Verhaltensregeln zu befolgen:",
             "noAbuse": {
-              "content": "Inhalt",
-              "label": "Bezeichnung"
+              "content": "Verwenden Sie MirrorBuddy nicht, um beleidigende, diskriminierende, gewalttätige oder illegale Inhalte zu erzeugen. Versuchen Sie nicht, die Sicherheitsfilter der Maestros zu umgehen.",
+              "label": "Kein Missbrauch"
             },
             "notShare": {
-              "content": "Inhalt",
-              "label": "Bezeichnung"
+              "content": "Teilen Sie in Gesprächen mit den Maestros keine sensiblen persönlichen Informationen (Adresse, Telefonnummer, Bankdaten). Die KI ist nicht dafür ausgelegt, solche Daten zu verarbeiten.",
+              "label": "Keine Sensiblen Daten Teilen"
             },
             "report": {
-              "content": "Inhalt",
-              "label": "Bezeichnung"
+              "content": "Wenn Sie unangemessene Inhalte, Fehler oder Sicherheitsprobleme feststellen, melden Sie diese umgehend an roberdan@fightthestroke.org. Wir schätzen Ihre Mithilfe, MirrorBuddy sicher zu halten.",
+              "label": "Probleme Melden"
             },
             "respect": {
-              "content": "Inhalt",
-              "label": "Bezeichnung"
+              "content": "Respektieren Sie andere Nutzer und die virtuellen Maestros. MirrorBuddy ist für inklusives Lernen konzipiert und toleriert keinerlei Diskriminierung.",
+              "label": "Gegenseitiger Respekt"
             },
-            "title": "Titel"
+            "title": "6. Verhaltenskodex"
           },
           "section7": {
             "check": {
-              "content": "Inhalt",
-              "label": "Bezeichnung"
+              "content": "Überprüfen Sie regelmäßig den Fortschritt Ihres Kindes über das Eltern-Dashboard. Kontrollieren Sie die Gespräche mit den Maestros und die Empfehlungen der KI.",
+              "label": "Fortschritt Überwachen"
             },
             "contact": {
-              "content": "Inhalt",
-              "label": "Bezeichnung"
+              "content": "Wenn Sie Zweifel an der Nutzung der KI oder am Datenschutz Ihres Kindes haben, kontaktieren Sie uns unter roberdan@fightthestroke.org. Wir antworten innerhalb von 5 Werktagen.",
+              "label": "Bei Zweifeln Kontaktieren"
             },
-            "intro": "Einleitung",
+            "intro": "Wenn Ihr Kind MirrorBuddy nutzt, empfehlen wir Ihnen, diese Richtlinien zu befolgen:",
             "responsible": {
-              "content": "Inhalt",
-              "label": "Bezeichnung"
+              "content": "Als Elternteil sind Sie für die Nutzung von MirrorBuddy durch Ihr minderjähriges Kind verantwortlich. Stellen Sie sicher, dass es die Verhaltensregeln und die Einschränkungen des Dienstes versteht.",
+              "label": "Elterliche Verantwortung"
             },
             "supervise": {
-              "content": "Inhalt",
-              "label": "Bezeichnung"
+              "content": "Kinder unter 14 Jahren müssen MirrorBuddy unter Ihrer Aufsicht nutzen. Sie können die KI-Personalisierung in den Datenschutzeinstellungen deaktivieren, wenn Sie dies für angebracht halten.",
+              "label": "Aktive Aufsicht"
             },
-            "title": "Titel"
+            "title": "7. Richtlinien für Eltern"
           },
           "section8": {
-            "brief": "Kurzbeschreibung",
-            "intro": "Einleitung",
-            "item1": "Punkt1",
-            "item2": "Punkt2",
-            "item3": "Punkt3",
-            "item4": "Punkt4",
-            "privacyLink": "Datenschutz-Link",
-            "title": "Titel"
+            "brief": "Ihre Privatsphäre ist uns wichtig. Hier eine Zusammenfassung, wie wir Ihre Daten schützen:",
+            "intro": "Umfassende Informationen zur Erhebung, Nutzung und zum Schutz Ihrer personenbezogenen Daten finden Sie in unserer vollständigen Datenschutzerklärung.",
+            "item1": "Wir erheben nur die Daten, die zur Erbringung des Bildungsdienstes notwendig sind (E-Mail, Name, Gespräche, Fortschritte)",
+            "item2": "Wir verkaufen Ihre Daten niemals an Dritte und verwenden keine Werbe-Tracking-Cookies",
+            "item3": "Ihre Daten sind durch die DSGVO geschützt, und Sie können Ihre Rechte (Zugang, Berichtigung, Löschung) jederzeit ausüben",
+            "item4": "Die KI-Modelle werden nicht mit Ihren personenbezogenen Daten trainiert. Microsoft verwendet Ihre Daten nicht für das Training von Modellen",
+            "privacyLink": "Vollständige Datenschutzerklärung lesen",
+            "title": "8. Datenschutz in Kürze"
           },
           "section9": {
-            "intro": "Einleitung",
-            "item1": "Punkt1",
-            "item2": "Punkt2",
-            "item3": "Punkt3",
-            "note": "Hinweis",
-            "title": "Titel"
+            "intro": "MirrorBuddy wird 'wie besehen' und 'wie verfügbar' bereitgestellt. Im nach geltendem Recht zulässigen Umfang gilt:",
+            "item1": "Die Fightthestroke Foundation garantiert nicht, dass MirrorBuddy frei von Fehlern, Unterbrechungen oder Mängeln ist. Wir bemühen uns, den Dienst verfügbar zu halten, können jedoch keine Verfügbarkeit von 100 % garantieren",
+            "item2": "Wir haften nicht für direkte, indirekte oder Folgeschäden, die aus der Nutzung oder der Unmöglichkeit der Nutzung von MirrorBuddy entstehen, einschließlich, aber nicht beschränkt auf Datenverlust oder ausbleibenden Lernerfolg",
+            "item3": "Unsere Gesamthaftung Ihnen gegenüber übersteigt nicht den Betrag, den Sie in den letzten 12 Monaten für den Dienst gezahlt haben (oder null für Nutzer der kostenlosen Stufe)",
+            "note": "Diese Beschränkung gilt nicht in Fällen, in denen das italienische oder europäische Recht den Ausschluss oder die Beschränkung der Haftung nicht zulässt, einschließlich Schäden aus Vorsatz oder grober Fahrlässigkeit.",
+            "title": "9. Haftungsbeschränkung"
           }
         }
       }

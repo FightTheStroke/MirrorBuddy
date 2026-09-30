@@ -602,7 +602,7 @@
     },
     "protectedUsers": {
       "noUsers": "No Users",
-      "title": "Titel",
+      "title": "Geschützte Benutzer",
       "empty": "Keine geschützten Benutzer konfiguriert",
       "description": "Diese Benutzer sind vor der automatischen Bereinigung von Testdaten geschützt.",
       "add": "Benutzer hinzufügen",
@@ -679,7 +679,7 @@
       "calls": "Aufrufe",
       "configureAzure": "Azure konfigurieren",
       "dailyCosts": "Tägliche Kosten",
-      "description": "Beschreibung",
+      "description": "Übersicht der Plattformmetriken",
       "estimatedCost": "Geschätzte Kosten",
       "last30Days": "Letzte 30 Tage",
       "loading": "Laden...",
@@ -708,7 +708,7 @@
       "topServices": "Top-Dienste",
       "total": "Gesamt",
       "maestroUsageChart": {
-        "title": "Titel"
+        "title": "Nutzung pro Maestro"
       },
       "timeStudyChart": {
         "chartAriaLabel": "Diagramm der Lernzeit nach Fach"
