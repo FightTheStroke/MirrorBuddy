@@ -10,6 +10,7 @@
 
 import { logger } from '@/lib/logger';
 import { type TokenParamName, sanitizeUpstreamError } from './azure-errors';
+import { acceptsCustomTemperature, rememberTemperatureRefusal } from './temperature-support';
 
 export type StreamRequestOptions = {
   endpointUrl: (deployment: string) => string;
@@ -43,7 +44,7 @@ export async function fetchStreamWithCompatibility(
 
   // GPT-5 class deployments accept only their default temperature. Once refused,
   // it stays dropped for every later attempt.
-  let includeTemperature = true;
+  let includeTemperature = acceptsCustomTemperature(deployment);
 
   const attempts: Array<{ deployment: string; tokenParamName: TokenParamName }> = [
     { deployment, tokenParamName: 'max_completion_tokens' },
@@ -87,7 +88,7 @@ export async function fetchStreamWithCompatibility(
       lastFailure = replayable(response.status, errorText);
 
       if (sanitized.unsupportedTemperature && includeTemperature) {
-        includeTemperature = false;
+        includeTemperature = rememberTemperatureRefusal(attempt.deployment);
         logger.warn(
           '[Azure Streaming] Deployment rejects a custom temperature; using its default',
           {

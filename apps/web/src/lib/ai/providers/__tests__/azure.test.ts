@@ -6,6 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { azureChatCompletion, azureCircuitBreaker } from '../azure';
 import type { ProviderConfig } from '../types';
+import { forgetTemperatureRefusals } from '../temperature-support';
 
 describe('azureChatCompletion - Resilience', () => {
   const originalFetch = global.fetch;
@@ -15,6 +16,7 @@ describe('azureChatCompletion - Resilience', () => {
     vi.useFakeTimers();
     // Reset circuit breaker state between tests
     azureCircuitBreaker.reset();
+    forgetTemperatureRefusals();
   });
 
   afterEach(() => {
@@ -345,6 +347,35 @@ describe('azureChatCompletion - Resilience', () => {
       const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
       expect(bodyOf(calls[0])).toHaveProperty('temperature', 0.7);
       expect(bodyOf(calls[1])).not.toHaveProperty('temperature');
+    });
+
+    it('omits temperature up front once the deployment has refused it', async () => {
+      let callCount = 0;
+      global.fetch = vi.fn().mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return Promise.resolve({
+            ok: false,
+            status: 400,
+            text: () => Promise.resolve(unsupportedTemperatureBody),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              choices: [{ message: { content: '56' }, finish_reason: 'stop' }],
+              usage: { total_tokens: 5 },
+            }),
+        });
+      });
+
+      await azureChatCompletion(config, messages, 'System', 0.7, 100);
+      await azureChatCompletion(config, messages, 'System', 0.7, 100);
+
+      const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
+      expect(calls).toHaveLength(3);
+      expect(bodyOf(calls[2])).not.toHaveProperty('temperature');
     });
 
     it('keeps the token-parameter fallback available after dropping temperature', async () => {

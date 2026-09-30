@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Chat requests no longer pay a guaranteed extra Azure round-trip: once a deployment refuses a
+  custom `temperature` (GPT-5/6 class), later requests omit it up front
+- The model catalog seed (`npm run seed:models`) now connects through the Prisma driver adapter;
+  it had never been able to run, which left the admin model picker empty
+
 ## [0.43.0] - 2026-09-30
 
 ### Changed

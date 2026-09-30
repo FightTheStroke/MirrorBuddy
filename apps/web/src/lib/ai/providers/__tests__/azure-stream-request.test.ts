@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fetchStreamWithCompatibility } from '../azure-stream-request';
+import { forgetTemperatureRefusals } from '../temperature-support';
 
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -67,6 +68,7 @@ describe('fetchStreamWithCompatibility', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    forgetTemperatureRefusals();
   });
 
   afterEach(() => {
@@ -85,6 +87,19 @@ describe('fetchStreamWithCompatibility', () => {
     expect(bodyOf(calls[0])).toHaveProperty('temperature', 0.7);
     expect(bodyOf(calls[1])).not.toHaveProperty('temperature');
     expect(bodyOf(calls[1])).toHaveProperty('max_completion_tokens', 100);
+  });
+
+  it('omits temperature up front once the deployment has refused it', async () => {
+    const responses = [failure(400, UNSUPPORTED_TEMPERATURE), success(), success()];
+    global.fetch = vi.fn().mockImplementation(() => Promise.resolve(responses.shift()));
+
+    await fetchStreamWithCompatibility(baseOptions());
+    const second = await fetchStreamWithCompatibility(baseOptions());
+
+    expect(second.ok).toBe(true);
+    const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
+    expect(calls).toHaveLength(3);
+    expect(bodyOf(calls[2])).not.toHaveProperty('temperature');
   });
 
   it('keeps temperature dropped while falling back to the legacy token parameter', async () => {
