@@ -14,6 +14,7 @@
  *
  * | Deployment       | Underlying model | Status  | Inference retires |
  * | ---------------- | ---------------- | ------- | ----------------- |
+ * | mb-gpt-61-sol    | gpt-6.1-sol      | GA      | see Learn         |
  * | gpt-6-astra      | gpt-6-astra      | GA      | 2028-01-11        |
  * | gpt-5.6-terra    | gpt-5.6-terra    | GA      | 2028-01-11        |
  * | gpt-5.6-sol      | gpt-5.6-sol      | GA      | 2028-01-11        |
@@ -42,14 +43,17 @@
 import { logger } from '@/lib/logger';
 
 /**
- * Azure deployment serving the default chat model (gpt-5.6-terra, GA).
+ * Azure deployment serving the default chat model (gpt-6.1-sol, GA).
  *
- * Terra is the balanced member of the 5.6 line: same context window and
- * tooling as the Sol flagship at half the token price and lower latency,
- * which is the right trade for tutoring turns. Sol stays deployed and
- * mapped below, so raising the bar is a one-line change.
+ * Chosen on 2026-09-30 after a blind eval on real Maestro prompts, the five
+ * synthetic DSA students, the study-kit generators and safety probes: it
+ * scored highest on tutoring, tools and safety, at a lower token price than
+ * gpt-5.6-terra. `mb-gpt-61-sol` is a DataZoneStandard (EU-only) deployment.
  */
-const CHAT_DEFAULT_DEPLOYMENT = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT?.trim() || 'gpt-5.6-terra';
+const GPT61_SOL_DEPLOYMENT =
+  process.env.AZURE_OPENAI_GPT61_SOL_DEPLOYMENT?.trim() || 'mb-gpt-61-sol';
+const CHAT_DEFAULT_DEPLOYMENT =
+  process.env.AZURE_OPENAI_CHAT_DEPLOYMENT?.trim() || GPT61_SOL_DEPLOYMENT;
 
 function getChatDeploymentFallback(): string | undefined {
   const fallback = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT?.trim();
@@ -89,8 +93,13 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   // 2026-07-09 wave — GPT-5.6 line. Every tier chats on the same model: the
   // quality of the tutor is not something to ration by price plan. Terra is
   // the default; Sol is kept mapped as the deliberate upgrade path.
-  'gpt-5.6-terra': CHAT_DEFAULT_DEPLOYMENT,
+  // Terra was the default until 2026-09-30; kept on its own deployment so a
+  // tier row still naming it keeps working and it stays a one-click rollback.
+  'gpt-5.6-terra': 'gpt-5.6-terra',
   'gpt-5.6-sol': process.env.AZURE_OPENAI_GPT56_SOL_DEPLOYMENT?.trim() || 'gpt-5.6-sol',
+
+  // 2026-09-29 wave — GPT-6.1 Sol: current default for every tier and feature.
+  'gpt-6.1-sol': GPT61_SOL_DEPLOYMENT,
 
   // 2026-09-03 wave — GPT-6 Astra is the newest GA flagship and is already
   // provisioned on the resource, but it is deliberately NOT mapped: the decision

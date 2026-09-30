@@ -10,30 +10,21 @@ import type { TierDefinition } from '@prisma/client';
 
 import { BASE_TIER_MAESTRI, ROSTER_IDS } from '../../data/roster-ids';
 
-// Model defaults from env vars (change in .env to migrate without code changes)
-// Every tier chats on the same model: tutoring quality is not rationed by plan.
-// The three names are kept so the env vars stay meaningful, but they default
-// to the same model on purpose.
-const CHAT_DEFAULT = 'gpt-5.6-terra';
+// One model for every tier and every AI feature (decided 2026-09-30): Trial and
+// Base are where students form their first impression, so nothing is rationed by
+// plan — not chat, not tools. DEFAULT_CHAT_MODEL_EDU / _PRO are no longer read.
+const CHAT_DEFAULT = 'gpt-6.1-sol';
 const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || CHAT_DEFAULT;
-const CHAT_MODEL_EDU = process.env.DEFAULT_CHAT_MODEL_EDU || CHAT_DEFAULT;
-const CHAT_MODEL_PRO = process.env.DEFAULT_CHAT_MODEL_PRO || CHAT_DEFAULT;
 const DEMO_MODEL = process.env.DEFAULT_DEMO_MODEL || 'gpt-5-nano';
 
 /**
- * Per-feature model assignments (ADR 0073).
- *
- * These used to live only in the standalone `prisma/seed-tiers.ts`, which
- * duplicated this whole file. A database initialised through that entry point
- * got per-feature models but a stale maestri list; one seeded through here got
- * the right roster but no per-feature models. Both are now defined once, and
- * the standalone script is a thin wrapper around this function.
+ * Per-feature model assignments (ADR 0073), identical for every tier.
  *
  * Values match `createFallbackTier()` in tier-fallbacks.ts, which is what the
  * app serves when the database row is missing — the two must not disagree.
  * Voice deployment selection is global (ADR 0169), not seeded per tier.
  */
-const TRIAL_MODELS = {
+const FEATURE_MODELS = {
   chatModel: CHAT_MODEL,
   pdfModel: CHAT_MODEL,
   mindmapModel: CHAT_MODEL,
@@ -44,34 +35,6 @@ const TRIAL_MODELS = {
   chartModel: CHAT_MODEL,
   homeworkModel: CHAT_MODEL,
   webcamModel: CHAT_MODEL,
-  demoModel: DEMO_MODEL,
-} as const;
-
-const BASE_MODELS = {
-  chatModel: CHAT_MODEL_EDU,
-  pdfModel: CHAT_MODEL,
-  mindmapModel: CHAT_MODEL,
-  quizModel: CHAT_MODEL_EDU,
-  flashcardsModel: CHAT_MODEL,
-  summaryModel: CHAT_MODEL,
-  formulaModel: CHAT_MODEL_EDU,
-  chartModel: CHAT_MODEL,
-  homeworkModel: CHAT_MODEL_EDU,
-  webcamModel: CHAT_MODEL_EDU,
-  demoModel: DEMO_MODEL,
-} as const;
-
-const PRO_MODELS = {
-  chatModel: CHAT_MODEL_PRO,
-  pdfModel: CHAT_MODEL_PRO,
-  mindmapModel: CHAT_MODEL_PRO,
-  quizModel: CHAT_MODEL_PRO,
-  flashcardsModel: CHAT_MODEL_PRO,
-  summaryModel: CHAT_MODEL_PRO,
-  formulaModel: CHAT_MODEL_PRO,
-  chartModel: CHAT_MODEL_PRO,
-  homeworkModel: CHAT_MODEL_PRO,
-  webcamModel: CHAT_MODEL_PRO,
   demoModel: DEMO_MODEL,
 } as const;
 
@@ -111,7 +74,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
   };
   const trial = await prisma.tierDefinition.upsert({
     where: { code: 'trial' },
-    update: { features: trialFeatures, ...TRIAL_MODELS },
+    update: { features: trialFeatures, ...FEATURE_MODELS },
     create: {
       code: 'trial',
       name: 'Trial',
@@ -122,7 +85,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
       docsLimitTotal: 1,
       videoVisionSecondsPerSession: 0,
       videoVisionMinutesMonthly: 0,
-      ...TRIAL_MODELS,
+      ...FEATURE_MODELS,
       features: trialFeatures,
       availableMaestri: ['leonardo', 'galileo', 'curie'],
       availableCoaches: ['melissa'],
@@ -145,7 +108,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
     where: { code: 'base' },
     update: {
       availableMaestri: baseMaestri,
-      ...BASE_MODELS,
+      ...FEATURE_MODELS,
     },
     create: {
       code: 'base',
@@ -157,7 +120,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
       docsLimitTotal: 5,
       videoVisionSecondsPerSession: 0,
       videoVisionMinutesMonthly: 0,
-      ...BASE_MODELS,
+      ...FEATURE_MODELS,
       features: {
         chat: true,
         voice: true,
@@ -198,7 +161,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
       availableMaestri: proMaestri,
       availableCoaches: proCoaches,
       availableBuddies: proBuddies,
-      ...PRO_MODELS,
+      ...FEATURE_MODELS,
     },
     create: {
       code: 'pro',
@@ -210,7 +173,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
       docsLimitTotal: 999999,
       videoVisionSecondsPerSession: 60,
       videoVisionMinutesMonthly: 10,
-      ...PRO_MODELS,
+      ...FEATURE_MODELS,
       features: {
         chat: true,
         voice: true,

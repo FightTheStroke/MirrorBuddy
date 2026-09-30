@@ -205,6 +205,7 @@
 | 0158 | Coming Soon Waitlist + Invited Access | Pre-launch waitlist, promo codes, GDPR double opt-in |
 | 0180 | A/B Testing Framework                 | Deterministic bucketing and experiment attribution   |
 | 0181 | Community Contribution Engine         | Moderated contributions, rewards and voting          |
+| 0182 | GPT-6.1 Sol Single Model              | One EU-hosted model for every tier and feature       |
 
 ## Consortium & Grants
 
@@ -226,6 +227,6 @@
 
 ---
 
-**Total Active ADRs**: 139
+**Total Active ADRs**: 140
 **Archived ADRs**: 7
-**Last Updated**: 2026-08-30
+**Last Updated**: 2026-09-30

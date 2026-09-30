@@ -151,14 +151,13 @@ function validateOptionalEnvVars(): void {
     { name: 'NEXT_PUBLIC_BASE_URL', category: 'App' },
     // Model defaults - optional, have code fallbacks
     { name: 'DEFAULT_CHAT_MODEL', category: 'AI Models' },
-    { name: 'DEFAULT_CHAT_MODEL_EDU', category: 'AI Models' },
-    { name: 'DEFAULT_CHAT_MODEL_PRO', category: 'AI Models' },
     { name: 'DEFAULT_DEMO_MODEL', category: 'AI Models' },
     { name: 'DEFAULT_EXTRACTOR_MODEL', category: 'AI Models' },
     // GPT-5 / GPT-6 deployment names
     { name: 'AZURE_OPENAI_GPT5_NANO_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_GPT5_MINI_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_GPT56_SOL_DEPLOYMENT', category: 'AI Models' },
+    { name: 'AZURE_OPENAI_GPT61_SOL_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI', category: 'AI Models' },
     // Voice cost accounting — optional override of the built-in rate card
     { name: 'AZURE_VOICE_RATES_JSON', category: 'Voice costs' },

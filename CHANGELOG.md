@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Every tier and every AI feature (chat and all study tools) now uses `gpt-6.1-sol` on an
+  EU-only Azure deployment. Trial tools previously ran on `gpt-5-mini`, which scored lowest
+  on tutoring and safety in the internal evaluation (ADR 0182).
+
 ## [0.42.5] - 2026-09-29
 
 ### Security

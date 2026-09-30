@@ -24,8 +24,28 @@ describe('tier chat model policy', () => {
 
   it('serves the current default chat model', () => {
     for (const tier of tiers) {
-      expect(tier.chatModel).toBe('gpt-5.6-terra');
+      expect(tier.chatModel).toBe('gpt-6.1-sol');
     }
+  });
+
+  // Sept 2026 decision: Trial and Base shape the first experience, so no tier
+  // gets a cheaper model for any feature (tools included), not just for chat.
+  it('serves the same model for every AI feature on every tier', () => {
+    const FEATURE_MODELS = [
+      'chatModel',
+      'pdfModel',
+      'mindmapModel',
+      'quizModel',
+      'flashcardsModel',
+      'summaryModel',
+      'formulaModel',
+      'chartModel',
+      'homeworkModel',
+      'webcamModel',
+    ] as const;
+    const models = new Set(tiers.flatMap((tier) => FEATURE_MODELS.map((field) => tier[field])));
+
+    expect([...models]).toEqual(['gpt-6.1-sol']);
   });
 
   it('never points a tier at a retired model', () => {
