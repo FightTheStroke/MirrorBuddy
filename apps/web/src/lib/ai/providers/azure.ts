@@ -6,6 +6,7 @@
 import { logger } from '@/lib/logger';
 import { CircuitBreaker, withRetry } from '@/lib/resilience/circuit-breaker';
 import type { ProviderConfig, ChatCompletionResult, ToolCall, ToolDefinition } from './types';
+import { acceptsCustomTemperature, rememberTemperatureRefusal } from './temperature-support';
 import {
   type TokenParamName,
   AzureHttpError,
@@ -76,7 +77,7 @@ export async function azureChatCompletion(
 
   // GPT-5 class deployments reject a custom temperature; dropped on first refusal
   // and kept dropped for every later compatibility attempt.
-  let includeTemperature = true;
+  let includeTemperature = acceptsCustomTemperature(config.model);
 
   if (tools && tools.length > 0) {
     baseRequestBody.tools = tools;
@@ -166,7 +167,7 @@ export async function azureChatCompletion(
           }
 
           if (error.unsupportedTemperature && includeTemperature) {
-            includeTemperature = false;
+            includeTemperature = rememberTemperatureRefusal(attempt.deployment);
             logger.warn('[Azure Chat] Deployment rejects a custom temperature; using its default', {
               deployment: attempt.deployment,
             });

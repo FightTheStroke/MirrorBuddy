@@ -105,6 +105,7 @@
     "kb:seed": "tsx --env-file-if-exists=.env --conditions=react-server scripts/seed-maestri-knowledge-vectors.ts",
     "seed:admin": "npm run script -- scripts/seed-admin.ts",
     "seed:tiers": "tsx --env-file-if-exists=.env apps/web/prisma/seed-tiers.ts",
+    "seed:models": "tsx --env-file-if-exists=.env apps/web/prisma/seed-model-catalog.ts",
     "sim:nightly": "npx tsx scripts/nightly-sim-runner.ts",
     "sim:quick": "npx tsx scripts/nightly-sim-runner.ts --models 3b --dry-run",
     "vercel-build": "prisma generate && prisma migrate deploy && npm run build",

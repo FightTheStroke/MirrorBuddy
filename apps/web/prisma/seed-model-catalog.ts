@@ -5,11 +5,14 @@
  * Used by admin UI for model selection per tier/feature.
  */
 
-import { PrismaClient } from '@prisma/client';
-
+import { createPrismaClient } from '../src/lib/ssl-config';
 import { models } from './model-catalog-data';
 
-const prisma = new PrismaClient();
+// Prisma 7 requires a driver adapter; a bare PrismaClient cannot connect, which
+// is why this seed never ran and the admin model picker stayed empty.
+const databaseUrl = process.env.DATABASE_URL?.trim();
+if (!databaseUrl) throw new Error('DATABASE_URL is required for model catalog seeding');
+const prisma = createPrismaClient(databaseUrl);
 
 async function main() {
   console.log('Seeding ModelCatalog with available AI models...');
