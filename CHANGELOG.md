@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.43.0] - 2026-09-30
+
 ### Changed
 
 - Every tier and every AI feature (chat and all study tools) now uses `gpt-6.1-sol` on an
