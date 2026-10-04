@@ -1,6 +1,6 @@
 # ADR 0173: MirrorBuddy stays on Azure OpenAI API keys
 
-**Status**: Accepted — 26 August 2026
+**Status**: Superseded by [ADR 0183](0183-ai-moves-to-fightthestroke-tenant.md) on 4 October 2026 — the FightTheStroke tenant now exists and hosts the AI. Accepted 26 August 2026.
 **Context**: attempted migration to keyless Entra/OIDC, blocked by tenant policy
 
 ## The point, in one sentence
@@ -20,18 +20,18 @@ wall.
 
 Three experiments measured on 2026-08-26 — not hypotheses.
 
-| Attempt                                                       | Outcome                                                                            |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Federated credential on a **managed identity**                | **Refused.** Policy `CloudGov_FIC_MIDeny` at the root management group             |
-| Federated credential on an **app registration** (fallback)    | **Refused.** `ServiceManagementReference field is required` — needs Service Tree   |
-| Entra token → call Azure OpenAI with no `api-key`             | **Works** (HTTP 200), but only from a local identity, not from Vercel              |
+| Attempt                                                    | Outcome                                                                          |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Federated credential on a **managed identity**             | **Refused.** Policy `CloudGov_FIC_MIDeny` at the root management group           |
+| Federated credential on an **app registration** (fallback) | **Refused.** `ServiceManagementReference field is required` — needs Service Tree |
+| Entra token → call Azure OpenAI with no `api-key`          | **Works** (HTTP 200), but only from a local identity, not from Vercel            |
 
 The policy allows `allowGitHub`, `allowAWS`, `allowAKS` and other issuers. It
 **does not allow Vercel**. This is not a misconfiguration: it is a list, and
 Vercel is not on it.
 
 The third experiment matters because it separates two things that look like
-one: **the policy blocks *federation*, not Entra.** A workload running on a
+one: **the policy blocks _federation_, not Entra.** A workload running on a
 machine already authenticated in the tenant can go keyless today — which is
 exactly what the other consumer of the same resource did. Vercel is the
 federated case, and the federated case is the one refused.
@@ -98,11 +98,11 @@ children mid-session.
 
 **Step 3 must be an authenticated call, and `/api/health` cannot be that call.**
 `checkAIProvider()` returns `pass` on `!!(AZURE_OPENAI_ENDPOINT &&
-AZURE_OPENAI_API_KEY)` — it asserts the variables are *non-empty*, and never
+AZURE_OPENAI_API_KEY)` — it asserts the variables are _non-empty_, and never
 contacts Azure. A mistyped key 2 therefore makes the health check green, right
 before step 4 destroys the only key that worked. A verification that cannot fail
 is worse than no verification: it does not merely fail to catch the error, it
-*authorises* the destructive step. The probe above is the same authenticated
+_authorises_ the destructive step. The probe above is the same authenticated
 `api-key` request `infra-monitor.yml` already makes, which is what makes it a
 real check.
 
@@ -142,7 +142,7 @@ Three things remain true, and should be read as accepted rather than solved:
 
 ## Consequences
 
-- `!!(endpoint && apiKey)` as an *availability* test is **correct** and should be
+- `!!(endpoint && apiKey)` as an _availability_ test is **correct** and should be
   left alone: it answers "is a provider configured on this deployment", and it
   would only have become wrong if the key had gone away. It is **not** a
   liveness test, and the rotation runbook above is explicit about not borrowing

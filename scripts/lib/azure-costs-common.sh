@@ -4,7 +4,7 @@
 # scripts. Sourced, never executed directly.
 # ============================================================================
 # Default subscription (can be overridden with --subscription)
-SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:-8015083b-adad-42ff-922d-feaed61c5d62}"
+SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:-906ca84a-6733-4eb0-904e-c7a2fd67ef72}"
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'

@@ -88,7 +88,8 @@
 | 0166 | Parental Gate level for "Per i grandi" (DEC-01)   | PROPOSED — decision on gate strength for `/invite/request` (GDPR Art. 8, L. 132/2025)                    |
 | 0167 | Buddy Identity Unification — Phase 2 (DEC-08)     | PROPOSED — options A/B/C for naming the handoff banner narrator; awaiting human decision                 |
 | 0168 | `maestriLimit` Deprecation (DEC-06)               | ACCEPTED — per-Maestro cap removed, never enforced; intent model made it obsolete                        |
-| 0173 | MirrorBuddy stays on Azure API keys               | ACCEPTED — Vercel OIDC forbidden by tenant policy; rotation, blast radius, residual risk                 |
+| 0173 | MirrorBuddy stays on Azure API keys               | SUPERSEDED by 0183 — Vercel OIDC forbidden by Microsoft tenant policy                                    |
+| 0183 | AI moves to FightTheStroke tenant                 | ACCEPTED — mirrorbuddy-aoai-swc + kv-mirrorbuddy-fts; keys now, keyless (Vercel OIDC) next               |
 | 0174 | Robot self-managing credentials and updates       | ACCEPTED — paired robot fetches Azure creds per start and self-updates; no hardware visit                |
 | 0175 | Staging DB isolation + admin credential sync      | ACCEPTED — staging runs on its own EU Supabase project; every release re-applies ADMIN_PASSWORD          |
 | 0176 | Notification recipients come from the database    | ACCEPTED — internal alerts go to every ADMIN in the DB; public contact is always info@fightthestroke.org |

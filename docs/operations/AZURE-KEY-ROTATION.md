@@ -8,29 +8,34 @@ that needs it fails at the worst moment.
 That is not hypothetical. On **28 August 2026** the key was regenerated in the
 Azure portal at 10:33 and the GitHub secrets were updated at 10:40 — seven
 minutes during which continuous integration held a key Azure had already
-revoked. The `kv-virtualbpm-prod` copy was never updated at all: it had been
-dead since **29 November 2025** and nobody noticed for nine months.
+revoked. The Key Vault copy (then `kv-virtualbpm-prod`) was never updated at all:
+it had been dead since **29 November 2025** and nobody noticed for nine months.
+
+Since **4 October 2026** (ADR 0183) everything below lives in the FightTheStroke
+tenant: resource `mirrorbuddy-aoai-swc`, resource group `rg-mirrorbuddy-ai`,
+vault `kv-mirrorbuddy-fts`, subscription `906ca84a-6733-4eb0-904e-c7a2fd67ef72`. Log in with the
+FightTheStroke account (`az login --tenant fightthestroke.org`).
 
 ## The four stores
 
 | Store                  | Holds                                                   | How to update                                                   |
 | ---------------------- | ------------------------------------------------------- | --------------------------------------------------------------- |
-| Azure account          | `key1` and `key2` on `aoai-virtualbpm-prod`             | Azure portal, or `az cognitiveservices account keys regenerate` |
+| Azure account          | `key1` and `key2` on `mirrorbuddy-aoai-swc`             | Azure portal, or `az cognitiveservices account keys regenerate` |
 | Vercel production      | `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_REALTIME_API_KEY` | `vercel env rm` + `vercel env add`                              |
 | GitHub Actions secrets | the same two names                                      | `gh secret set`                                                 |
-| `kv-virtualbpm-prod`   | `azure-openai-api-key`, `azure-openai-realtime-api-key` | `az keyvault secret set`                                        |
+| `kv-mirrorbuddy-fts`   | `azure-openai-api-key`, `azure-openai-realtime-api-key` | `az keyvault secret set`                                        |
 
 Azure gives you two keys precisely so a rotation never needs a gap. Use that.
 
-## The order (ADR 0173)
+## The order (ADR 0173, still valid under ADR 0183)
 
 1. **Read the standby key.** Production is on one of the two; the other is the
    one you are about to move to.
 
    ```bash
-   SUB=8015083b-adad-42ff-922d-feaed61c5d62
+   SUB=906ca84a-6733-4eb0-904e-c7a2fd67ef72
    az cognitiveservices account keys list \
-     --name aoai-virtualbpm-prod --resource-group rg-virtualbpm-prod \
+     --name mirrorbuddy-aoai-swc --resource-group rg-mirrorbuddy-ai \
      --subscription $SUB --query key2 -o tsv
    ```
 
@@ -44,7 +49,7 @@ Azure gives you two keys precisely so a rotation never needs a gap. Use that.
 
    ```bash
    az cognitiveservices account keys regenerate \
-     --name aoai-virtualbpm-prod --resource-group rg-virtualbpm-prod \
+     --name mirrorbuddy-aoai-swc --resource-group rg-mirrorbuddy-ai \
      --subscription $SUB --key-name Key1
    ```
 
@@ -54,7 +59,7 @@ people it hits are students in the middle of a lesson.
 ## Proving it worked
 
 ```bash
-AZURE_OPENAI_ENDPOINT="https://aoai-virtualbpm-prod.openai.azure.com/" \
+AZURE_OPENAI_ENDPOINT="https://mirrorbuddy-aoai-swc.openai.azure.com/" \
   ./scripts/check-azure-key-drift.sh
 ```
 
@@ -76,8 +81,8 @@ Every store holds the same address, and Azure is the source of truth for it:
 
 ```bash
 az cognitiveservices account show \
-  --name aoai-virtualbpm-prod --resource-group rg-virtualbpm-prod \
-  --subscription 8015083b-adad-42ff-922d-feaed61c5d62 \
+  --name mirrorbuddy-aoai-swc --resource-group rg-mirrorbuddy-ai \
+  --subscription 906ca84a-6733-4eb0-904e-c7a2fd67ef72 \
   --query properties.endpoint -o tsv
 ```
 

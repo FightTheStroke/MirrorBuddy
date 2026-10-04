@@ -129,7 +129,7 @@ main() {
 			{
 				generated: $date,
 				region: "swedencentral",
-				resource: "aoai-virtualbpm-prod",
+				resource: "mirrorbuddy-aoai-swc",
 				models: .,
 				relevant_categories: {
 					realtime_voice: [.[] | select(test("realtime|gpt-audio"))],
@@ -154,7 +154,7 @@ generate_issue_body() {
 	local body=""
 
 	body="## Azure OpenAI Model Changes Detected\n\n"
-	body+="**Resource**: aoai-virtualbpm-prod (swedencentral)\n"
+	body+="**Resource**: mirrorbuddy-aoai-swc (swedencentral, FightTheStroke tenant)\n"
 	body+="**Date**: $(date +%Y-%m-%d)\n\n"
 
 	if [ -n "$new_models" ]; then
