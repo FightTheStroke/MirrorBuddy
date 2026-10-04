@@ -2,7 +2,10 @@
  * Model currency guards.
  *
  * Verified against the Azure resource `aoai-virtualbpm-prod` (swedencentral) on
- * 2026-09-16 with `az cognitiveservices model list` / `deployment list`:
+ * 2026-09-16 with `az cognitiveservices model list` / `deployment list`. Since
+ * 2026-10-04 MirrorBuddy runs on `mirrorbuddy-aoai-swc` in the FightTheStroke
+ * tenant (ADR 0183), which hosts only mb-gpt-61-sol, gpt-5-nano,
+ * text-embedding-3-small, gpt-realtime-2.1, gpt-realtime-whisper and tts-hd:
  *
  * - gpt-6-astra          2026-09-03  GA       retires 2028-01-11  (deployed, unused)
  * - gpt-5.6-terra        2026-07-09  GA       retires 2028-01-11  (current default)
@@ -79,12 +82,22 @@ describe('model currency', () => {
       expect(getDeploymentForModel('gpt-4o-mini')).toBe('mb-gpt-61-sol');
     });
 
-    it('keeps gpt-5.6-terra on its own deployment after the chat default moves', async () => {
+    it('routes gpt-5.6-terra to gpt-6.1-sol: the FightTheStroke resource has no Terra deployment (ADR 0183)', async () => {
+      delete process.env.AZURE_OPENAI_GPT61_SOL_DEPLOYMENT;
       process.env.AZURE_OPENAI_CHAT_DEPLOYMENT = 'mb-gpt-61-sol';
 
       const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
 
-      expect(getDeploymentForModel('gpt-5.6-terra')).toBe('gpt-5.6-terra');
+      expect(getDeploymentForModel('gpt-5.6-terra')).toBe('mb-gpt-61-sol');
+    });
+
+    it('routes gpt-5.6-sol to gpt-6.1-sol unless its own deployment is configured (ADR 0183)', async () => {
+      delete process.env.AZURE_OPENAI_GPT61_SOL_DEPLOYMENT;
+      delete process.env.AZURE_OPENAI_GPT56_SOL_DEPLOYMENT;
+
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+
+      expect(getDeploymentForModel('gpt-5.6-sol')).toBe('mb-gpt-61-sol');
     });
   });
 

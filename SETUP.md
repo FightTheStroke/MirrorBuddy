@@ -302,11 +302,11 @@ A valid checkout with no references exits 0 and explicitly reports the empty sca
 
 ### Backup & Restore
 
-The `.env` file is NOT tracked in git. It is backed up to **Azure Key Vault** (`kv-virtualbpm-prod`) and synced to **GitHub Secrets** and **Vercel**.
+The `.env` file is NOT tracked in git. It is backed up to **Azure Key Vault** (`kv-mirrorbuddy-fts`, FightTheStroke tenant — ADR 0183) and synced to **GitHub Secrets** and **Vercel**.
 
 ```bash
-# Prerequisites: Azure CLI logged in
-az login  # Only needed once per machine
+# Prerequisites: Azure CLI logged in to the FightTheStroke tenant
+az login --tenant fightthestroke.org  # Only needed once per machine
 
 # Backup .env to Key Vault (run after any .env change)
 ./scripts/env-vault.sh backup

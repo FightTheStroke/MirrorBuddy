@@ -3,7 +3,8 @@
 # AZURE KEY DRIFT CHECK
 #
 # The Azure OpenAI key lives in four places: the Azure account itself, Vercel
-# production, the GitHub Actions secrets, and kv-virtualbpm-prod. On 28 August
+# production, the GitHub Actions secrets, and the Key Vault (kv-mirrorbuddy-fts in
+# the FightTheStroke tenant since October 2026, ADR 0183). On 28 August
 # 2026 the key was regenerated in the portal and the other stores were updated
 # out of order; the Key Vault copy was never updated at all and sat dead from
 # 29 November 2025 until this check was written. Nothing noticed, because
@@ -23,8 +24,8 @@
 set -uo pipefail
 
 API_VERSION="2024-10-21"
-VAULT="${AZURE_KEY_VAULT_NAME:-kv-virtualbpm-prod}"
-SUBSCRIPTION="${AZURE_SUBSCRIPTION_ID:-8015083b-adad-42ff-922d-feaed61c5d62}"
+VAULT="${AZURE_KEY_VAULT_NAME:-kv-mirrorbuddy-fts}"
+SUBSCRIPTION="${AZURE_SUBSCRIPTION_ID:-906ca84a-6733-4eb0-904e-c7a2fd67ef72}"
 
 FAILURES=0
 SKIPPED=0
@@ -78,7 +79,7 @@ fi
 if ! valid_endpoint "$ENDPOINT"; then
   echo "AZURE_OPENAI_ENDPOINT is not an https:// URL — the store holding it is"
   echo "misconfigured. Expected something like"
-  echo "  https://aoai-virtualbpm-prod.openai.azure.com/"
+  echo "  https://mirrorbuddy-aoai-swc.openai.azure.com/"
   exit 1
 fi
 
@@ -109,7 +110,7 @@ A store is holding a key Azure no longer accepts.
 
 Rotation updates every store, in this order (docs/operations/AZURE-KEY-ROTATION.md):
   1. Vercel production      2. GitHub Actions secrets
-  3. kv-virtualbpm-prod     4. only then regenerate the old key in Azure
+  3. kv-mirrorbuddy-fts     4. only then regenerate the old key in Azure
 EOF
   exit 1
 fi

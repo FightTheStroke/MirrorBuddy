@@ -219,8 +219,9 @@
 
    ```bash
    az cognitiveservices account deployment create \
-     --resource-group rg-virtualbpm-prod \
-     --name aoai-virtualbpm-prod \
+     --resource-group rg-mirrorbuddy-ai \
+     --name mirrorbuddy-aoai-swc \
+     --subscription 906ca84a-6733-4eb0-904e-c7a2fd67ef72 \
      --deployment-name gpt-realtime-mini \
      --model-name gpt-realtime-mini \
      --model-version 2025-12-15 \

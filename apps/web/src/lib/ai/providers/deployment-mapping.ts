@@ -11,6 +11,10 @@
  * === RETIREMENT TIMELINE ===
  * Audited 2026-09-16 against `aoai-virtualbpm-prod` (swedencentral) with
  * `az cognitiveservices model list` and `az cognitiveservices account deployment list`.
+ * Since 2026-10-04 (ADR 0183) production uses `mirrorbuddy-aoai-swc` in the
+ * FightTheStroke tenant, which hosts ONLY: mb-gpt-61-sol, gpt-5-nano,
+ * text-embedding-3-small, gpt-realtime-2.1, gpt-realtime-whisper, tts-hd-deployment.
+ * Rows below that are not in that list are history, not live deployments.
  *
  * | Deployment       | Underlying model | Status  | Inference retires |
  * | ---------------- | ---------------- | ------- | ----------------- |
@@ -90,13 +94,12 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   'gpt-5.2-chat': CHAT_DEFAULT_DEPLOYMENT,
   'gpt-5.2-edu': CHAT_DEFAULT_DEPLOYMENT,
 
-  // 2026-07-09 wave — GPT-5.6 line. Every tier chats on the same model: the
-  // quality of the tutor is not something to ration by price plan. Terra is
-  // the default; Sol is kept mapped as the deliberate upgrade path.
-  // Terra was the default until 2026-09-30; kept on its own deployment so a
-  // tier row still naming it keeps working and it stays a one-click rollback.
-  'gpt-5.6-terra': 'gpt-5.6-terra',
-  'gpt-5.6-sol': process.env.AZURE_OPENAI_GPT56_SOL_DEPLOYMENT?.trim() || 'gpt-5.6-sol',
+  // 2026-07-09 wave — GPT-5.6 line. Terra was the default until 2026-09-30.
+  // Since 2026-10-04 (ADR 0183) the AI runs on the FightTheStroke resource,
+  // which has no 5.6 deployments: a tier row still naming them lands on the
+  // current default instead of a DeploymentNotFound.
+  'gpt-5.6-terra': GPT61_SOL_DEPLOYMENT,
+  'gpt-5.6-sol': process.env.AZURE_OPENAI_GPT56_SOL_DEPLOYMENT?.trim() || GPT61_SOL_DEPLOYMENT,
 
   // 2026-09-29 wave — GPT-6.1 Sol: current default for every tier and feature.
   'gpt-6.1-sol': GPT61_SOL_DEPLOYMENT,

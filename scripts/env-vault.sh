@@ -10,21 +10,33 @@
 #
 # Prerequisites:
 #   1. Azure CLI installed: brew install azure-cli
-#   2. Logged in: az login (opens browser, SSO with Microsoft account)
-#   3. Access to Key Vault kv-virtualbpm-prod (roberdan@microsoft.com)
+#   2. Logged in to the FightTheStroke tenant: az login --tenant fightthestroke.org
+#   3. Access to Key Vault kv-mirrorbuddy-fts (roberdan@fightthestroke.org)
+#
+# Since October 2026 (ADR 0183) the vault lives in the FightTheStroke tenant.
+# The February 2026 backup copied from the old Microsoft vault is kept there as
+# mirrorbuddy-env-backup-2026-02-15-historical: it holds retired Microsoft
+# endpoints and keys, so this script never restores it.
 #
 # No extra credentials needed — uses your Azure AD session.
 # Session lasts ~24h, then run `az login` again.
 # ============================================================================
 set -euo pipefail
 
-VAULT_NAME="kv-virtualbpm-prod"
+VAULT_NAME="${AZURE_KEY_VAULT_NAME:-kv-mirrorbuddy-fts}"
+SUBSCRIPTION="${AZURE_SUBSCRIPTION_ID:-906ca84a-6733-4eb0-904e-c7a2fd67ef72}"
 SECRET_NAME="mirrorbuddy-env-backup"
 ENV_FILE=".env"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 cd "$PROJECT_DIR"
+
+missing_backup() {
+  echo "❌ No readable $SECRET_NAME in $VAULT_NAME (subscription $SUBSCRIPTION)."
+  echo "   Log in to the FightTheStroke tenant, or create the first backup: $0 backup"
+  exit 1
+}
 
 backup() {
   if [ ! -f "$ENV_FILE" ]; then
@@ -39,6 +51,7 @@ backup() {
 
   az keyvault secret set \
     --vault-name "$VAULT_NAME" \
+    --subscription "$SUBSCRIPTION" \
     --name "$SECRET_NAME" \
     --value "$encoded" \
     --content-type "application/x-dotenv" \
@@ -57,8 +70,9 @@ restore() {
   local encoded
   encoded=$(az keyvault secret show \
     --vault-name "$VAULT_NAME" \
+    --subscription "$SUBSCRIPTION" \
     --name "$SECRET_NAME" \
-    --query "value" -o tsv 2>&1)
+    --query "value" -o tsv 2>/dev/null) || missing_backup
 
   echo "$encoded" | base64 --decode > "$ENV_FILE"
 
@@ -76,8 +90,9 @@ show_diff() {
   local encoded
   encoded=$(az keyvault secret show \
     --vault-name "$VAULT_NAME" \
+    --subscription "$SUBSCRIPTION" \
     --name "$SECRET_NAME" \
-    --query "value" -o tsv 2>&1)
+    --query "value" -o tsv 2>/dev/null) || missing_backup
 
   local tmp_vault
   tmp_vault=$(mktemp)
@@ -117,9 +132,10 @@ status() {
   local info
   info=$(az keyvault secret show \
     --vault-name "$VAULT_NAME" \
+    --subscription "$SUBSCRIPTION" \
     --name "$SECRET_NAME" \
     --query "{created:attributes.created, updated:attributes.updated, version:id, tags:tags}" \
-    -o json 2>&1)
+    -o json 2>/dev/null) || missing_backup
 
   echo "═══ Key Vault Backup Status ═══"
   echo "$info" | python3 -c "
