@@ -126,9 +126,6 @@ docs/.archive/
 .env.production
 .env.vercel
 .env.vercel.*
-# CodeGraph: keep DB ignored, allow config to be tracked/read
-.codegraph/**
-!.codegraph/config.json
 business-plan/**
 
 # Git worktree directories (local only)
@@ -146,9 +143,6 @@ study-materials/
 .serena/
 kanban/
 handoff/latest.md
-
-# graphify knowledge graph output (regenerable, ~30k nodes)
-graphify-out/
 
 # Generated didactic content for KB seeding (npm run kb:extract)
 .tmp/
