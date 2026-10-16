@@ -206,36 +206,25 @@ export async function cleanupTestData(): Promise<void> {
   const registry = getInternalRegistry();
 
   try {
-    // Use transaction for atomicity
-    await prisma.$transaction(async (tx) => {
-      // Delete messages first (to avoid FK constraint issues)
-      if (registry.messageIds.size > 0) {
-        await tx.message.deleteMany({
-          where: {
-            id: { in: Array.from(registry.messageIds) },
-          },
-        });
-      }
-
-      // Delete conversations (cascade will handle ToolOutput records)
-      if (registry.conversationIds.size > 0) {
-        await tx.conversation.deleteMany({
-          where: {
-            id: { in: Array.from(registry.conversationIds) },
-          },
-        });
-      }
-
-      // Deleting the owned users also cascades their hashed-handle AuthSession records.
-      if (registry.userIds.size > 0) {
-        await tx.user.deleteMany({
-          where: {
-            id: { in: Array.from(registry.userIds) },
-            isTestData: true,
-          },
-        });
-      }
-    });
+    // Keep ordered cleanup atomic without an interactive transaction's callback deadline.
+    await prisma.$transaction([
+      prisma.message.deleteMany({
+        where: {
+          id: { in: Array.from(registry.messageIds) },
+        },
+      }),
+      prisma.conversation.deleteMany({
+        where: {
+          id: { in: Array.from(registry.conversationIds) },
+        },
+      }),
+      prisma.user.deleteMany({
+        where: {
+          id: { in: Array.from(registry.userIds) },
+          isTestData: true,
+        },
+      }),
+    ]);
 
     // Clear the registry after cleanup
     clearTestDataRegistry();
