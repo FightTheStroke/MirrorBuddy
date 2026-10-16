@@ -88,6 +88,26 @@ describe.runIf(policyTestDatabaseEnabled())(
       return collectMetricSource('service_limits', () => collect(labels, 42), labels, 42);
     }
 
+    async function expectSanitizedFailure(operation: 'token' | 'metrics', status?: number) {
+      expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
+        'Metrics collector failed: azure_openai',
+        {
+          collector: 'azure_openai',
+          component: 'metrics-collector',
+          errorType: 'AzureProviderError',
+          ...(status === undefined ? {} : { status }),
+        },
+      );
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(await limitsModule.getAzureOpenAILimits()).toMatchObject({
+        status: 'error',
+        cause: expect.objectContaining({
+          operation,
+          ...(status === undefined ? {} : { status }),
+        }),
+      });
+    }
+
     it('rejects Monitor429 once without false TPM usage or healthy aggregate; preserves real RPM and PG', async () => {
       tpmStatus = 429;
       const samples = await collectAggregate();
@@ -111,24 +131,14 @@ describe.runIf(policyTestDatabaseEnabled())(
         timestamp: 42,
       });
       expect(samples.filter((s) => s.labels.service === 'supabase')).toHaveLength(6);
-      expect(logger.warn).not.toHaveBeenCalled();
-      expect(logger.error).toHaveBeenCalledExactlyOnceWith(
-        'Metrics collector failed',
-        { collector: 'azure_openai' },
-        expect.objectContaining({ status: 429, operation: 'metrics' }),
-      );
+      await expectSanitizedFailure('metrics', 429);
     });
 
     it('reports token401 exactly once with original status and no manufactured usage', async () => {
       tokenStatus = 401;
       const samples = await collectAggregate();
       expect(samples.filter((s) => s.labels.service === 'azure_openai')).toEqual([]);
-      expect(logger.warn).not.toHaveBeenCalled();
-      expect(logger.error).toHaveBeenCalledExactlyOnceWith(
-        'Metrics collector failed',
-        { collector: 'azure_openai' },
-        expect.objectContaining({ status: 401, operation: 'token' }),
-      );
+      await expectSanitizedFailure('token', 401);
       expect(boundary).toHaveBeenCalledTimes(1);
     });
 
@@ -148,16 +158,14 @@ describe.runIf(policyTestDatabaseEnabled())(
       expect(logger.warn).not.toHaveBeenCalled();
     });
 
-    it('retains original network failure cause through the reporting boundary', async () => {
+    it('retains the network cause internally while reporting only sanitized attribution', async () => {
       const original = new TypeError('controlled token network failure');
       boundary.mockRejectedValue(original);
       await collectAggregate();
-      expect(logger.error).toHaveBeenCalledExactlyOnceWith(
-        'Metrics collector failed',
-        { collector: 'azure_openai' },
-        expect.objectContaining({ operation: 'token', cause: original }),
-      );
-      expect(logger.warn).not.toHaveBeenCalled();
+      await expectSanitizedFailure('token');
+      const snapshot = await limitsModule.getAzureOpenAILimits();
+      if (snapshot.status !== 'ok') expect(snapshot.cause?.cause).toBe(original);
+      expect(JSON.stringify(vi.mocked(logger.warn).mock.calls)).not.toContain(original.message);
     });
 
     it('preserves healthy cached values and both stress helper contracts', async () => {
@@ -185,14 +193,10 @@ describe.runIf(policyTestDatabaseEnabled())(
         ),
       ).toBe(true);
       expect(samples.some((s) => s.labels.metric === 'chat_rpm')).toBe(false);
-      expect(logger.error).toHaveBeenCalledExactlyOnceWith(
-        'Metrics collector failed',
-        { collector: 'azure_openai' },
-        expect.objectContaining({ status: 429 }),
-      );
+      await expectSanitizedFailure('metrics', 429);
       expect(await limitsModule.isAzureOpenAIStressed()).toBeNull();
       expect(await limitsModule.getAzureOpenAIStressReport()).toContain('HTTP 429');
-      expect(logger.error).toHaveBeenCalledTimes(1);
+      expect(logger.warn).toHaveBeenCalledTimes(1);
     });
   },
 );
