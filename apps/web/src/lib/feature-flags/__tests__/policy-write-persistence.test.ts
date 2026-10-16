@@ -120,6 +120,8 @@ describe.runIf(enabled)('sparse policy persistence with real PostgreSQL', () => 
   it('retains a failed local stop after a real missing-row error and reload', async () => {
     await prisma.featureFlag.update({ where: { id }, data: { killSwitch: false } });
     await prepareWritablePolicy(id);
+    // Finish startup reads before deliberately deleting the persisted fixture.
+    await reloadFlags();
     await prisma.featureFlag.delete({ where: { id } });
     const stop = beginFeaturePolicyWrite(
       id,
