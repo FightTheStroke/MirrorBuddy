@@ -8,17 +8,18 @@ import { CircuitBreaker, withRetry } from '@/lib/resilience/circuit-breaker';
 import type { ProviderConfig, ChatCompletionResult, ToolCall, ToolDefinition } from './types';
 import { acceptsCustomTemperature, rememberTemperatureRefusal } from './temperature-support';
 import {
+  azureResponsesCompletion,
+  usesResponsesForTools,
+  type AzureResponsesResult,
+} from './azure-responses';
+import {
   type TokenParamName,
   AzureHttpError,
   sanitizeUpstreamError,
   isRetryableAzureError,
 } from './azure-errors';
 
-/**
- * Module-level circuit breaker for Azure provider
- * Shared across all requests to track service health
- * Exported for testing purposes
- */
+/** Shared circuit breaker for Azure requests, exported for testing. */
 export const azureCircuitBreaker = new CircuitBreaker({
   failureThreshold: 5,
   timeout: 60000,
@@ -29,11 +30,9 @@ export const azureCircuitBreaker = new CircuitBreaker({
 
 type FetchResult =
   | { kind: 'success'; response: Response; deployment: string; tokenParamName: TokenParamName }
-  | { kind: 'content_filtered'; deployment: string; filteredCategories: string[] };
+  | AzureResponsesResult;
 
-/**
- * Perform chat completion using Azure OpenAI
- */
+/** Perform chat completion using Azure OpenAI. */
 export async function azureChatCompletion(
   config: ProviderConfig,
   messages: Array<{ role: string; content: string }>,
@@ -62,11 +61,7 @@ export async function azureChatCompletion(
     });
   }
 
-  // Azure OpenAI automatic prompt caching:
-  // System prompt is sent as first message — Azure caches prefix automatically
-  // when it's ≥1024 tokens and stable between requests. Our hybrid approach
-  // (static mini-KB + identity) ensures a stable prefix. Dynamic context
-  // (memory, RAG, tools) is appended after the stable prefix.
+  // Keep the stable system prompt first so Azure can cache its prefix.
   const allMessages = systemPrompt
     ? [{ role: 'system', content: systemPrompt }, ...messages]
     : messages;
@@ -90,6 +85,10 @@ export async function azureChatCompletion(
   }
 
   async function doFetch(deployment: string, tokenParamName: TokenParamName): Promise<FetchResult> {
+    if (tools?.length && usesResponsesForTools(deployment)) {
+      const responsesConfig = { ...config, model: deployment };
+      return azureResponsesCompletion(responsesConfig, allMessages, maxTokens, tools, tool_choice);
+    }
     const requestBody: Record<string, unknown> = {
       ...baseRequestBody,
       ...(includeTemperature ? { temperature } : {}),
@@ -214,7 +213,8 @@ export async function azureChatCompletion(
     );
   });
 
-  // Handle content filter result (no Response to parse)
+  if (fetched.kind === 'completion') return fetched.result;
+
   if (fetched.kind === 'content_filtered') {
     return {
       content: 'Mi dispiace, non posso rispondere a questa domanda. Posso aiutarti con altro?',

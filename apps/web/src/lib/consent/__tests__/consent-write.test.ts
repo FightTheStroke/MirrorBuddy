@@ -104,13 +104,22 @@ describe('T6 honest consent writes', () => {
     },
   );
 
-  it('exposes a retryable network failure without granting acceptance', async () => {
-    vi.mocked(fetch).mockRejectedValue(new TypeError('Network unavailable'));
-    const consent = saveAnalyticsConsent(true);
-    await expect(syncUnifiedConsentToServer(consent)).rejects.toMatchObject({ code: 'network' });
-    expect(hasAnalyticsConsent()).toBe(false);
-    expect(getConsentSyncSnapshot().error?.retryable).toBe(true);
-  });
+  it.each(['Network unavailable', 'Load failed', 'Failed to fetch'])(
+    'never automatically replays a failed consent write: %s',
+    async (message) => {
+      vi.mocked(fetch).mockImplementation(async (input, init) => {
+        if (input === '/api/user/consent') throw new TypeError(message);
+        return respond(input, init);
+      });
+      const consent = saveAnalyticsConsent(true);
+      await expect(syncUnifiedConsentToServer(consent)).rejects.toMatchObject({ code: 'network' });
+      expect(
+        vi.mocked(fetch).mock.calls.filter(([url]) => url === '/api/user/consent'),
+      ).toHaveLength(1);
+      expect(hasAnalyticsConsent()).toBe(false);
+      expect(getConsentSyncSnapshot().error?.retryable).toBe(true);
+    },
+  );
 
   it.each([
     { success: true },

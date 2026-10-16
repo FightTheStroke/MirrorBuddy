@@ -9,6 +9,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { retryNetworkRead } from '@/lib/resilience/network-read';
 import { csrfFetch } from '@/lib/auth';
 import {
   getClientIdentity,
@@ -100,19 +101,22 @@ export async function loadConversationSummariesFromDB(): Promise<ConversationSum
   }
 
   try {
-    const response = await fetch('/api/conversations?limit=20&active=true');
+    const data: unknown = await retryNetworkRead(async () => {
+      if (!isSameAccount(identity, await whenIdentitySettled()))
+        throw new Error('Conversation identity changed');
+      const response = await fetch('/api/conversations?limit=20&active=true');
 
-    // The session expired between identity and this request. Signal it with a
-    // cause the caller can recognise, so a stale tab is not reported as a fault.
-    if (response.status === 401 || response.status === 403) {
-      throw new IdentityUnavailableError(`SESSION_EXPIRED (${response.status})`);
-    }
+      // A stale tab is an expired session, not a transport failure to retry.
+      if (response.status === 401 || response.status === 403) {
+        throw new IdentityUnavailableError(`SESSION_EXPIRED (${response.status})`);
+      }
 
-    if (!response.ok) {
-      throw new Error(`Conversations API returned ${response.status}`);
-    }
+      if (!response.ok) {
+        throw new Error(`Conversations API returned ${response.status}`);
+      }
 
-    const data = await response.json();
+      return response.json();
+    });
     // Another hook may re-check /api/auth/me meanwhile: same account, new object.
     const current = await whenIdentitySettled();
     if (!isSameAccount(identity, current)) throw new Error('Conversation identity changed');

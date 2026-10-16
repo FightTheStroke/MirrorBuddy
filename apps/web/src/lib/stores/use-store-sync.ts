@@ -11,8 +11,11 @@ import {
   getClientIdentity,
   getUserIdFromCookie,
   IdentityUnavailableError,
+  isSameAccount,
+  whenIdentitySettled,
 } from '@/lib/auth/client-auth';
 import { logger } from '@/lib/logger';
+import { retryNetworkRead } from '@/lib/resilience/network-read';
 
 /**
  * Initialize all stores by loading data from server
@@ -27,7 +30,13 @@ export async function initializeStores() {
   }
 
   // Still handled: the cookie can be present but stale (expired session).
-  const res = await fetch('/api/user');
+  const identity = getClientIdentity();
+  const res = await retryNetworkRead(async () => {
+    if (!isSameAccount(identity, await whenIdentitySettled())) {
+      throw new IdentityUnavailableError('IDENTITY_CHANGED');
+    }
+    return fetch('/api/user');
+  });
 
   // The session died between asking who the user is and asking for their data.
   // Hydration must still fail — pretending it succeeded would leave empty stores

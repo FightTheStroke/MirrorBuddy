@@ -20,13 +20,13 @@ Added `Sentry.captureException()` calls to all API route error handlers to ensur
 ### Pattern 1: API Handler Wrapper (Recommended for New Routes)
 
 ```typescript
-import { apiHandler, errors } from "@/lib/api/error-handler";
+import { apiHandler, errors } from '@/lib/api/error-handler';
 
 export const POST = apiHandler(async (request) => {
   // Your logic here
   // Throws are automatically caught and reported to Sentry
   if (!data) {
-    throw errors.badRequest("Missing required field");
+    throw errors.badRequest('Missing required field');
   }
 
   return NextResponse.json({ success: true });
@@ -43,7 +43,7 @@ export const POST = apiHandler(async (request) => {
 ### Pattern 2: Manual Error Reporting (Existing Routes)
 
 ```typescript
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from '@sentry/nextjs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,14 +52,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     // Report error to Sentry for monitoring and alerts
     Sentry.captureException(error, {
-      tags: { api: "/api/my-route" },
+      tags: { api: '/api/my-route' },
     });
 
-    logger.error("Operation failed", { error: String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    logger.error('Operation failed', { error: String(error) });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 ```
@@ -178,6 +175,25 @@ curl https://mirrorbuddy.org/api/admin/sentry/self-test
 - **Error frequency**: Check daily for spikes
 - **New issues**: Review and triage within 24h
 - **Performance**: Monitor transaction performance for slowdowns
+
+## Azure chat tools incident: 2026-10-16
+
+A synthetic request reproduced HTTP 400 on the production model's Chat Completions
+API with tools: `code=provider_error`, `param=reasoning_effort`. The same model
+accepted Responses API requests. The corrected provider adapter also returned a
+valid forced function call in a live, synthetic test.
+
+- GPT-6.1 Sol tool requests use `/openai/v1/responses` with `store: false`.
+  Deployment aliases come from the existing deployment mapping.
+- Tool definitions and results retain the application's existing contract, including
+  optional arguments, call IDs, token accounting and content-filter handling.
+- Other models, tool-free chat and streaming retain their existing paths. The
+  adapter stays inside the existing retry and circuit-breaker limits.
+- Do not record raw upstream errors: they may echo student prompts. Keep only
+  sanitized status, category and code. Live diagnostic requests require spending
+  approval and synthetic data.
+- A successful provider test is not a production rollout. Keep the Sentry issues
+  open until the corrected release is deployed and the affected flows are checked.
 
 ## References
 

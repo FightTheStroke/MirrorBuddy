@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.43.4] - 2026-10-16
+
+### Fixed
+
+- Recover from one transient browser network failure while reading consent, hydrating
+  account data, loading conversation summaries (including interrupted response bodies),
+  or downloading the offline service worker. Retries are bounded and account-aware;
+  consent writes, HTTP errors, aborted requests and invalid responses are not replayed.
+- Route GPT-6.1 Sol chat requests with tools through Azure's stateless Responses API,
+  avoiding the Chat Completions rejection of function tools with its reasoning mode.
+  Preserve optional tool arguments, forced tool choices, token usage, content filtering
+  and bounded retries. Other models and tool-free streaming keep their existing paths.
+- Persistent failures still reach the existing error state and monitoring.
+
 ## [0.43.3] - 2026-10-04
 
 - No user-facing changes recorded.

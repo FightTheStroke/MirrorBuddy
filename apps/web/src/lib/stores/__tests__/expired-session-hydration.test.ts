@@ -92,6 +92,31 @@ describe('Hydrating the stores for a session that has expired', () => {
 
     await expect(initializeStores()).rejects.toThrow(/500/);
   });
+
+  it.each([
+    'Load failed',
+    'Failed to fetch',
+    'Network request failed',
+    'NetworkError when attempting to fetch resource.',
+  ])('recovers a single mobile network failure: %s', async (message) => {
+    global.fetch = vi
+      .fn<typeof fetch>()
+      .mockRejectedValueOnce(new TypeError(message))
+      .mockResolvedValueOnce(Response.json({}));
+
+    await expect(initializeStores()).resolves.toBeUndefined();
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not replay hydration for an account that signed out', async () => {
+    global.fetch = vi.fn(async () => {
+      setClientIdentity({ status: 'anonymous' });
+      throw new TypeError('Load failed');
+    });
+
+    await expect(initializeStores()).rejects.toBeInstanceOf(IdentityUnavailableError);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('Loading previous conversation summaries for an expired session', () => {
@@ -108,9 +133,8 @@ describe('Loading previous conversation summaries for an expired session', () =>
 
   it('names an expired session as such rather than a load failure', async () => {
     global.fetch = respondWith(401) as unknown as typeof fetch;
-    const { loadConversationSummariesFromDB } = await import(
-      '../conversation-flow-store/persistence'
-    );
+    const { loadConversationSummariesFromDB } =
+      await import('../conversation-flow-store/persistence');
 
     await expect(loadConversationSummariesFromDB()).rejects.toBeInstanceOf(
       IdentityUnavailableError,
@@ -139,9 +163,8 @@ describe('Loading previous conversation summaries for an expired session', () =>
 
   it('still fails loudly when the conversations API is broken', async () => {
     global.fetch = respondWith(500) as unknown as typeof fetch;
-    const { loadConversationSummariesFromDB } = await import(
-      '../conversation-flow-store/persistence'
-    );
+    const { loadConversationSummariesFromDB } =
+      await import('../conversation-flow-store/persistence');
 
     await expect(loadConversationSummariesFromDB()).rejects.toThrow(/500/);
   });
