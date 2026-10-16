@@ -23,6 +23,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make fast-release browser smoke checks mandatory and let Playwright own the isolated
   server, preventing duplicate startup and false success when no server is available.
 
+### Security
+
+- Update Next.js within the 16.3 patch line, Capacitor, Sharp, and affected transitive
+  dependencies to available patched versions. Full release acceptance still requires
+  the dependency audit; an unpatched development-tool advisory is not a clean audit.
+
 ## [0.43.3] - 2026-10-04
 
 - No user-facing changes recorded.
