@@ -5,6 +5,7 @@
 // ============================================================================
 
 import { logger } from '@/lib/logger';
+import { retryNetworkRead } from '@/lib/resilience/network-read';
 
 /**
  * Check if service workers are supported in the current environment.
@@ -34,9 +35,9 @@ export async function registerOfflineServiceWorker(): Promise<boolean> {
   }
 
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
-    });
+    const registration = await retryNetworkRead(() =>
+      navigator.serviceWorker.register('/sw.js', { scope: '/' }),
+    );
 
     if (!registration) {
       logger.warn('[Offline SW] Registration unavailable');

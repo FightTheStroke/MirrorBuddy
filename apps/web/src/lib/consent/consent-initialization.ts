@@ -8,6 +8,7 @@ import {
   type UnifiedConsentData,
 } from './unified-consent';
 import { migrateConsent } from './consent-migration';
+import { isTransientNetworkError, retryNetworkRead } from '@/lib/resilience/network-read';
 import {
   getClientIdentity,
   subscribeClientIdentity,
@@ -59,17 +60,22 @@ export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | n
   const current = generation;
   const observed = { terms: currentRevision('terms'), analytics: currentRevision('analytics') };
   const get = async (url: string): Promise<unknown> => {
-    let response: Response;
     try {
-      response = await fetch(url, { method: 'GET', credentials: 'include' });
-    } catch {
+      return await retryNetworkRead(async () => {
+        if (generation !== current || identity !== getConsentIdentity())
+          throw new ConsentSyncError('superseded');
+        const response = await fetch(url, { method: 'GET', credentials: 'include' });
+        if (!response.ok) throw new ConsentSyncError('http', response.status);
+        try {
+          return await response.json();
+        } catch (error) {
+          if (isTransientNetworkError(error)) throw error;
+          throw new ConsentSyncError('invalid-response');
+        }
+      });
+    } catch (error) {
+      if (error instanceof ConsentSyncError) throw error;
       throw new ConsentSyncError('network');
-    }
-    if (!response.ok) throw new ConsentSyncError('http', response.status);
-    try {
-      return await response.json();
-    } catch {
-      throw new ConsentSyncError('invalid-response');
     }
   };
   const terms = await get('/api/tos');

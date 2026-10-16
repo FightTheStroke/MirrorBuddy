@@ -91,6 +91,32 @@ describe('T6 synchronization races and readiness', () => {
     expect(hasAnalyticsConsent()).toBe(false);
   });
 
+  it('recovers a transient read failure without repeating legal writes', async () => {
+    signIn();
+    vi.mocked(fetch)
+      .mockRejectedValueOnce(new TypeError('Load failed'))
+      .mockResolvedValueOnce(Response.json({ accepted: false, version: '1.0' }))
+      .mockResolvedValueOnce(Response.json({ consent: null, analyticsAllowed: false }));
+
+    await expect(initializeConsent()).resolves.toBe(false);
+    expect(getConsentSyncSnapshot()).toMatchObject({ ready: true, status: 'idle', error: null });
+    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(vi.mocked(fetch).mock.calls.every(([, init]) => init?.method === 'GET')).toBe(true);
+    expect(hasAnalyticsConsent()).toBe(false);
+  });
+
+  it('stops a read retry when the account changes during the failure', async () => {
+    signIn();
+    vi.mocked(fetch).mockImplementationOnce(async () => {
+      setConsentTestAccount(false);
+      throw new TypeError('Load failed');
+    });
+
+    await expect(initializeConsent()).rejects.toMatchObject({ code: 'superseded' });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(hasAnalyticsConsent()).toBe(false);
+  });
+
   it('surfaces initialization failure without rendering stale mandatory acceptance as ready', async () => {
     saveTermsConsent(true);
     signIn();

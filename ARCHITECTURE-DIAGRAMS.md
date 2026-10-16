@@ -5,8 +5,9 @@
 > Complete visual documentation of the MirrorBuddy platform architecture.
 > All diagrams are in Mermaid format for easy maintenance and version control.
 
-**Version**: 0.41.8
+**Version**: 0.43.4
 **Technical Layout Review**: 2026-09-14 (workspace paths, provider boundaries, tier caps, ADR relationships)
+**Release Boundary Review**: 2026-10-16 (single-model tiers, FightTheStroke Azure tenant, tool-request protocol; not production acceptance)
 **Update Policy**: Release owners review diagrams and explicitly update both version markers to `VERSION`. Checks never modify this file.
 
 This is a structural reference, not proof of a successful production release or
@@ -557,6 +558,9 @@ graph TB
 ## 6. Channel: Chat (Text)
 
 The Chat channel uses SSE (Server-Sent Events) for real-time streaming.
+Tool-free streaming retains Chat Completions; GPT-6.1 Sol requests with
+function tools use the stateless Responses API (`store: false`). Both paths
+share the provider's filtering, usage accounting, and bounded retry contract.
 
 ```mermaid
 sequenceDiagram
@@ -1065,7 +1069,11 @@ sequenceDiagram
     TS-->>API: boolean
 ```
 
-### 11.3 Per-Feature Model Selection (ADR 0073)
+### 11.3 Shared Model Across Tiers (ADR 0182, refining ADR 0073)
+
+Tier flags control feature availability and usage, not text-model quality.
+Every enabled text/tool feature resolves to the same GPT-6.1 Sol deployment;
+voice retains its independent realtime selection.
 
 ```mermaid
 graph LR
@@ -1080,23 +1088,19 @@ graph LR
         Formula[formula]
     end
 
-    subgraph Trial_Models["Trial Models"]
-        TM[gpt-5-nano]
-    end
+    TierFlags["Trial / Base / Pro feature flags"]
+    TextModel["gpt-6.1-sol (mb-gpt-61-sol)"]
+    VoiceModel["gpt-realtime-2.1 (independent voice selection)"]
 
-    subgraph Base_Models["Base Models"]
-        BM1["gpt-5.2-edu (chat, quiz, homework)"]
-        BM2["gpt-5-mini (pdf, mindmap, summary)"]
-        BM3["gpt-realtime (voice)"]
-    end
-
-    subgraph Pro_Models["Pro Models"]
-        PM["gpt-5.2-chat (All features)"]
-    end
-
-    Chat --> TM
-    Chat --> BM1
-    Chat --> PM
+    TierFlags --> Feature_Types
+    Chat --> TextModel
+    PDF --> TextModel
+    Mindmap --> TextModel
+    Quiz --> TextModel
+    Flash --> TextModel
+    Summary --> TextModel
+    Formula --> TextModel
+    Realtime --> VoiceModel
 ```
 
 ---
@@ -2809,6 +2813,10 @@ graph LR
 
 ### 21.1 Service Map
 
+Azure services run in the FightTheStroke tenant per ADR 0183, not the retired
+corporate resource. The cutover retains API keys; Vercel OIDC federation is a
+future step, not an implemented authentication guarantee.
+
 ```mermaid
 graph TB
     subgraph MirrorBuddy["MirrorBuddy"]
@@ -2816,7 +2824,7 @@ graph TB
     end
 
     subgraph AI_Services["AI Services"]
-        AzureChat["Azure OpenAI (Chat Completions)"]
+        AzureChat["Azure OpenAI (Chat Completions / stateless Responses)"]
         AzureRealtime["Azure Realtime API (Voice Sessions)"]
         AzureEmbed["Azure Embeddings (RAG Indexing)"]
         AzureTTS["Azure TTS (Text-to-Speech)"]
@@ -3325,52 +3333,54 @@ certification. Proposed, deferred, and historical decisions are identified
 explicitly. A/B testing and community contributions use ADR 0180 and ADR 0181;
 the earlier crisis and waitlist decisions retain ADR 0157 and ADR 0158.
 
-| Decision                                                                          | Affected diagram | Relationship and limits                                                                                                                                                           |
-| --------------------------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [ADR 0137](docs/adr/0137-schema-drift-detection.md)                               | 3, 14            | Schema-to-migration drift detection is database-free; it does not prove a live database was migrated.                                                                             |
-| [ADR 0138](docs/adr/0138-vercel-env-sync.md)                                      | 15, 24           | Configuration metadata checks and injected-value checks are separate boundaries; a check is not a secret synchronization operation.                                               |
-| [ADR 0139](docs/adr/0139-tool-naming-normalization.md)                            | 9                | Character tool aliases normalize into canonical tool types before execution.                                                                                                      |
-| [ADR 0140](docs/adr/0140-compliance-audit-remediation.md)                         | 19               | Historical disclosure/audit remediation; its old Claude and Maestro-limit statements are not current provider or tier evidence.                                                   |
-| [ADR 0141](docs/adr/0141-admin-dashboard-overhaul-v3.md)                          | 17, 20           | Admin services distinguish unconfigured metrics from real observations and audit mutations with the actual actor.                                                                 |
-| [ADR 0142](docs/adr/0142-azure-service-principal-monitoring.md)                   | 20               | August decision explicitly rejects provisioning a monitoring service principal; local operator-authenticated cost reporting remains distinct.                                     |
-| [ADR 0143](docs/adr/0143-sso-oidc-security-hardening.md)                          | 4                | Signed OIDC token verification, nonce checks, and database-owned roles refine the SSO boundary.                                                                                   |
-| [ADR 0144](docs/adr/0144-disaster-recovery-backup-strategy.md)                    | 3, 24            | Recovery relies on provider backups and a restore runbook; recovery targets are not evidence of a completed restore drill.                                                        |
-| [ADR 0145](docs/adr/0145-migration-best-practices.md)                             | 3, 15            | Migration naming, small schema changes, and separate data migrations constrain database rollout.                                                                                  |
-| [ADR 0146](docs/adr/0146-architecture-map-drift-check.md)                         | 2, 22            | The six-layer import model and drift checks complement this visual reference.                                                                                                     |
-| [ADR 0147](docs/adr/0147-email-communications-system.md)                          | 3, 21, 27        | Templates, campaigns, recipient preferences, and Resend webhooks form the email lifecycle.                                                                                        |
-| [ADR 0148](docs/adr/0148-stripe-admin-panel.md)                                   | 17, 26           | Admin payment operations are audited; a payments kill switch is separate from subscription state.                                                                                 |
-| [ADR 0149](docs/adr/0149-static-vs-dynamic-system-prompts.md)                     | 5, 8             | Maestri/coaches use static character identity; buddy prompts incorporate student context. ADR 0162 refines knowledge injection.                                                   |
-| [ADR 0150](docs/adr/0150-production-smoke-testing.md)                             | 14, 24           | Production smoke checks must avoid learning-data mutations; source identity and local test success alone are insufficient.                                                        |
-| [ADR 0151](docs/adr/0151-anonymous-user-guard.md)                                 | 4, 12, 23        | Anonymous production requests do not auto-create users; trial visitor sessions remain separate.                                                                                   |
-| [ADR 0152](docs/adr/0152-voice-ga-migration.md)                                   | 7, 29            | GA session payloads and response parsing replace preview shapes on the selected protocol path.                                                                                    |
-| [ADR 0153](docs/adr/0153-redis-centralized-env-resolution.md)                     | 1.1              | Central resolution handles Upstash and Vercel KV aliases rather than each consumer resolving credentials independently.                                                           |
-| [ADR 0155](docs/adr/0155-model-comparison-benchmarks.md)                          | 5, 18, 20        | Model/profile benchmark orchestration measures outcomes; synthetic profiles do not substitute for accessibility acceptance.                                                       |
-| [ADR 0156](docs/adr/0156-safety-benchmark-gap-remediation.md)                     | 19.1             | Crisis and bias-pattern remediation spans five locales and feeds deterministic safety regression checks.                                                                          |
-| [ADR 0180: experiments](docs/adr/0180-ab-testing-framework.md)                    | 3, 20            | Deterministic bucketing maps user/visitor identities to stored experiment configurations.                                                                                         |
-| [ADR 0157: crisis](docs/adr/0157-crisis-response-protocol.md)                     | 19.1, 19.11      | Detection must lead to blocking/response, logging, and notification, not just classification. Distinct decision from experiments.                                                 |
-| [ADR 0158: waitlist](docs/adr/0158-coming-soon-waitlist.md)                       | 13, 17           | Historical coming-soon design: [the unused overlay flag was removed](docs/ops/FLAGS.md); the waitlist lifecycle is separate.                                                      |
-| [ADR 0181: community](docs/adr/0181-community-contribution-engine.md)             | 19, 25           | Contributions pass moderation and human review before rewards; this is not the waitlist lifecycle.                                                                                |
-| [ADR 0159](docs/adr/0159-gpt-realtime-audio-15-migration.md)                      | 7, 21            | Realtime/audio 1.5 was a flag-controlled migration, not a permanent default encoded by this document.                                                                             |
-| [ADR 0160](docs/adr/0160-workflow-gap-remediation.md)                             | 14, 19, 25       | End-to-end checks connect experiments, benchmarks, community, and crisis handling instead of treating isolated modules as delivered features.                                     |
-| [ADR 0161](docs/adr/0161-login-csrf-bypass-threat-model.md)                       | 4                | Records the login-specific CSRF exception and threat model; it does not relax authenticated mutation protection.                                                                  |
-| [ADR 0162](docs/adr/0162-prompt-optimization-architecture.md)                     | 5, 10            | A compact identity knowledge base, dynamic didactic retrieval, and conditional accessibility context replace indiscriminate prompt expansion.                                     |
-| [ADR 0163](docs/adr/0163-nightmaintenance-release-incident-hygiene.md)            | 14, 24           | Release progression includes post-production checks and incident hygiene, not just a successful build.                                                                            |
-| [ADR 0164](docs/adr/0164-monorepo-migration-pnpm-turborepo.md)                    | 1.3, 2, 22       | Application files moved to `apps/web`; shared libraries and root orchestration have separate responsibilities. Migration plans are not proof every planned optimization shipped.  |
-| [ADR 0165](docs/adr/0165-azure-voice-2026-05-rollout.md)                          | 7                | May voice models have independent rollout controls; provisioning alone does not establish active session selection.                                                               |
-| [ADR 0166](docs/adr/0166-parental-gate-dec01.md)                                  | 19.9             | **Proposed / human decision pending:** adult-area confirmation strength must not be diagrammed as verified parental consent.                                                      |
-| [ADR 0167](docs/adr/0167-buddy-avatar-phase2.md)                                  | 8                | **Proposed / human decision pending:** narrator identity unification is not an implemented buddy identity decision.                                                               |
-| [ADR 0168](docs/adr/0168-maestrilimit-deprecation-dec06.md)                       | 11, 12, 26       | The per-Maestro cap was removed, not enforced. The August catalogue UI does not reinstate it.                                                                                     |
-| [ADR 0169](docs/adr/0169-azure-voice-2026-07-realtime-21-cedar.md)                | 7                | Realtime 2.1 takes precedence when configured/enabled; fallback and voice compatibility remain part of session selection.                                                         |
-| [ADR 0170](docs/adr/0170-reachy-mini-robot-embodiment.md)                         | 1.3, 21          | A separately deployed Python robot pairs through device APIs and reuses character/profile services.                                                                               |
-| [ADR 0171](docs/adr/0171-guided-meditation-imposed-silence.md)                    | 7, 21            | Robot meditation owns timing and suppresses competing speech triggers; silence is not merely requested in a prompt.                                                               |
-| [ADR 0172](docs/adr/0172-voice-cost-attribution.md)                               | 7, 20            | Per-user cost derives from Azure response usage and server-owned session identity, not wall-clock minutes.                                                                        |
-| [ADR 0173](docs/adr/0173-mirrorbuddy-stays-on-azure-api-keys.md)                  | 21, 24           | API-key authentication remains the production design; the documented tenant block means keyless federation is not assumed.                                                        |
-| [ADR 0174](docs/adr/0174-robot-self-managing-credentials-and-updates.md)          | 1.3, 21          | Paired devices retrieve runtime credentials and check updates; this is distinct from the browser ephemeral-token flow.                                                            |
-| [ADR 0175](docs/adr/0175-staging-database-isolation-and-admin-credential-sync.md) | 3, 24            | Staging data isolation and post-release admin credential synchronization are separate operational responsibilities; the production build path must use production-bound evidence. |
-| [ADR 0176](docs/adr/0176-notification-recipients-come-from-the-database.md)       | 19.11, 27        | Internal alerts resolve enabled, non-test administrators from the database with an explicit configured fallback.                                                                  |
-| [ADR 0177](docs/adr/0177-browser-error-monitoring-is-decided-by-the-bundle.md)    | 20               | Browser monitoring follows bundle configuration and a localhost exclusion, not a server-only deployment variable.                                                                 |
-| [ADR 0178](docs/adr/0178-ai-act-risk-classification.md)                           | 19.10            | **Legal confirmation pending:** high-risk treatment is an interim precautionary posture, not a final legal classification.                                                        |
-| [ADR 0179](docs/adr/0179-ai-content-marking-defer.md)                             | 19.10, 19.12     | **Deferred:** visible AI disclosure is distinct from machine-readable marking, whose approach remains a legal/product decision.                                                   |
+| Decision                                                                          | Affected diagram | Relationship and limits                                                                                                                                                                              |
+| --------------------------------------------------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ADR 0137](docs/adr/0137-schema-drift-detection.md)                               | 3, 14            | Schema-to-migration drift detection is database-free; it does not prove a live database was migrated.                                                                                                |
+| [ADR 0138](docs/adr/0138-vercel-env-sync.md)                                      | 15, 24           | Configuration metadata checks and injected-value checks are separate boundaries; a check is not a secret synchronization operation.                                                                  |
+| [ADR 0139](docs/adr/0139-tool-naming-normalization.md)                            | 9                | Character tool aliases normalize into canonical tool types before execution.                                                                                                                         |
+| [ADR 0140](docs/adr/0140-compliance-audit-remediation.md)                         | 19               | Historical disclosure/audit remediation; its old Claude and Maestro-limit statements are not current provider or tier evidence.                                                                      |
+| [ADR 0141](docs/adr/0141-admin-dashboard-overhaul-v3.md)                          | 17, 20           | Admin services distinguish unconfigured metrics from real observations and audit mutations with the actual actor.                                                                                    |
+| [ADR 0142](docs/adr/0142-azure-service-principal-monitoring.md)                   | 20               | August decision explicitly rejects provisioning a monitoring service principal; local operator-authenticated cost reporting remains distinct.                                                        |
+| [ADR 0143](docs/adr/0143-sso-oidc-security-hardening.md)                          | 4                | Signed OIDC token verification, nonce checks, and database-owned roles refine the SSO boundary.                                                                                                      |
+| [ADR 0144](docs/adr/0144-disaster-recovery-backup-strategy.md)                    | 3, 24            | Recovery relies on provider backups and a restore runbook; recovery targets are not evidence of a completed restore drill.                                                                           |
+| [ADR 0145](docs/adr/0145-migration-best-practices.md)                             | 3, 15            | Migration naming, small schema changes, and separate data migrations constrain database rollout.                                                                                                     |
+| [ADR 0146](docs/adr/0146-architecture-map-drift-check.md)                         | 2, 22            | The six-layer import model and drift checks complement this visual reference.                                                                                                                        |
+| [ADR 0147](docs/adr/0147-email-communications-system.md)                          | 3, 21, 27        | Templates, campaigns, recipient preferences, and Resend webhooks form the email lifecycle.                                                                                                           |
+| [ADR 0148](docs/adr/0148-stripe-admin-panel.md)                                   | 17, 26           | Admin payment operations are audited; a payments kill switch is separate from subscription state.                                                                                                    |
+| [ADR 0149](docs/adr/0149-static-vs-dynamic-system-prompts.md)                     | 5, 8             | Maestri/coaches use static character identity; buddy prompts incorporate student context. ADR 0162 refines knowledge injection.                                                                      |
+| [ADR 0150](docs/adr/0150-production-smoke-testing.md)                             | 14, 24           | Production smoke checks must avoid learning-data mutations; source identity and local test success alone are insufficient.                                                                           |
+| [ADR 0151](docs/adr/0151-anonymous-user-guard.md)                                 | 4, 12, 23        | Anonymous production requests do not auto-create users; trial visitor sessions remain separate.                                                                                                      |
+| [ADR 0152](docs/adr/0152-voice-ga-migration.md)                                   | 7, 29            | GA session payloads and response parsing replace preview shapes on the selected protocol path.                                                                                                       |
+| [ADR 0153](docs/adr/0153-redis-centralized-env-resolution.md)                     | 1.1              | Central resolution handles Upstash and Vercel KV aliases rather than each consumer resolving credentials independently.                                                                              |
+| [ADR 0155](docs/adr/0155-model-comparison-benchmarks.md)                          | 5, 18, 20        | Model/profile benchmark orchestration measures outcomes; synthetic profiles do not substitute for accessibility acceptance.                                                                          |
+| [ADR 0156](docs/adr/0156-safety-benchmark-gap-remediation.md)                     | 19.1             | Crisis and bias-pattern remediation spans five locales and feeds deterministic safety regression checks.                                                                                             |
+| [ADR 0180: experiments](docs/adr/0180-ab-testing-framework.md)                    | 3, 20            | Deterministic bucketing maps user/visitor identities to stored experiment configurations.                                                                                                            |
+| [ADR 0157: crisis](docs/adr/0157-crisis-response-protocol.md)                     | 19.1, 19.11      | Detection must lead to blocking/response, logging, and notification, not just classification. Distinct decision from experiments.                                                                    |
+| [ADR 0158: waitlist](docs/adr/0158-coming-soon-waitlist.md)                       | 13, 17           | Historical coming-soon design: [the unused overlay flag was removed](docs/ops/FLAGS.md); the waitlist lifecycle is separate.                                                                         |
+| [ADR 0181: community](docs/adr/0181-community-contribution-engine.md)             | 19, 25           | Contributions pass moderation and human review before rewards; this is not the waitlist lifecycle.                                                                                                   |
+| [ADR 0159](docs/adr/0159-gpt-realtime-audio-15-migration.md)                      | 7, 21            | Realtime/audio 1.5 was a flag-controlled migration, not a permanent default encoded by this document.                                                                                                |
+| [ADR 0160](docs/adr/0160-workflow-gap-remediation.md)                             | 14, 19, 25       | End-to-end checks connect experiments, benchmarks, community, and crisis handling instead of treating isolated modules as delivered features.                                                        |
+| [ADR 0161](docs/adr/0161-login-csrf-bypass-threat-model.md)                       | 4                | Records the login-specific CSRF exception and threat model; it does not relax authenticated mutation protection.                                                                                     |
+| [ADR 0162](docs/adr/0162-prompt-optimization-architecture.md)                     | 5, 10            | A compact identity knowledge base, dynamic didactic retrieval, and conditional accessibility context replace indiscriminate prompt expansion.                                                        |
+| [ADR 0163](docs/adr/0163-nightmaintenance-release-incident-hygiene.md)            | 14, 24           | Release progression includes post-production checks and incident hygiene, not just a successful build.                                                                                               |
+| [ADR 0164](docs/adr/0164-monorepo-migration-pnpm-turborepo.md)                    | 1.3, 2, 22       | Application files moved to `apps/web`; shared libraries and root orchestration have separate responsibilities. Migration plans are not proof every planned optimization shipped.                     |
+| [ADR 0165](docs/adr/0165-azure-voice-2026-05-rollout.md)                          | 7                | May voice models have independent rollout controls; provisioning alone does not establish active session selection.                                                                                  |
+| [ADR 0166](docs/adr/0166-parental-gate-dec01.md)                                  | 19.9             | **Proposed / human decision pending:** adult-area confirmation strength must not be diagrammed as verified parental consent.                                                                         |
+| [ADR 0167](docs/adr/0167-buddy-avatar-phase2.md)                                  | 8                | **Proposed / human decision pending:** narrator identity unification is not an implemented buddy identity decision.                                                                                  |
+| [ADR 0168](docs/adr/0168-maestrilimit-deprecation-dec06.md)                       | 11, 12, 26       | The per-Maestro cap was removed, not enforced. The August catalogue UI does not reinstate it.                                                                                                        |
+| [ADR 0169](docs/adr/0169-azure-voice-2026-07-realtime-21-cedar.md)                | 7                | Realtime 2.1 takes precedence when configured/enabled; fallback and voice compatibility remain part of session selection.                                                                            |
+| [ADR 0170](docs/adr/0170-reachy-mini-robot-embodiment.md)                         | 1.3, 21          | A separately deployed Python robot pairs through device APIs and reuses character/profile services.                                                                                                  |
+| [ADR 0171](docs/adr/0171-guided-meditation-imposed-silence.md)                    | 7, 21            | Robot meditation owns timing and suppresses competing speech triggers; silence is not merely requested in a prompt.                                                                                  |
+| [ADR 0172](docs/adr/0172-voice-cost-attribution.md)                               | 7, 20            | Per-user cost derives from Azure response usage and server-owned session identity, not wall-clock minutes.                                                                                           |
+| [ADR 0173](docs/adr/0173-mirrorbuddy-stays-on-azure-api-keys.md)                  | 21, 24           | API-key authentication remains the cutover design; ADR 0183 supersedes the old corporate-tenant restriction, but keyless federation is still not assumed.                                            |
+| [ADR 0174](docs/adr/0174-robot-self-managing-credentials-and-updates.md)          | 1.3, 21          | Paired devices retrieve runtime credentials and check updates; this is distinct from the browser ephemeral-token flow.                                                                               |
+| [ADR 0175](docs/adr/0175-staging-database-isolation-and-admin-credential-sync.md) | 3, 24            | Staging data isolation and post-release admin credential synchronization are separate operational responsibilities; the production build path must use production-bound evidence.                    |
+| [ADR 0176](docs/adr/0176-notification-recipients-come-from-the-database.md)       | 19.11, 27        | Internal alerts resolve enabled, non-test administrators from the database with an explicit configured fallback.                                                                                     |
+| [ADR 0177](docs/adr/0177-browser-error-monitoring-is-decided-by-the-bundle.md)    | 20               | Browser monitoring follows bundle configuration and a localhost exclusion, not a server-only deployment variable.                                                                                    |
+| [ADR 0178](docs/adr/0178-ai-act-risk-classification.md)                           | 19.10            | **Legal confirmation pending:** high-risk treatment is an interim precautionary posture, not a final legal classification.                                                                           |
+| [ADR 0179](docs/adr/0179-ai-content-marking-defer.md)                             | 19.10, 19.12     | **Deferred:** visible AI disclosure is distinct from machine-readable marking, whose approach remains a legal/product decision.                                                                      |
+| [ADR 0182](docs/adr/0182-gpt61-sol-single-model.md)                               | 6, 9, 11.3       | All enabled text/tool features share GPT-6.1 Sol across tiers; voice remains independent. Tool-bearing requests use stateless Responses while tool-free streaming retains Chat Completions.          |
+| [ADR 0183](docs/adr/0183-ai-moves-to-fightthestroke-tenant.md)                    | 21.1, 24         | Azure AI moved to the FightTheStroke tenant. API keys remain the cutover authentication; future OIDC federation must be proved separately, and the old corporate tenant is not a runtime dependency. |
 
 ## 29. Voice GA + Unified Conversation (W7)
 
@@ -3561,7 +3571,7 @@ graph TB
 
 ---
 
-_Version: 0.41.8_
+_Version: 0.43.4_
 _Technical layout reviewed: 14 September 2026_
 _Generated from codebase analysis and ADR documentation_
 _Release owner updates both version markers after review; validation is read-only._

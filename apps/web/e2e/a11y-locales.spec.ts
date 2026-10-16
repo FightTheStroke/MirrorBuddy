@@ -18,10 +18,11 @@
  */
 
 import { test, expect, testAllLocales, SUPPORTED_LOCALES } from './fixtures';
+import type { LocalePage } from './fixtures/locale-page';
 
 // IMPORTANT: These tests check unauthenticated pages (welcome, legal)
 // Override global storageState to start without authentication
-test.use({ storageState: undefined });
+test.use({ storageState: { cookies: [], origins: [] } });
 import AxeBuilder from '@axe-core/playwright';
 
 /**
@@ -46,9 +47,22 @@ async function setupTosModalBypass(page: import('@playwright/test').Page) {
       body: JSON.stringify({
         accepted: true,
         version: '1.0',
+        acceptedAt: new Date().toISOString(),
       }),
     });
   });
+}
+
+async function gotoAuditPage(localePage: LocalePage, path: string) {
+  await localePage.goto(path);
+  if (path === '/' || path === '/landing') {
+    // Anonymous home and legacy landing routes both resolve to welcome.
+    await expect(localePage.page).toHaveURL(
+      new RegExp(`/${localePage.locale}/welcome(?:[/?#]|$)`),
+      { timeout: 30000 },
+    );
+    await localePage.page.waitForLoadState('load');
+  }
 }
 
 /**
@@ -84,9 +98,8 @@ test.describe('WCAG 2.1 AA Compliance - All Locales', () => {
   testAllLocales('all pages pass axe-core WCAG 2.1 AA', async ({ localePage }) => {
     for (const page of PAGES_TO_TEST) {
       // Navigate to page in current locale
-      await localePage.goto(page.path);
+      await gotoAuditPage(localePage, page.path);
       await localePage.page.waitForLoadState(WAIT_FOR_NETWORK_IDLE);
-      await localePage.page.waitForTimeout(1000); // Extra wait for CI
 
       // Run axe-core accessibility audit
       const results = await new AxeBuilder({ page: localePage.page })
@@ -132,7 +145,7 @@ test.describe('WCAG 2.1 AA per-page audit - All Locales', () => {
    * Homepage is critical entry point for accessibility
    */
   testAllLocales('homepage passes axe-core', async ({ localePage }) => {
-    await localePage.goto('/');
+    await gotoAuditPage(localePage, '/');
     await localePage.page.waitForLoadState(WAIT_FOR_NETWORK_IDLE);
     await localePage.page.waitForTimeout(500);
 
@@ -210,7 +223,7 @@ test.describe('Locale-Specific Accessibility Features', () => {
    * RTL languages may require special handling
    */
   testAllLocales('locale has correct language direction', async ({ localePage }) => {
-    await localePage.goto('/');
+    await gotoAuditPage(localePage, '/');
     await localePage.page.waitForLoadState(WAIT_FOR_NETWORK_IDLE);
 
     const htmlDir = await localePage.page.locator('html').getAttribute('dir');
@@ -281,7 +294,7 @@ test.describe('Color Contrast - All Locales', () => {
    * Note: Some contrast issues are tracked separately, using higher timeout for CI
    */
   testAllLocales('homepage has sufficient color contrast', async ({ localePage }) => {
-    await localePage.goto('/');
+    await gotoAuditPage(localePage, '/');
     await localePage.page.waitForLoadState('domcontentloaded');
     // Extra wait for CSS animations and font loading in CI
     await localePage.page.waitForTimeout(2000);
@@ -323,7 +336,7 @@ test.describe('Heading Hierarchy - All Locales', () => {
    * Critical for screen reader users and document structure
    */
   testAllLocales('homepage has proper heading hierarchy', async ({ localePage }) => {
-    await localePage.goto('/');
+    await gotoAuditPage(localePage, '/');
     await localePage.page.waitForLoadState(WAIT_FOR_NETWORK_IDLE);
 
     // Run axe-core for heading rules
@@ -342,7 +355,7 @@ test.describe('Heading Hierarchy - All Locales', () => {
     const testPages = ['/', '/welcome', '/landing'];
 
     for (const testPath of testPages) {
-      await localePage.goto(testPath);
+      await gotoAuditPage(localePage, testPath);
       await localePage.page.waitForLoadState(WAIT_FOR_NETWORK_IDLE);
 
       const h1Count = await localePage.page.locator('h1').count();
@@ -401,7 +414,7 @@ test.describe('Image Accessibility - All Locales', () => {
    * Alt text should be language-appropriate
    */
   testAllLocales('images have alt text or are marked as decorative', async ({ localePage }) => {
-    await localePage.goto('/');
+    await gotoAuditPage(localePage, '/');
     await localePage.page.waitForLoadState(WAIT_FOR_NETWORK_IDLE);
 
     // Run axe-core for image alt text
@@ -433,6 +446,7 @@ test.describe('Comprehensive Accessibility Audit by Locale', () => {
         body: JSON.stringify({
           accepted: true,
           version: '1.0',
+          acceptedAt: new Date().toISOString(),
         }),
       });
     });
@@ -452,7 +466,10 @@ test.describe('Comprehensive Accessibility Audit by Locale', () => {
       // Test homepage
       await page.goto(`/${locale}/`);
       await page.waitForLoadState(WAIT_FOR_NETWORK_IDLE);
-      await page.waitForTimeout(500);
+      await expect(page).toHaveURL(new RegExp(`/${locale}/welcome(?:[/?#]|$)`), {
+        timeout: 30000,
+      });
+      await page.waitForLoadState('load');
 
       // Run comprehensive audit
       const results = await new AxeBuilder({ page })

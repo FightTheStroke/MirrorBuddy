@@ -83,4 +83,64 @@ describe('loading conversation summaries across an identity refresh', () => {
       'Conversation identity changed',
     );
   });
+
+  it('retries a transient response-body failure after HTTP 200', async () => {
+    setClientIdentity(student('user-1'));
+    const interrupted = Response.json(summaries);
+    vi.spyOn(interrupted, 'json').mockRejectedValueOnce(new TypeError('Load failed'));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValueOnce(interrupted).mockResolvedValueOnce(Response.json(summaries)),
+    );
+
+    await expect(loadConversationSummariesFromDB()).resolves.toEqual(summaries);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('never replays a failed read into another account', async () => {
+    setClientIdentity(student('user-1'));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        setClientIdentity(student('user-2'));
+        throw new TypeError('Load failed');
+      }),
+    );
+
+    await expect(loadConversationSummariesFromDB()).rejects.toThrow(
+      'Conversation identity changed',
+    );
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops after one network retry and preserves the original failure', async () => {
+    setClientIdentity(student('user-1'));
+    const error = new TypeError('Load failed');
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(error));
+
+    await expect(loadConversationSummariesFromDB()).rejects.toBe(error);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    new TypeError('Cannot read properties of undefined'),
+    new SyntaxError('Invalid JSON'),
+    new DOMException('Aborted', 'AbortError'),
+    new Error('Load failed'),
+    null,
+  ])('does not retry non-network failures: %s', async (error) => {
+    setClientIdentity(student('user-1'));
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(error));
+
+    await expect(loadConversationSummariesFromDB()).rejects.toBe(error);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([401, 403, 429, 500, 503])('does not replay an HTTP %i response', async (status) => {
+    setClientIdentity(student('user-1'));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status })));
+
+    await expect(loadConversationSummariesFromDB()).rejects.toThrow();
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
 });

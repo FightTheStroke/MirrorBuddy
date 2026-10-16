@@ -17,6 +17,20 @@
  */
 
 import { test, expect } from '../fixtures/base-fixtures';
+import type { Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const expectedVersion = readFileSync(resolve(__dirname, '../../../../VERSION'), 'utf8').trim();
+
+async function expectScreenshot(page: Page, name: string) {
+  const versions = page.getByText(/^v\d+\.\d+\.\d+$/);
+  for (const label of await versions.all()) {
+    await expect(label).toHaveText(`v${expectedVersion}`);
+  }
+  // Release numbers intentionally differ; verify them separately before masking.
+  await expect(page).toHaveScreenshot(name, { mask: [versions] });
+}
 
 // Wait for content to stabilize before taking screenshots
 const WAIT_FOR_STABLE = 800; // ms
@@ -41,19 +55,31 @@ test.describe('Visual Regression - Baseline Snapshots', () => {
     }
   });
 
+  test('rejects an incorrect release label before masking it', async ({ page }) => {
+    await page.goto('/welcome', { waitUntil: 'domcontentloaded' });
+    const version = page.getByText(/^v\d+\.\d+\.\d+$/).first();
+    await expect(version).toBeVisible();
+    await version.evaluate((element) => {
+      element.textContent = 'v0.0.0';
+    });
+    await expect(expectScreenshot(page, 'invalid-version-must-not-exist.png')).rejects.toThrow(
+      /toHaveText/,
+    );
+  });
+
   // ========== HOME PAGE ==========
   test('home page - desktop baseline', async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.desktop);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(WAIT_FOR_STABLE);
-    await expect(page).toHaveScreenshot('home-desktop.png');
+    await expectScreenshot(page, 'home-desktop.png');
   });
 
   test('home page - mobile baseline', async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(WAIT_FOR_STABLE);
-    await expect(page).toHaveScreenshot('home-mobile.png');
+    await expectScreenshot(page, 'home-mobile.png');
   });
 
   // ========== WELCOME PAGE ==========
@@ -61,14 +87,14 @@ test.describe('Visual Regression - Baseline Snapshots', () => {
     await page.setViewportSize(VIEWPORTS.desktop);
     await page.goto('/welcome', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(WAIT_FOR_STABLE);
-    await expect(page).toHaveScreenshot('welcome-desktop.png');
+    await expectScreenshot(page, 'welcome-desktop.png');
   });
 
   test('welcome page - mobile baseline', async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
     await page.goto('/welcome', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(WAIT_FOR_STABLE);
-    await expect(page).toHaveScreenshot('welcome-mobile.png');
+    await expectScreenshot(page, 'welcome-mobile.png');
   });
 
   // ========== ASTUCCIO PAGE ==========
@@ -76,14 +102,14 @@ test.describe('Visual Regression - Baseline Snapshots', () => {
     await page.setViewportSize(VIEWPORTS.desktop);
     await page.goto('/astuccio', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(WAIT_FOR_STABLE);
-    await expect(page).toHaveScreenshot('astuccio-desktop.png');
+    await expectScreenshot(page, 'astuccio-desktop.png');
   });
 
   test('astuccio page - mobile baseline', async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
     await page.goto('/astuccio', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(WAIT_FOR_STABLE);
-    await expect(page).toHaveScreenshot('astuccio-mobile.png');
+    await expectScreenshot(page, 'astuccio-mobile.png');
   });
 
   // ========== ADMIN DASHBOARD ==========
@@ -91,14 +117,14 @@ test.describe('Visual Regression - Baseline Snapshots', () => {
     await page.setViewportSize(VIEWPORTS.desktop);
     await page.goto('/admin', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(WAIT_FOR_STABLE);
-    await expect(page).toHaveScreenshot('admin-dashboard-desktop.png');
+    await expectScreenshot(page, 'admin-dashboard-desktop.png');
   });
 
   test('admin dashboard - mobile baseline', async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
     await page.goto('/admin', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(WAIT_FOR_STABLE);
-    await expect(page).toHaveScreenshot('admin-dashboard-mobile.png');
+    await expectScreenshot(page, 'admin-dashboard-mobile.png');
   });
 
   // ========== SETTINGS (via home page interaction) ==========
@@ -112,11 +138,13 @@ test.describe('Visual Regression - Baseline Snapshots', () => {
       .locator('button')
       .filter({ hasText: /Impostazioni/i })
       .first();
-    if (await settingsBtn.isVisible()) {
-      await settingsBtn.click();
-      await page.waitForTimeout(WAIT_FOR_STABLE);
-      await expect(page).toHaveScreenshot('settings-desktop.png');
-    }
+    test.skip(
+      !(await settingsBtn.isVisible()),
+      'Settings action is absent in this fixture; no visual comparison',
+    );
+    await settingsBtn.click();
+    await page.waitForTimeout(WAIT_FOR_STABLE);
+    await expectScreenshot(page, 'settings-desktop.png');
   });
 
   test('settings modal - mobile baseline', async ({ page }) => {
@@ -129,11 +157,13 @@ test.describe('Visual Regression - Baseline Snapshots', () => {
       .locator('button')
       .filter({ hasText: /Impostazioni/i })
       .first();
-    if (await settingsBtn.isVisible()) {
-      await settingsBtn.click();
-      await page.waitForTimeout(WAIT_FOR_STABLE);
-      await expect(page).toHaveScreenshot('settings-mobile.png');
-    }
+    test.skip(
+      !(await settingsBtn.isVisible()),
+      'Settings action is absent in this fixture; no visual comparison',
+    );
+    await settingsBtn.click();
+    await page.waitForTimeout(WAIT_FOR_STABLE);
+    await expectScreenshot(page, 'settings-mobile.png');
   });
 
   // ========== LANDING PAGE ==========
@@ -141,13 +171,13 @@ test.describe('Visual Regression - Baseline Snapshots', () => {
     await page.setViewportSize(VIEWPORTS.desktop);
     await page.goto('/landing', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(WAIT_FOR_STABLE);
-    await expect(page).toHaveScreenshot('landing-desktop.png');
+    await expectScreenshot(page, 'landing-desktop.png');
   });
 
   test('landing page - mobile baseline', async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
     await page.goto('/landing', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(WAIT_FOR_STABLE);
-    await expect(page).toHaveScreenshot('landing-mobile.png');
+    await expectScreenshot(page, 'landing-mobile.png');
   });
 });

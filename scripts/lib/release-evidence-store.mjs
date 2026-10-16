@@ -12,6 +12,7 @@ import { basename, isAbsolute, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildIdentity, digest, inputIdentity } from './release-evidence-inputs.mjs';
 import { validateExpectedScope } from './release-evidence-scope.mjs';
+import { runtimeAbsence } from './release-audit-runtime.mjs';
 import {
   validateAudit,
   validateBrowser,
@@ -30,7 +31,7 @@ export function recipe(kind, directory) {
     case 'pre-release':
       return ['npm', 'run', 'pre-release'];
     case 'audit':
-      return ['pnpm', 'audit', '--audit-level=high', '--json'];
+      return ['node', 'scripts/release-audit.mjs', directory];
     case 'unit':
       return [
         'npm',
@@ -99,7 +100,7 @@ export function reports(kind) {
   if (!kinds.includes(kind)) throw new Error('Unknown release check');
   if (kind === 'unit') return ['unit.json', 'coverage.json', 'unit.scope.json'];
   if (kind === 'e2e') return ['e2e.json', 'e2e.scope.json'];
-  if (kind === 'audit') return ['audit.json'];
+  if (kind === 'audit') return ['audit.json', 'audit.context.json'];
   return [];
 }
 
@@ -111,12 +112,24 @@ export function native(directory, name) {
   }
 }
 
-export function validateReports(kind, directory) {
+export function validateReports(kind, directory, sourceRoot = root) {
   if (kind === 'unit') {
     validateUnit(native(directory, 'unit.json'));
     validateCoverage(native(directory, 'coverage.json'));
   } else if (kind === 'e2e') validateBrowser(native(directory, 'e2e.json'));
-  else if (kind === 'audit') validateAudit(native(directory, 'audit.json'));
+  else if (kind === 'audit') {
+    const context = native(directory, 'audit.context.json');
+    const result = validateAudit(native(directory, 'audit.json'), context);
+    if (result.acceptedHigh) {
+      if (
+        context.approvalHash !==
+        digest(readFileSync(join(sourceRoot, 'scripts/security/braces-exception.json')))
+      )
+        throw new Error('Audit approval content changed after execution');
+      if (!same(context.runtime, runtimeAbsence(sourceRoot)))
+        throw new Error('Audit runtime absence evidence changed after execution');
+    }
+  }
 }
 
 export function validateSourceScope(kind, directory, sourceRoot) {
@@ -163,8 +176,13 @@ export function readReceipt(kind, directory, identity = inputIdentity(root)) {
     if (receipt.reportHashes?.[name] !== digest(readFileSync(artifact(directory, name)))) {
       throw new Error(`${kind} native report identity changed`);
     }
+    if (
+      kind === 'audit' &&
+      receipt.rawExitCode !== native(directory, 'audit.context.json').rawExitCode
+    )
+      throw new Error('Raw audit execution exit code changed');
   }
-  validateReports(kind, directory);
+  validateReports(kind, directory, identity.root);
   validateSourceScope(kind, directory, identity.root);
   if (kind === 'unit' || kind === 'e2e') validateExpectedScope(kind, directory, identity.root);
   if (kind === 'pre-release' || kind === 'e2e') {

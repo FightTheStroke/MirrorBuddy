@@ -8,9 +8,9 @@ import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { initializeMindmap, modifyMindmap, readMindmap } from '../service';
 import { snapshotSchema, outcomeSchema } from '../protocol';
+import { policyTestDatabaseEnabled } from '@/test/policy-test-environment';
 
-const localUrl = 'postgresql://Roberdan@localhost:5432/mirrorbuddy_test';
-const enabled = process.env.TEST_DATABASE_URL === localUrl && process.env.DATABASE_URL === localUrl;
+const enabled = policyTestDatabaseEnabled();
 const execute = promisify(execFile);
 let userId: string;
 let toolId: string;

@@ -2,9 +2,10 @@ import { prisma, dbPool } from '@/lib/db';
 import { modifyMindmap, readMindmap } from '../../service';
 import { ownerSchema } from '../../storage';
 import { z } from 'zod';
+import { policyTestDatabaseEnabled } from '@/test/policy-test-environment';
 
 async function main() {
-  if (process.env.DATABASE_URL !== 'postgresql://Roberdan@localhost:5432/mirrorbuddy_test')
+  if (!policyTestDatabaseEnabled())
     throw new Error('This fixture only runs against the explicit local test database');
   const request = z
     .object({

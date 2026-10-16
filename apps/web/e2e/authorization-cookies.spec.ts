@@ -209,12 +209,13 @@ test.describe('Cookie Consistency', () => {
     expect(clientCookie!.httpOnly).toBe(false);
 
     // The opaque handle is not an identity claim; /me resolves its durable owner.
-    expect(serverCookie!.value).toMatch(/^s2:[\w-]{43}\.[a-f0-9]{64}$/);
+    const signedHandle = decodeURIComponent(serverCookie!.value);
+    expect(signedHandle).toMatch(/^s2:[\w-]{43}\.[a-f0-9]{64}$/);
     const me = await page.request.get('/api/auth/me');
     expect(me.status()).toBe(200);
     const identity = await me.json();
     expect(identity.user.id).toBe(clientCookie!.value);
-    expect(serverCookie!.value.split('.')[0]).not.toBe(clientCookie!.value);
+    expect(signedHandle.split('.')[0]).not.toBe(clientCookie!.value);
   });
 
   test('Cookies cleared on logout', async ({ page, context }) => {

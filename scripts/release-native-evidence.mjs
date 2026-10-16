@@ -13,6 +13,7 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { buildIdentity, digest, inputIdentity } from './lib/release-evidence-inputs.mjs';
 import { validateNativeEvidence } from './lib/release-evidence-native.mjs';
+import { auditMessage } from './lib/release-audit-exception.mjs';
 import { captureExpectedScope, validateExpectedScope } from './lib/release-evidence-scope.mjs';
 import {
   artifact,
@@ -48,17 +49,14 @@ export function run(kind, directory, reuse) {
   const startedAt = Date.now();
   const log = artifact(directory, `${kind}.log`);
   const logFd = openSync(log, 'w', 0o600);
-  const outputFd =
-    kind === 'audit' ? openSync(artifact(directory, 'audit.json'), 'w', 0o600) : logFd;
   let result;
   try {
     result = spawnSync(command[0], command.slice(1), {
       cwd: root,
       env: process.env,
-      stdio: ['ignore', outputFd, logFd],
+      stdio: ['ignore', logFd, logFd],
     });
   } finally {
-    if (outputFd !== logFd) closeSync(outputFd);
     closeSync(logFd);
   }
   if (result.error || result.signal || result.status !== 0) {
@@ -98,6 +96,8 @@ export function run(kind, directory, reuse) {
         version: 1,
         kind,
         exitCode: 0,
+        rawExitCode:
+          kind === 'audit' ? native(directory, 'audit.context.json').rawExitCode : undefined,
         identity,
         command,
         startedAt,
@@ -111,6 +111,7 @@ export function run(kind, directory, reuse) {
     ),
     { mode: 0o600 },
   );
+  if (kind === 'audit') console.log(readFileSync(log, 'utf8').trim());
   console.log(`${kind} passed; bound execution receipt recorded`);
 }
 
@@ -121,6 +122,7 @@ export function collect(directory, identity = inputIdentity(root)) {
     coverage: native(directory, 'coverage.json'),
     e2e: native(directory, 'e2e.json'),
     audit: native(directory, 'audit.json'),
+    auditContext: native(directory, 'audit.context.json'),
   });
   const version = JSON.parse(readFileSync(join(identity.root, 'package.json'), 'utf8')).version;
   const core = typeof version === 'string' ? version.match(/^\d+\.\d+\.\d+/)?.[0] : undefined;
@@ -149,6 +151,7 @@ export function collect(directory, identity = inputIdentity(root)) {
       return `Coverage ${key}: ${metric.covered}/${metric.total} (${metric.pct}%).`;
     }),
     `Dependency audit: high ${summary.audit.high}, critical ${summary.audit.critical}, moderate ${summary.audit.moderate}, low ${summary.audit.low}.`,
+    auditMessage(summary.audit),
     '',
     'This records the specified verification executions, not deployment or live Sentry resolution.',
     'Each release gate runs unit and browser tests afresh; collection never reruns them.',

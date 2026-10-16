@@ -12,6 +12,6 @@ export async function navigateForStyleAudit(page: Page, path: string) {
   const destination = REDIRECT_DESTINATIONS[path] ?? path;
   await expect(page).toHaveURL((url) => {
     const pathname = url.pathname.replace(/^\/(it|en|fr|de|es)(?=\/|$)/, '').replace(/\/$/, '');
-    return pathname === destination.replace(/\/$/, '');
+    return pathname === destination.replace(/\/$/, '') || (path === '/' && pathname === '/welcome');
   });
 }

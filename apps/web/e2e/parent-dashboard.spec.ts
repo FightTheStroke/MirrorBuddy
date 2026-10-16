@@ -65,12 +65,9 @@ test.describe('Parent Dashboard Route (F-16)', () => {
     // 1. The dashboard content (if profile exists and consent given)
     // 2. Consent form (if consent not given)
     // 3. No profile state (if profile doesn't exist)
-    const hasStructure =
-      (await adminPage.locator('main').isVisible()) ||
-      (await adminPage.locator("[role='main']").isVisible()) ||
-      (await adminPage.locator('div.min-h-screen').isVisible());
-
-    expect(hasStructure).toBe(true);
+    await expect(
+      adminPage.locator('main:visible, [role="main"]:visible, div.min-h-screen:visible').first(),
+    ).toBeVisible();
   });
 
   test('parent dashboard page title is set correctly', async ({ adminPage }) => {

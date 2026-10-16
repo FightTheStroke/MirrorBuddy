@@ -80,7 +80,11 @@ export async function dismissBlockingModals(page: import('@playwright/test').Pag
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ accepted: true, version: '1.0' }),
+      body: JSON.stringify({
+        accepted: true,
+        version: '1.0',
+        acceptedAt: new Date().toISOString(),
+      }),
     });
   });
 

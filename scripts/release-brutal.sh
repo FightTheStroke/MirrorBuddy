@@ -104,12 +104,9 @@ npm run lint >"$RUN_DIR/lint.log" 2>&1 &
 PID_LINT=$!
 npm run typecheck >"$RUN_DIR/typecheck.log" 2>&1 &
 PID_TYPE=$!
-pnpm audit --audit-level=high >"$RUN_DIR/audit.log" 2>&1 &
-PID_AUDIT=$!
 
 wait $PID_LINT && pass "lint" || fail "lint" "\`\`\`\n$(tail -20 "$RUN_DIR/lint.log")\n\`\`\`"
 wait $PID_TYPE && pass "typecheck" || fail "typecheck" "\`\`\`\n$(grep -E 'error TS|Cannot find' "$RUN_DIR/typecheck.log" | head -10)\n\`\`\`"
-wait $PID_AUDIT && pass "audit" || fail "audit" "\`\`\`\n$(tail -20 "$RUN_DIR/audit.log")\n\`\`\`"
 
 # =============================================================================
 # PHASE 3: BUILD
@@ -137,6 +134,13 @@ if [ "$E2E_EXIT" -eq 0 ] && [ "$E2E_PASSED" -gt 0 ] && [ "$E2E_FAILED" -eq 0 ] 2
 else
 	FAILED_TESTS=$(echo "$E2E_CLEAN" | /usr/bin/grep -E "^\s+[0-9]+\)|Error:" | head -10)
 	fail "e2e" "**Exit**: $E2E_EXIT, **Passed**: $E2E_PASSED, **Failed**: $E2E_FAILED\n\n\`\`\`\n$FAILED_TESTS\n\`\`\`"
+fi
+
+if node scripts/release-audit.mjs >"$RUN_DIR/audit.log" 2>&1; then
+	pass "audit"
+	cat "$RUN_DIR/audit.log"
+else
+	fail "audit" "\`\`\`\n$(tail -20 "$RUN_DIR/audit.log")\n\`\`\`"
 fi
 
 # =============================================================================

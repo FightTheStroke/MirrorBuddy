@@ -86,9 +86,9 @@ echo ""
 # =============================================================================
 # PHASE 2: PARALLEL STATIC ANALYSIS
 # =============================================================================
-echo -e "${BLUE}[PHASE 2] Parallel static analysis (lint + typecheck + audit)...${NC}"
+echo -e "${BLUE}[PHASE 2] Parallel static analysis (lint + typecheck)...${NC}"
 
-# Run all three in parallel
+# Run both in parallel
 (
     npm run lint > "$TEMP_DIR/lint.log" 2>&1
     echo $? > "$TEMP_DIR/lint.exit"
@@ -101,15 +101,9 @@ LINT_PID=$!
 ) &
 TYPE_PID=$!
 
-(
-    pnpm audit --audit-level=high > "$TEMP_DIR/audit.log" 2>&1
-    echo $? > "$TEMP_DIR/audit.exit"
-) &
-AUDIT_PID=$!
-
 # Wait for all with progress indicator
 echo -n "   Running: "
-while kill -0 $LINT_PID 2>/dev/null || kill -0 $TYPE_PID 2>/dev/null || kill -0 $AUDIT_PID 2>/dev/null; do
+while kill -0 $LINT_PID 2>/dev/null || kill -0 $TYPE_PID 2>/dev/null; do
     echo -n "."
     sleep 0.5
 done
@@ -118,7 +112,6 @@ echo " done"
 # Check results
 LINT_EXIT=$(cat "$TEMP_DIR/lint.exit" 2>/dev/null || echo 1)
 TYPE_EXIT=$(cat "$TEMP_DIR/typecheck.exit" 2>/dev/null || echo 1)
-AUDIT_EXIT=$(cat "$TEMP_DIR/audit.exit" 2>/dev/null || echo 1)
 
 FAILED=0
 
@@ -136,14 +129,6 @@ if [ "$TYPE_EXIT" -ne 0 ]; then
     FAILED=1
 else
     echo -e "${GREEN}✓ TypeScript passed${NC}"
-fi
-
-if [ "$AUDIT_EXIT" -ne 0 ]; then
-    echo -e "${RED}✗ Security audit failed${NC}"
-    cat "$TEMP_DIR/audit.log"
-    FAILED=1
-else
-    echo -e "${GREEN}✓ Security audit passed${NC}"
 fi
 
 [ $FAILED -ne 0 ] && exit 1
@@ -173,6 +158,13 @@ if ! node "$SCRIPT_DIR_PR/prepare-standalone.mjs" > "$TEMP_DIR/standalone.log" 2
 fi
 release_build_lock
 echo -e "${GREEN}✓ Build successful; standalone assets prepared${NC}"
+
+if ! node scripts/release-audit.mjs > "$TEMP_DIR/audit.log" 2>&1; then
+    echo -e "${RED}✗ Security audit failed${NC}"
+    cat "$TEMP_DIR/audit.log"
+    exit 1
+fi
+cat "$TEMP_DIR/audit.log"
 
 PHASE3_TIME=$(date +%s)
 echo -e "${BLUE}   Phase 3: $((PHASE3_TIME - PHASE2_TIME))s${NC}"

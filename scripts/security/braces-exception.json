@@ -1,0 +1,16 @@
+{
+  "advisoryId": "GHSA-vfj7-8cjw-p6xm",
+  "nativeAdvisoryId": 1240992,
+  "package": "braces",
+  "version": "3.0.3",
+  "severity": "high",
+  "approvedBy": "Roberto D'Angelo",
+  "approval": "approvo la derog alla sicurezza",
+  "approvedOn": "2026-10-16",
+  "expiresAt": "2026-10-24T00:00:00+02:00",
+  "scope": "development-only ESLint and knip chains; absent from production audit, NFT traces and standalone",
+  "paths": [
+    ".>eslint-config-next>@next/eslint-plugin-next>fast-glob>micromatch>braces",
+    ".>knip>fast-glob>micromatch>braces"
+  ]
+}

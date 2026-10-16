@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.43.4] - 2026-10-16
+
+### Fixed
+
+- Recover from one transient browser network failure while reading consent, hydrating
+  account data, loading conversation summaries (including interrupted response bodies),
+  or downloading the offline service worker. Retries are bounded and account-aware;
+  consent writes, HTTP errors, aborted requests and invalid responses are not replayed.
+- Route GPT-6.1 Sol chat requests with tools through Azure's stateless Responses API,
+  avoiding the Chat Completions rejection of function tools with its reasoning mode.
+  Preserve optional tool arguments, forced tool choices, token usage, content filtering
+  and bounded retries. Other models and tool-free streaming keep their existing paths.
+- Persistent failures still reach the existing error state and monitoring.
+- Make fast-release browser smoke checks mandatory and let Playwright own the isolated
+  server, preventing duplicate startup and false success when no server is available.
+- Keep screenshot baselines separate by screenshot name, browser/device project and
+  platform. Browser checks wait for redirected pages and interactive controls before
+  auditing accessibility, switching language or sending a message.
+- Establish visual regression references from the independently rebuilt 0.43.3 source
+  and its original lockfile, with recorded image hashes. Assert release labels before
+  masking their intentional version change; absent settings actions are reported as
+  skipped rather than passing without a comparison.
+
+### Security
+
+- Update Next.js within the 16.3 patch line, Capacitor, Sharp, and affected transitive
+  dependencies to available patched versions. The remaining development-only
+  `braces@3.0.3` advisory has an explicitly approved, narrowly scoped exception through
+  October 23, 2026; the raw audit is not clean. Other high or critical findings and
+  production exposure remain blocking.
+
 ## [0.43.3] - 2026-10-04
 
 - No user-facing changes recorded.

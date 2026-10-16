@@ -110,9 +110,6 @@ describe('registerOfflineServiceWorker', () => {
     expect(mockServiceWorker.register).toHaveBeenCalledTimes(2);
   });
 
-  // ============================================================================
-  // Error handling
-  // ============================================================================
   it.each([undefined, null])('reports an unavailable registration result: %s', async (value) => {
     mockServiceWorker.register.mockResolvedValueOnce(value);
 
@@ -149,11 +146,12 @@ describe('registerOfflineServiceWorker', () => {
     expect(result).toBe(false);
   });
 
-  it('reports the original script load failure without promising an unimplemented retry', async () => {
+  it('reports a persistent script load failure after one retry', async () => {
     const error = new TypeError('Script https://www.mirrorbuddy.org/sw.js load failed');
-    mockServiceWorker.register.mockRejectedValueOnce(error);
+    mockServiceWorker.register.mockRejectedValue(error);
 
     expect(await registerOfflineServiceWorker()).toBe(false);
+    expect(mockServiceWorker.register).toHaveBeenCalledTimes(2);
     expect(logger.error).not.toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalledWith('[Offline SW] Registration failed', {
       errorName: 'TypeError',
@@ -171,6 +169,16 @@ describe('registerOfflineServiceWorker', () => {
     expect(logger.warn).toHaveBeenCalledWith('[Offline SW] Registration failed', {
       errorName: 'Error',
     });
+  });
+
+  it('recovers a transient script download failure with one registration retry', async () => {
+    mockServiceWorker.register.mockRejectedValueOnce(
+      new TypeError('Script https://www.mirrorbuddy.org/sw.js load failed'),
+    );
+
+    expect(await registerOfflineServiceWorker()).toBe(true);
+    expect(mockServiceWorker.register).toHaveBeenCalledTimes(2);
+    expect(logger.warn).not.toHaveBeenCalled();
   });
 
   // ============================================================================
@@ -223,9 +231,6 @@ describe('registerOfflineServiceWorker', () => {
     );
   });
 
-  // ============================================================================
-  // Multiple registrations
-  // ============================================================================
   it('should be idempotent when called multiple times', async () => {
     // Call multiple times rapidly
     const results = await Promise.all([

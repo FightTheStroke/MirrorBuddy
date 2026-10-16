@@ -38,16 +38,6 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-# Cleanup dev server on any exit (set -e, SIGINT, etc.)
-SMOKE_SERVER_PID=""
-cleanup_smoke_server() {
-	if [[ -n "$SMOKE_SERVER_PID" ]]; then
-		kill "$SMOKE_SERVER_PID" 2>/dev/null || true
-		wait "$SMOKE_SERVER_PID" 2>/dev/null || true
-	fi
-}
-trap cleanup_smoke_server EXIT
-
 echo ""
 echo "=========================================="
 echo " RELEASE FAST (PR-LIKE) - MIRRORBUDDY"
@@ -71,25 +61,9 @@ echo -e "${GREEN}✓ Unit tests passed${NC}"
 
 echo ""
 echo -e "${BLUE}[4/5] E2E smoke...${NC}"
-if ! curl -sf --max-time 3 "http://localhost:${MB_PORT}/api/health" >/dev/null 2>&1; then
-	echo -e "${YELLOW}↪ Dev server not running, starting on :${MB_PORT}...${NC}"
-	PORT="$MB_PORT" npm run dev >/dev/null 2>&1 &
-	SMOKE_SERVER_PID=$!
-	for i in $(seq 1 30); do
-		if curl -sf --max-time 2 "http://localhost:${MB_PORT}/api/health" >/dev/null 2>&1; then
-			echo -e "${GREEN}  Server ready${NC}"
-			break
-		fi
-		[ "$i" -eq 30 ] && echo -e "${YELLOW}↪ Server not ready after 60s, skipping smoke${NC}"
-		sleep 2
-	done
-fi
-if curl -sf --max-time 3 "http://localhost:${MB_PORT}/api/health" >/dev/null 2>&1; then
-	MIRRORBUDDY_PORT="$MB_PORT" npm run test:e2e:smoke
-	echo -e "${GREEN}✓ Smoke E2E passed${NC}"
-else
-	echo -e "${YELLOW}↪ Skipping E2E smoke: server unavailable${NC}"
-fi
+# Playwright owns the isolated server and fails if startup or smoke checks fail.
+MIRRORBUDDY_PORT="$MB_PORT" npm run test:e2e:smoke
+echo -e "${GREEN}✓ Smoke E2E passed${NC}"
 echo ""
 echo -e "${BLUE}[5/5] Build (optional parity)...${NC}"
 if [ "${RELEASE_FAST_SKIP_BUILD:-0}" = "1" ]; then
