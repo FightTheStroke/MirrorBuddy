@@ -6,9 +6,9 @@ import { initializeMindmap, readMindmap, modifyMindmap } from '../service';
 import type { MindmapOwner } from '../storage';
 import { saveOwnedMaterial, updateOwnedMaterial } from '@/app/api/materials/ownership';
 import { saveMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
+import { policyTestDatabaseEnabled } from '@/test/policy-test-environment';
 
-const localUrl = 'postgresql://Roberdan@localhost:5432/mirrorbuddy_test';
-const enabled = process.env.TEST_DATABASE_URL === localUrl && process.env.DATABASE_URL === localUrl;
+const enabled = policyTestDatabaseEnabled();
 const content = {
   title: 'Cells',
   nodes: [{ id: 'root', label: 'Cell', color: '#123456', children: [] }],

@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Preserve optional tool arguments, forced tool choices, token usage, content filtering
   and bounded retries. Other models and tool-free streaming keep their existing paths.
 - Persistent failures still reach the existing error state and monitoring.
+- Make fast-release browser smoke checks mandatory and let Playwright own the isolated
+  server, preventing duplicate startup and false success when no server is available.
 
 ## [0.43.3] - 2026-10-04
 
