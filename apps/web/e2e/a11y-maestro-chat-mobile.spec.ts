@@ -57,9 +57,13 @@ async function openMaestroChat(page: Page, width: number) {
 
 async function sendMessage(page: Page) {
   const field = page.locator('textarea');
-  await field.focus();
-  await field.fill('Mi aiuti con le equazioni?');
-  await page.keyboard.press('Enter');
+  const send = page.getByRole('button', { name: 'Invia messaggio' });
+  // Confirm React accepted the draft before exercising keyboard submission.
+  await expect(async () => {
+    await field.fill('Mi aiuti con le equazioni?');
+    await expect(send).toBeEnabled();
+  }).toPass({ timeout: 15000 });
+  await field.press('Enter');
   await expect(page.locator('.rounded-br-md').first()).toBeVisible();
   await expect(page.getByText('Certo, partiamo dalle equazioni.')).toBeVisible();
   await waitForSettledMessages(page);

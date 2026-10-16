@@ -107,7 +107,8 @@ export default defineConfig({
 
   // Visual regression settings for screenshot comparisons
   snapshotDir: path.join(__dirname, 'e2e', 'full-ui-audit', '__snapshots__'),
-  snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-{platform}{ext}',
+  snapshotPathTemplate:
+    '{snapshotDir}/{testFileDir}/{testFileName}-{arg}-{projectName}-{platform}{ext}',
 
   use: {
     baseURL: appBaseURL,

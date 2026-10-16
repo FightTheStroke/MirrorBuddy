@@ -15,7 +15,7 @@ import { test, expect } from './fixtures';
 import { locales, localeNames, type Locale } from '@/i18n/config';
 
 // Unauthenticated public welcome page.
-test.use({ storageState: undefined });
+test.use({ storageState: { cookies: [], origins: [] } });
 
 const RELOAD_PROBE = '__mbSoftNavProbe';
 
@@ -38,10 +38,12 @@ async function switchLocaleViaSwitcher(
 ): Promise<void> {
   const trigger = page.locator('button[aria-haspopup="menu"]').first();
   await expect(trigger).toBeVisible();
-  await trigger.click();
-
   const menu = page.getByRole('menu');
-  await expect(menu).toBeVisible();
+  // SSR can expose the trigger before its React handler is attached.
+  await expect(async () => {
+    if (!(await menu.isVisible())) await trigger.click();
+    await expect(menu).toBeVisible();
+  }).toPass({ timeout: 15000 });
 
   await menu.getByRole('menuitem', { name: localeNames[target] }).click();
   await page.waitForURL(new RegExp(`/${target}/welcome`));

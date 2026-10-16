@@ -194,6 +194,11 @@ valid forced function call in a live, synthetic test.
   approval and synthetic data.
 - A successful provider test is not a production rollout. Keep the Sentry issues
   open until the corrected release is deployed and the affected flows are checked.
+- Browser verification must audit the final welcome page after anonymous home or
+  legacy landing redirects, not an intermediate redirect document. Wait for usable
+  controls before language switches and chat submission. Screenshot baseline names
+  include the screenshot argument, browser/device project and platform; missing
+  baselines are not successful visual comparisons.
 
 ## References
 

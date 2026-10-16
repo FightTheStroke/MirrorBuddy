@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Persistent failures still reach the existing error state and monitoring.
 - Make fast-release browser smoke checks mandatory and let Playwright own the isolated
   server, preventing duplicate startup and false success when no server is available.
+- Keep screenshot baselines separate by screenshot name, browser/device project and
+  platform. Browser checks wait for redirected pages and interactive controls before
+  auditing accessibility, switching language or sending a message.
 
 ### Security
 
