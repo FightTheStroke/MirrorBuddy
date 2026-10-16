@@ -25,12 +25,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keep screenshot baselines separate by screenshot name, browser/device project and
   platform. Browser checks wait for redirected pages and interactive controls before
   auditing accessibility, switching language or sending a message.
+- Establish visual regression references from the independently rebuilt 0.43.3 source
+  and its original lockfile, with recorded image hashes. Assert release labels before
+  masking their intentional version change; absent settings actions are reported as
+  skipped rather than passing without a comparison.
 
 ### Security
 
 - Update Next.js within the 16.3 patch line, Capacitor, Sharp, and affected transitive
-  dependencies to available patched versions. Full release acceptance still requires
-  the dependency audit; an unpatched development-tool advisory is not a clean audit.
+  dependencies to available patched versions. The remaining development-only
+  `braces@3.0.3` advisory has an explicitly approved, narrowly scoped exception through
+  October 23, 2026; the raw audit is not clean. Other high or critical findings and
+  production exposure remain blocking.
 
 ## [0.43.3] - 2026-10-04
 

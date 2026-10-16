@@ -38,6 +38,7 @@ function fixture(expiredKind?: string) {
     writeFileSync(join(directory, `${kind}.scope.json`), JSON.stringify(scope), { mode: 0o600 });
   }
   const save = () => {
+    writeFileSync(join(directory, 'audit.context.json'), '{"rawExitCode":0}');
     for (const [name, report] of Object.entries(data)) {
       writeFileSync(join(directory, `${name}.json`), JSON.stringify(report));
     }
@@ -53,6 +54,7 @@ function fixture(expiredKind?: string) {
           version: 1,
           kind,
           exitCode: 0,
+          rawExitCode: kind === 'audit' ? 0 : undefined,
           identity,
           command: recipe(kind, directory),
           startedAt: Date.now() - age - 10,

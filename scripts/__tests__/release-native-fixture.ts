@@ -81,6 +81,7 @@ export function nativeEvidenceFixture(root = '/source') {
       ],
     },
     audit: {
+      advisories: {},
       metadata: {
         vulnerabilities: { info: 0, low: 0, moderate: 0, high: 0, critical: 0 },
       },

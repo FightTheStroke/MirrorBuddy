@@ -1,0 +1,39 @@
+{
+  "purpose": "Regression reference from the deployed 0.43.3 source, not human design approval",
+  "capturedOn": "2026-10-16",
+  "reference": {
+    "version": "0.43.3",
+    "commit": "e0cf0465a56b487de1f4b11d554b504d9e53e3c3",
+    "lockfileSha256": "bb55fea76285663bca42e840976f1d620c7774816dc720264ba0e39773597495",
+    "buildId": "xz6GzygBSFml3akcdL3Y3",
+    "applicationChanges": [],
+    "harnessChanges": [
+      "Separate baseline names by screenshot argument, project and platform",
+      "Assert the checkout version before masking only its intentionally changing label",
+      "Report absent settings actions as skipped instead of passing without a screenshot"
+    ]
+  },
+  "environment": {
+    "node": "24.22.0",
+    "playwright": "1.59.1",
+    "browser": "Chromium 1217",
+    "platform": "darwin",
+    "project": "chromium",
+    "viewports": {
+      "desktop": { "width": 1280, "height": 720 },
+      "mobile": { "width": 375, "height": 667 }
+    }
+  },
+  "images": {
+    "full-ui-audit/visual-regression.spec.ts-admin-dashboard-desktop-chromium-darwin.png": "e96e6245d9e55f094437244b243660dc43e91132de3f07a0bad581219db2215e",
+    "full-ui-audit/visual-regression.spec.ts-admin-dashboard-mobile-chromium-darwin.png": "086aa4d601fa7dc979ee2d7693dcb777b253460e097478a0b6e8a42f8f7b746c",
+    "full-ui-audit/visual-regression.spec.ts-astuccio-desktop-chromium-darwin.png": "c689b1cc8829bad21cad33ef9d6887b904c79ce1f1079191972056c15bc03108",
+    "full-ui-audit/visual-regression.spec.ts-astuccio-mobile-chromium-darwin.png": "c1e3e4ff575f0fd2896db4b63742607337a1f405a440a83b7e183f0d3397a200",
+    "full-ui-audit/visual-regression.spec.ts-home-desktop-chromium-darwin.png": "440e3944cf171faa59a1738382e6f4eb301347e9e8c9b1f4f850411cae0fe4ae",
+    "full-ui-audit/visual-regression.spec.ts-home-mobile-chromium-darwin.png": "f3a687fc4d001a29b809a6e021da10b646a3f70fceeff2013cbc010e3a58c904",
+    "full-ui-audit/visual-regression.spec.ts-landing-desktop-chromium-darwin.png": "48b40101ef1ec60f8c79fb846f254af307ea2330ba7ab8bfb804d4e3b7127500",
+    "full-ui-audit/visual-regression.spec.ts-landing-mobile-chromium-darwin.png": "4e5908b3a3702725069fcbe86c64f1fe170f8684a0197fe604d2e2e0075b569c",
+    "full-ui-audit/visual-regression.spec.ts-welcome-desktop-chromium-darwin.png": "48b40101ef1ec60f8c79fb846f254af307ea2330ba7ab8bfb804d4e3b7127500",
+    "full-ui-audit/visual-regression.spec.ts-welcome-mobile-chromium-darwin.png": "a8c13c16b41a17ea29d4dfeb1509bb0b6ab50bad6b34629a7e02ee24c3283676"
+  }
+}

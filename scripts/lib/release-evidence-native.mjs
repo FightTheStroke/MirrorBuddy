@@ -1,4 +1,5 @@
 import coverageLibrary from 'istanbul-lib-coverage';
+import { evaluateAudit } from './release-audit-exception.mjs';
 
 const count = (value) => Number.isSafeInteger(value) && value >= 0;
 const reject = (message) => {
@@ -133,18 +134,8 @@ export function validateBrowser(report) {
   };
 }
 
-export function validateAudit(audit) {
-  const vulnerabilities = audit?.metadata?.vulnerabilities;
-  if (
-    audit?.error ||
-    !vulnerabilities ||
-    !['info', 'low', 'moderate', 'high', 'critical'].every((key) => count(vulnerabilities[key])) ||
-    vulnerabilities.high !== 0 ||
-    vulnerabilities.critical !== 0
-  ) {
-    reject('Missing, failed, or high-severity dependency audit');
-  }
-  return vulnerabilities;
+export function validateAudit(audit, context = { rawExitCode: 0 }) {
+  return evaluateAudit(audit, context);
 }
 
 export function validateNativeEvidence(evidence) {
@@ -153,6 +144,6 @@ export function validateNativeEvidence(evidence) {
     unit: validateUnit(evidence.unit),
     coverage: validateCoverage(evidence.coverage),
     e2e: validateBrowser(evidence.e2e),
-    audit: validateAudit(evidence.audit),
+    audit: validateAudit(evidence.audit, evidence.auditContext),
   };
 }

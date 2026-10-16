@@ -69,20 +69,24 @@ function auditFixture() {
   const state = fixture();
   const identity = inputIdentity(state.root, {});
   const audit = JSON.stringify({
+    advisories: {},
     metadata: {
       vulnerabilities: { info: 0, low: 0, moderate: 0, high: 0, critical: 0 },
     },
   });
   writeFileSync(join(state.directory, 'audit.json'), audit);
+  const context = '{"rawExitCode":0}';
+  writeFileSync(join(state.directory, 'audit.context.json'), context);
   const receipt = {
     version: 1,
     kind: 'audit',
     exitCode: 0,
+    rawExitCode: 0,
     identity,
     command: recipe('audit', state.directory),
     startedAt: Date.now() - 10,
     finishedAt: Date.now(),
-    reportHashes: { 'audit.json': digest(audit) },
+    reportHashes: { 'audit.json': digest(audit), 'audit.context.json': digest(context) },
   };
   const save = () =>
     writeFileSync(join(state.directory, 'audit.receipt.json'), JSON.stringify(receipt));
