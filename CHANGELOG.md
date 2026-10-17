@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Update KaTeX to 0.18.2 (GHSA-238p-pmpm-9mq7) and stop trusting links, HTML ids/classes
+  and images inside AI-generated formulas.
+
+### Fixed
+
+- Load the formula stylesheet from the installed KaTeX version instead of an older CDN copy.
+
 ## [0.43.5] - 2026-10-17
 
 - No user-facing changes recorded.

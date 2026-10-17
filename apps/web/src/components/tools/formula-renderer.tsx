@@ -1,22 +1,14 @@
 'use client';
 
+import 'katex/dist/katex.min.css';
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { clientLogger as logger } from '@/lib/logger/client';
 import type { FormulaRequest } from '@/types';
 
-// Lazy load KaTeX CSS - only loaded once
-let katexCssLoaded = false;
-const loadKatexCss = () => {
-  if (katexCssLoaded || typeof document === 'undefined') return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css';
-  link.crossOrigin = 'anonymous';
-  document.head.appendChild(link);
-  katexCssLoaded = true;
-};
+// Formulas come from AI output: never enable KaTeX `trust` (links, HTML ids/classes, images).
+const KATEX_OPTIONS = { throwOnError: false, errorColor: '#ef4444', strict: false } as const;
 
 interface FormulaRendererProps {
   request: FormulaRequest;
@@ -35,16 +27,9 @@ export function FormulaRenderer({ request, className, displayMode = true }: Form
     const renderFormula = async () => {
       try {
         setError(null);
-        loadKatexCss();
         const katex = (await import('katex')).default;
         if (containerRef.current) {
-          katex.render(request.latex, containerRef.current, {
-            displayMode,
-            throwOnError: false,
-            errorColor: '#ef4444',
-            trust: true,
-            strict: false,
-          });
+          katex.render(request.latex, containerRef.current, { ...KATEX_OPTIONS, displayMode });
         }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
@@ -100,14 +85,9 @@ export function InlineFormula({ latex, className }: InlineFormulaProps) {
 
     const renderInlineFormula = async () => {
       try {
-        loadKatexCss();
         const katex = (await import('katex')).default;
         if (containerRef.current) {
-          katex.render(latex, containerRef.current, {
-            displayMode: false,
-            throwOnError: false,
-            errorColor: '#ef4444',
-          });
+          katex.render(latex, containerRef.current, { ...KATEX_OPTIONS, displayMode: false });
         }
       } catch (err) {
         logger.error('KaTeX error', { error: String(err) });
