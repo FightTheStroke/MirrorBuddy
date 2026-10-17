@@ -54,6 +54,7 @@
     "errorMicUnavailable": "I can't use the microphone. Check that it's connected.",
     "errorMicNotAllowed": "To talk, ask a grown-up to turn on the microphone.",
     "errorConnectionFailed": "Something went wrong with voice. Try again soon!",
+    "errorContentFiltered": "I can't answer that for safety reasons. Try asking something else!",
     "configError": {
       "title": "Missing Configuration",
       "subtitle": "Voice mode is not configured correctly",

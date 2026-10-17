@@ -54,6 +54,7 @@
     "errorMicUnavailable": "Je ne peux pas utiliser le micro. Vérifie qu'il est branché.",
     "errorMicNotAllowed": "Pour parler, demande à un grand d'activer le micro.",
     "errorConnectionFailed": "Quelque chose n'a pas marché avec la voix. Réessaie bientôt !",
+    "errorContentFiltered": "Je ne peux pas répondre à ça pour des raisons de sécurité. Essaie de poser une autre question !",
     "configError": {
       "title": "Configuration manquante",
       "subtitle": "Le mode vocal n'est pas configuré correctement",

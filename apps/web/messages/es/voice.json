@@ -54,6 +54,7 @@
     "errorMicUnavailable": "No puedo usar el micrófono. Comprueba que esté conectado.",
     "errorMicNotAllowed": "Para hablar, pide a un adulto que active el micrófono.",
     "errorConnectionFailed": "Algo no funcionó con la voz. ¡Inténtalo pronto!",
+    "errorContentFiltered": "No puedo responder a eso por razones de seguridad. ¡Intenta preguntar otra cosa!",
     "configError": {
       "title": "Configuración faltante",
       "subtitle": "El modo de voz no está configurado correctamente",

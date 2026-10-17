@@ -16,7 +16,8 @@ export type VoiceErrorCode =
   | 'VOICE_CONFIG_UNAVAILABLE'
   | 'MIC_UNAVAILABLE'
   | 'MIC_NOT_ALLOWED'
-  | 'VOICE_CONNECTION_FAILED';
+  | 'VOICE_CONNECTION_FAILED'
+  | 'VOICE_CONTENT_FILTERED';
 
 /**
  * Error carrying a stable {@link VoiceErrorCode}. `message` is set to the code
@@ -58,6 +59,7 @@ const VOICE_ERROR_CODES: VoiceErrorCode[] = [
   'MIC_UNAVAILABLE',
   'MIC_NOT_ALLOWED',
   'VOICE_CONNECTION_FAILED',
+  'VOICE_CONTENT_FILTERED',
 ];
 
 /** Maps a VoiceErrorCode to its i18n key under the `voice` namespace. */
@@ -69,4 +71,5 @@ export const VOICE_ERROR_I18N_KEYS: Record<VoiceErrorCode, string> = {
   MIC_UNAVAILABLE: 'errorMicUnavailable',
   MIC_NOT_ALLOWED: 'errorMicNotAllowed',
   VOICE_CONNECTION_FAILED: 'errorConnectionFailed',
+  VOICE_CONTENT_FILTERED: 'errorContentFiltered',
 };

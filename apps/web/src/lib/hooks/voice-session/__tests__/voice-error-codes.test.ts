@@ -40,6 +40,12 @@ describe('getVoiceErrorCode', () => {
     expect(getVoiceErrorCode(wrapped)).toBeNull();
   });
 
+  it('extracts VOICE_CONTENT_FILTERED from a VoiceError', () => {
+    expect(getVoiceErrorCode(new VoiceError('VOICE_CONTENT_FILTERED'))).toBe(
+      'VOICE_CONTENT_FILTERED',
+    );
+  });
+
   it('returns null for a plain error without a code', () => {
     expect(getVoiceErrorCode(new Error('Connection failed'))).toBeNull();
     expect(getVoiceErrorCode('string error')).toBeNull();
@@ -57,6 +63,7 @@ describe('VOICE_ERROR_I18N_KEYS', () => {
       'MIC_UNAVAILABLE',
       'MIC_NOT_ALLOWED',
       'VOICE_CONNECTION_FAILED',
+      'VOICE_CONTENT_FILTERED',
     ];
     for (const code of codes) {
       expect(VOICE_ERROR_I18N_KEYS[code]).toMatch(/^error[A-Z]/);
