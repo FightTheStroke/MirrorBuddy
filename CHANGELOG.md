@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.43.6] - 2026-10-17
+
 ### Security
 
 - Update KaTeX to 0.18.2 (GHSA-238p-pmpm-9mq7) and stop trusting links, HTML ids/classes
