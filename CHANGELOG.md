@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `response.done` with `status: "failed"` + `status_details.error`, or
   `status: "incomplete"` + `status_details.reason === "content_filter"`.
 
+## [0.43.7] - 2026-10-17
+
+- No user-facing changes recorded.
+
 ## [0.43.6] - 2026-10-17
 
 ### Security
