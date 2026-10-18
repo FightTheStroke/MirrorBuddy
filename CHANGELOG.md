@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.43.9] - 2026-10-18
+
 ### Security
 
 - Accessible print/export: numeric accessibility settings (font size, line
