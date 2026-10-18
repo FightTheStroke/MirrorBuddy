@@ -40,7 +40,9 @@ function generateAccessibleHtml(options: PrintOptions): string {
     showWatermark = true,
   } = options;
 
-  const styles = getAccessibilityStyles(accessibility);
+  // A `<` in CSS can only serve to close the <style> element; encode it as the
+  // CSS escape `\3c ` so no settings value can break out of the block.
+  const styles = getAccessibilityStyles(accessibility).replace(/</g, '\\3c ');
 
   let contentHtml = '';
   switch (contentType) {
