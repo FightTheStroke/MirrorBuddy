@@ -34,4 +34,27 @@ describe('getAccessibilityStyles', () => {
     const css = getAccessibilityStyles({ customBackgroundColor: 'evil;}</style>' });
     expect(css).toContain('#ffffff');
   });
+
+  it('ignores a non-numeric line spacing that tries to close the style tag', () => {
+    const malicious = '1.5;}</style><script>alert(1)</script>' as unknown as number;
+    const css = getAccessibilityStyles({ lineSpacing: malicious });
+    expect(css).not.toContain('<script>');
+    expect(css).not.toContain('</style>');
+    expect(css).toContain('line-height: 1.5;');
+  });
+
+  it('ignores a non-numeric font size', () => {
+    const css = getAccessibilityStyles({ fontSize: '2;}</style>' as unknown as number });
+    expect(css).not.toContain('</style>');
+    expect(css).not.toContain('NaN');
+  });
+
+  it('keeps legitimate values and clamps extreme ones to a readable range', () => {
+    expect(getAccessibilityStyles({ fontSize: 1.3, lineSpacing: 1.4 })).toContain(
+      'line-height: 1.4;',
+    );
+    const css = getAccessibilityStyles({ fontSize: 100, lineSpacing: 50 });
+    expect(css).toContain('font-size: 48px;');
+    expect(css).toContain('line-height: 3;');
+  });
 });

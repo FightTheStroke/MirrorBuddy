@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Accessible print/export: numeric accessibility settings (font size, line
+  spacing) are now coerced to finite numbers within a readable range before
+  reaching the print stylesheet, and any `<` in the generated CSS is encoded,
+  so no settings value can close the `<style>` element (CodeQL
+  `js/html-constructed-from-input`, alert #125).
+
 ## [0.43.8] - 2026-10-18
 
 ### Fixed

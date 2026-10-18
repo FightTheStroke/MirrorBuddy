@@ -13,19 +13,27 @@ function sanitizeCssColor(value: string | undefined, fallback: string): string {
   return SAFE_CSS_COLOR.test(trimmed) ? trimmed : fallback;
 }
 
+// Numeric settings come from persisted, user-editable state: only a finite
+// positive number within a readable range may reach the CSS, never a string.
+function readableNumber(value: unknown, fallback: number, min: number, max: number): number {
+  const parsed =
+    typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : Number.NaN;
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
+  return Math.min(Math.max(parsed, min), max);
+}
+
 export function getAccessibilityStyles(settings: Partial<AccessibilitySettings>): string {
   const fontFamily = settings.dyslexiaFont
     ? "'OpenDyslexic', 'Comic Sans MS', Arial, sans-serif"
     : "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 
-  const baseFontSize = settings.fontSize || 1;
+  const baseFontSize = readableNumber(settings.fontSize, 1, 0.5, 3);
   const dyslexiaMultiplier = settings.dyslexiaFont ? 1.4 : 1;
   const largeTextMultiplier = settings.largeText ? 1.2 : 1;
   const fontSize = `${baseFontSize * dyslexiaMultiplier * largeTextMultiplier * 16}px`;
 
-  const lineHeight = settings.increasedLineHeight
-    ? Math.max(settings.lineSpacing || 1.5, 1.8)
-    : settings.lineSpacing || 1.5;
+  const lineSpacing = readableNumber(settings.lineSpacing, 1.5, 1, 3);
+  const lineHeight = settings.increasedLineHeight ? Math.max(lineSpacing, 1.8) : lineSpacing;
 
   const letterSpacing = settings.extraLetterSpacing ? '0.05em' : 'normal';
 
