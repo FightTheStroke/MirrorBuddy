@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
-import { isTransientVoiceNotice } from '@/lib/hooks/voice-session/voice-error-codes';
+import {
+  isTransientVoiceNotice,
+  VOICE_ERROR_I18N_KEYS,
+} from '@/lib/hooks/voice-session/voice-error-codes';
+import { useTransientVoiceNotice } from '@/lib/hooks/voice-session/use-transient-voice-notice';
 import { logger } from '@/lib/logger';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import type { VoiceConnectionInfo, ExistingUserData } from '../types';
@@ -17,15 +22,21 @@ export function useWelcomeVoice(
   const [voiceRetryAttempts, setVoiceRetryAttempts] = useState(0);
   const voiceRetryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastTranscriptRef = useRef<string | null>(null);
+  const tVoice = useTranslations('voice');
+  const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
+  const showTransientNotice = useTransientVoiceNotice(setVoiceNotice);
 
   const { addVoiceTranscript } = useOnboardingStore();
 
   const voiceSession = useVoiceSession({
     noiseReductionType: 'far_field',
     onError: (error) => {
-      // A filtered turn is not a connection failure: it must not consume
-      // retries or switch onboarding to the Web Speech fallback.
-      if (isTransientVoiceNotice(error)) return;
+      // A filtered turn is not a connection failure: tell the child briefly,
+      // but do not consume retries or switch to the Web Speech fallback.
+      if (isTransientVoiceNotice(error)) {
+        showTransientNotice(tVoice(VOICE_ERROR_I18N_KEYS.VOICE_CONTENT_FILTERED));
+        return;
+      }
 
       const message = error instanceof Error ? error.message : String(error);
 
@@ -93,6 +104,7 @@ export function useWelcomeVoice(
 
   return {
     voiceSession,
+    voiceNotice,
     useWebSpeechFallback,
     setUseWebSpeechFallback,
     handleAzureUnavailable,

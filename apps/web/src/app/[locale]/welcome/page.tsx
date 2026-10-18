@@ -40,7 +40,7 @@ function WelcomeContent() {
   // Defer voice connection check until onboarding starts (not needed for landing page)
   const { connectionInfo, hasCheckedAzure, useWebSpeechFallback, setUseWebSpeechFallback } =
     useVoiceConnection(!showLandingPage);
-  const { voiceSession, handleAzureUnavailable } = useWelcomeVoice(
+  const { voiceSession, voiceNotice, handleAzureUnavailable } = useWelcomeVoice(
     existingUserData,
     connectionInfo,
   );
@@ -159,6 +159,13 @@ function WelcomeContent() {
               />
             </motion.div>
           </AnimatePresence>
+          <div role="status" aria-live="polite" data-testid="welcome-voice-notice">
+            {voiceNotice && (
+              <p className="mt-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100">
+                {voiceNotice}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
