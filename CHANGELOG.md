@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Voice realtime: Azure content-filter rejections now surface as a calm, localized
+  notice (`VOICE_CONTENT_FILTERED`, it/en/fr/de/es) instead of a generic
+  provider-leaking message or a silently dropped turn. Covers both an `error`
+  event with `error.code`/`type === "content_filter"` and a terminal
+  `response.done` with `status: "failed"` + `status_details.error`, or
+  `status: "incomplete"` + `status_details.reason === "content_filter"`.
+  The notice clears itself after a few seconds and never disables starting the
+  next voice call; on the welcome page it shows briefly and no longer counts as
+  a connection retry.
+
 ## [0.43.7] - 2026-10-17
 
 - No user-facing changes recorded.

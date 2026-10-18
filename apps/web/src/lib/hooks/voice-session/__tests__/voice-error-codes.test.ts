@@ -9,9 +9,25 @@ import { describe, it, expect } from 'vitest';
 import {
   VoiceError,
   getVoiceErrorCode,
+  isTransientVoiceNotice,
   VOICE_ERROR_I18N_KEYS,
   type VoiceErrorCode,
 } from '../voice-error-codes';
+
+describe('isTransientVoiceNotice', () => {
+  it('treats a content-filtered turn as a transient notice', () => {
+    expect(isTransientVoiceNotice(new VoiceError('VOICE_CONTENT_FILTERED'))).toBe(true);
+    expect(isTransientVoiceNotice({ code: 'VOICE_CONTENT_FILTERED' })).toBe(true);
+  });
+
+  it('keeps connection and configuration failures persistent', () => {
+    expect(isTransientVoiceNotice(new VoiceError('VOICE_CONNECTION_FAILED'))).toBe(false);
+    expect(isTransientVoiceNotice(new VoiceError('VOICE_CONFIG_UNAVAILABLE'))).toBe(false);
+    expect(isTransientVoiceNotice(new Error('content_filter'))).toBe(false);
+    expect(isTransientVoiceNotice(undefined)).toBe(false);
+    expect(isTransientVoiceNotice(null)).toBe(false);
+  });
+});
 
 describe('VoiceError', () => {
   it('carries the code on both .code and .message', () => {
@@ -40,6 +56,12 @@ describe('getVoiceErrorCode', () => {
     expect(getVoiceErrorCode(wrapped)).toBeNull();
   });
 
+  it('extracts VOICE_CONTENT_FILTERED from a VoiceError', () => {
+    expect(getVoiceErrorCode(new VoiceError('VOICE_CONTENT_FILTERED'))).toBe(
+      'VOICE_CONTENT_FILTERED',
+    );
+  });
+
   it('returns null for a plain error without a code', () => {
     expect(getVoiceErrorCode(new Error('Connection failed'))).toBeNull();
     expect(getVoiceErrorCode('string error')).toBeNull();
@@ -57,6 +79,7 @@ describe('VOICE_ERROR_I18N_KEYS', () => {
       'MIC_UNAVAILABLE',
       'MIC_NOT_ALLOWED',
       'VOICE_CONNECTION_FAILED',
+      'VOICE_CONTENT_FILTERED',
     ];
     for (const code of codes) {
       expect(VOICE_ERROR_I18N_KEYS[code]).toMatch(/^error[A-Z]/);

@@ -117,6 +117,7 @@
     "errorMicUnavailable": "Non riesco a usare il microfono. Controlla che sia collegato.",
     "errorMicNotAllowed": "Per parlare, fai sì che un grande attivi il microfono.",
     "errorConnectionFailed": "Qualcosa non ha funzionato con la voce. Riprova tra poco!",
+    "errorContentFiltered": "Non posso rispondere a questa richiesta per motivi di sicurezza. Prova a chiedere qualcos'altro!",
     "configError": {
       "title": "Configurazione Mancante",
       "subtitle": "La modalità vocale non è configurata correttamente",

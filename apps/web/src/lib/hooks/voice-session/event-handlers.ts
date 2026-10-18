@@ -10,6 +10,7 @@ import { createVoiceUsageTracker } from './voice-usage-tracker';
 import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
 import { recordUserSpeechEnd } from './latency-utils';
 import { handleErrorEvent } from './error-handler';
+import { VoiceError } from './voice-error-codes';
 import { computeVoiceTimingDurations } from './voice-timing';
 import type { SafetyWarningState } from './safety-intervention';
 import type { AudioChunkQueue } from './audio-queue';
@@ -61,6 +62,32 @@ function pauseVoiceAudio(deps: EventHandlerDeps): void {
   });
   deps.scheduledSourcesRef.current.clear();
   deps.setSpeaking(false);
+}
+
+/**
+ * True when a terminal `response.done` carries Azure's content-filter
+ * rejection: `status: "failed"` with `status_details.error.code`, or
+ * `status: "incomplete"` with `status_details.reason`, both `content_filter`.
+ * Reads only the enum-like status fields - never free-text error content.
+ */
+function contentFilterReasonFromResponseDone(event: Record<string, unknown>): boolean {
+  const response = event.response;
+  if (!response || typeof response !== 'object') return false;
+  const { status, status_details: statusDetails } = response as {
+    status?: unknown;
+    status_details?: unknown;
+  };
+  if (!statusDetails || typeof statusDetails !== 'object') return false;
+  const details = statusDetails as { reason?: unknown; error?: unknown };
+  if (status === 'incomplete' && details.reason === 'content_filter') return true;
+  if (status === 'failed') {
+    const error = details.error;
+    if (error && typeof error === 'object') {
+      const { code, type } = error as { code?: unknown; type?: unknown };
+      if (code === 'content_filter' || type === 'content_filter') return true;
+    }
+  }
+  return false;
 }
 
 export function useHandleServerEvent(deps: EventHandlerDeps) {
@@ -219,12 +246,26 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
           // Streaming transcript - could show in UI
           break;
 
-        case 'response.done':
+        case 'response.done': {
           // If a meditation is waiting for its introduction to end, this is it.
           openingFinished();
           deps.hasActiveResponseRef.current = false;
           logger.debug('[VoiceSession] Response complete - hasActiveResponse = false');
+          // Azure reports a content-filter rejection as a terminal `response.done`
+          // rather than an `error` event: status "failed" with
+          // status_details.error.code, or status "incomplete" with
+          // status_details.reason, both set to "content_filter". Without this
+          // check the turn silently ends with hasActiveResponse already reset
+          // above (no stale pending state) but no notice ever reaches the UI.
+          const reportedContentFilter = contentFilterReasonFromResponseDone(event);
+          if (reportedContentFilter) {
+            logger.warn('[VoiceSession] Response terminated by content filter', {
+              code: 'content_filter',
+            });
+            deps.options.onError?.(new VoiceError('VOICE_CONTENT_FILTERED'));
+          }
           break;
+        }
 
         case 'response.cancelled':
           deps.hasActiveResponseRef.current = false;
