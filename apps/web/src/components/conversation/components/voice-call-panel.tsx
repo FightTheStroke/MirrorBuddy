@@ -19,6 +19,12 @@ import type { Maestro } from '@/types';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { getUserIdFromCookie } from '@/lib/auth';
 import { shouldEscalateVoiceError } from '@/lib/hooks/voice-session/error-classification';
+import {
+  isTransientVoiceNotice,
+  VOICE_ERROR_I18N_KEYS,
+} from '@/lib/hooks/voice-session/voice-error-codes';
+import { useTransientVoiceNotice } from '@/lib/hooks/voice-session/use-transient-voice-notice';
+import { useTranslations } from 'next-intl';
 
 interface VoiceConnectionInfo {
   provider: 'azure';
@@ -71,6 +77,8 @@ export function VoiceCallPanel({
 }: VoiceCallPanelProps) {
   const [connectionInfo, setConnectionInfo] = useState<VoiceConnectionInfo | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
+  const tVoice = useTranslations('voice');
+  const showTransientNotice = useTransientVoiceNotice(setConfigError);
   const hasAttemptedConnection = useRef(false);
   const conversationIdRef = useRef<string | null>(null);
   const _savedMessagesRef = useRef<Set<string>>(new Set());
@@ -85,6 +93,10 @@ export function VoiceCallPanel({
           component: 'VoiceCallPanel',
           message,
         });
+      }
+      if (isTransientVoiceNotice(error)) {
+        showTransientNotice(tVoice(VOICE_ERROR_I18N_KEYS.VOICE_CONTENT_FILTERED));
+        return;
       }
       setConfigError(message || 'Errore di connessione vocale');
     },

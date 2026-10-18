@@ -9,9 +9,25 @@ import { describe, it, expect } from 'vitest';
 import {
   VoiceError,
   getVoiceErrorCode,
+  isTransientVoiceNotice,
   VOICE_ERROR_I18N_KEYS,
   type VoiceErrorCode,
 } from '../voice-error-codes';
+
+describe('isTransientVoiceNotice', () => {
+  it('treats a content-filtered turn as a transient notice', () => {
+    expect(isTransientVoiceNotice(new VoiceError('VOICE_CONTENT_FILTERED'))).toBe(true);
+    expect(isTransientVoiceNotice({ code: 'VOICE_CONTENT_FILTERED' })).toBe(true);
+  });
+
+  it('keeps connection and configuration failures persistent', () => {
+    expect(isTransientVoiceNotice(new VoiceError('VOICE_CONNECTION_FAILED'))).toBe(false);
+    expect(isTransientVoiceNotice(new VoiceError('VOICE_CONFIG_UNAVAILABLE'))).toBe(false);
+    expect(isTransientVoiceNotice(new Error('content_filter'))).toBe(false);
+    expect(isTransientVoiceNotice(undefined)).toBe(false);
+    expect(isTransientVoiceNotice(null)).toBe(false);
+  });
+});
 
 describe('VoiceError', () => {
   it('carries the code on both .code and .message', () => {

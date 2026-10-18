@@ -5,8 +5,10 @@ import { logger } from '@/lib/logger';
 import { shouldEscalateVoiceError } from '@/lib/hooks/voice-session/error-classification';
 import {
   getVoiceErrorCode,
+  isTransientVoiceNotice,
   VOICE_ERROR_I18N_KEYS,
 } from '@/lib/hooks/voice-session/voice-error-codes';
+import { useTransientVoiceNotice } from '@/lib/hooks/voice-session/use-transient-voice-notice';
 import type { Maestro, ChatMessage } from '@/types';
 
 interface UseMaestroVoiceConnectionProps {
@@ -35,6 +37,7 @@ export function useMaestroVoiceConnection({
   const t = useTranslations('voice');
   const [isVoiceActive, setIsVoiceActive] = useState(initialMode === 'voice');
   const [configError, setConfigError] = useState<string | null>(null);
+  const showTransientNotice = useTransientVoiceNotice(setConfigError);
 
   // Resolve any voice error to a localized, child-friendly message.
   // Coded errors (VoiceError) map to dedicated keys; anything else falls back
@@ -85,6 +88,10 @@ export function useMaestroVoiceConnection({
           component: 'UseMaestroVoiceConnection',
           message,
         });
+      }
+      if (isTransientVoiceNotice(error)) {
+        showTransientNotice(resolveVoiceError(error));
+        return;
       }
       setConfigError(resolveVoiceError(error));
     },

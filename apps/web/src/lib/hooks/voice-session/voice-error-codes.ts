@@ -73,3 +73,12 @@ export const VOICE_ERROR_I18N_KEYS: Record<VoiceErrorCode, string> = {
   VOICE_CONNECTION_FAILED: 'errorConnectionFailed',
   VOICE_CONTENT_FILTERED: 'errorContentFiltered',
 };
+
+/**
+ * A content-filtered turn rejects one reply, not the connection: the session
+ * stays usable, so the UI shows it briefly and never keeps it as a persistent
+ * connection/configuration error that disables starting the next voice call.
+ */
+export function isTransientVoiceNotice(error: unknown): boolean {
+  return getVoiceErrorCode(error) === 'VOICE_CONTENT_FILTERED';
+}
