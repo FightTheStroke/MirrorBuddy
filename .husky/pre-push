@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# === CRITICAL GATES: Unit Tests + Debt + Vercel Sim ===
-# Typecheck is intentionally omitted here — pre-push-vercel.sh runs a full
-# production build which includes type checking. Avoids redundant double-check.
+# === PRE-PUSH GATES: related tests (full suite on critical paths) + debt + fast Vercel checks ===
+# No production build here: the CI "Build & Lint" job owns it. Opt in locally with PRE_PUSH_BUILD=1.
 
 # i18n validation (unconditional - ensures translation consistency)
 npm run i18n:check || exit 1
@@ -26,10 +25,34 @@ fi
 # Audit environment variables (ensures all process.env.X are documented)
 ./scripts/env-var-audit.sh || exit 1
 
-# Bound local process fan-out on shared machines without skipping any tests.
-echo "Running unit tests..."
+# Test selection (roberdan-os test rules): a push touching a .test-critical path runs the FULL unit
+# suite; any other push runs only the tests related to what it changed. No .test-critical, or no
+# resolvable origin/main, means the whole repo is critical (full suite).
+base=origin/main
+mode=full
+if [ -f .test-critical ] && [ -f scripts/test-rules/critical.mjs ] && git rev-parse --verify -q "$base" >/dev/null 2>&1; then
+  critical_report=$(node scripts/test-rules/critical.mjs "$base" 2>/dev/null || echo "critical=true")
+  if ! printf '%s\n' "$critical_report" | grep -q '^critical=true'; then mode=related; fi
+fi
+
 unit_log=$(mktemp "${TMPDIR:-/tmp}/mirrorbuddy-pre-push-unit.XXXXXX")
-if npm run test:unit -- --reporter=dot --maxWorkers=2 >"$unit_log" 2>&1; then
+if [ "$mode" = related ]; then
+  related_files=$(git diff --name-only --diff-filter=d "$base"...HEAD -- apps/web/src packages scripts | grep -E '\.(ts|tsx)$' | sed "s|^|$PWD/|" || true)
+  if [ -z "$related_files" ]; then
+    echo "pre-push: no unit-testable source changed, related tests skipped"
+    unit_cmd=()
+  else
+    echo "pre-push: running tests related to $(printf '%s\n' "$related_files" | wc -l | tr -d ' ') changed file(s)"
+    # shellcheck disable=SC2086
+    unit_cmd=(npx vitest related $related_files --run --root apps/web --passWithNoTests --reporter=dot --maxWorkers=2)
+  fi
+else
+  echo "pre-push: critical path touched or undeclared, running the FULL unit suite"
+  printf '%s\n' "${critical_report:-}" | grep '^match:' | head -5 || true
+  unit_cmd=(npm run test:unit -- --reporter=dot --maxWorkers=2)
+fi
+
+if [ "${#unit_cmd[@]}" -eq 0 ] || "${unit_cmd[@]}" >"$unit_log" 2>&1; then
   tail -5 "$unit_log"
   rm -- "$unit_log"
 else

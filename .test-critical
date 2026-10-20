@@ -1,0 +1,25 @@
+# Critical paths (roberdan-os test rules, docs/testing-template.md). One glob per line, then " # " and the reason.
+# A push whose diff touches one of these runs the FULL unit suite (.husky/pre-push); anything else runs only
+# the tests related to the changed files. The nightly workflow runs the full suite regardless.
+# Editing this file is itself critical. Start broad, narrow with a reason.
+apps/web/src/proxy.ts                    # only proxy: CSP headers, routing (307->404 when misplaced)
+apps/web/src/components/providers.tsx    # CSP nonces paired with the proxy headers
+apps/web/src/lib/safety/**               # child safety: bias, filtering, age enforcement
+packages/safety/**                       # shared safety implementation
+apps/web/src/lib/privacy/**              # GDPR/COPPA data handling
+apps/web/src/lib/compliance/**           # EU AI Act and compliance evidence
+apps/web/src/lib/auth/**                 # session, validateAuth, admin auth
+apps/web/src/lib/security/**             # CSRF, cookie signing, rate limiting
+apps/web/src/lib/tier/**                 # tier limits gate paid features and cost
+apps/web/src/lib/ai/**                   # AI provider routing, spend and fallbacks
+packages/ai-providers/**                 # shared AI provider implementation
+apps/web/prisma/**                       # schema and migrations: irreversible on a real database
+apps/web/vitest.config.ts                # test configuration: changes what every test means
+apps/web/src/test/**                     # shared test setup every file depends on
+package.json                             # root dependency set and scripts
+apps/web/package.json                    # app dependency set
+packages/*/package.json                  # package dependency sets
+pnpm-lock.yaml                           # dependency set
+tsconfig*.json                           # compiler settings for every file
+.test-critical                           # changing the list is critical
+.test-budget                             # changing the ceiling is critical

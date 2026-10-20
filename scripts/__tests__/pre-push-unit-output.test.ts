@@ -103,4 +103,37 @@ describe('pre-push unit diagnostics', () => {
     expect(result.status).toBe(7);
     expect(result.calls).toEqual(['run test:unit -- --reporter=dot --maxWorkers=2']);
   });
+
+  describe('test selection by .test-critical', () => {
+    function declare(changed: string) {
+      mkdirSync(join(fixture, 'scripts/test-rules'));
+      copyFileSync(
+        join(root, 'scripts/test-rules/critical.mjs'),
+        join(fixture, 'scripts/test-rules/critical.mjs'),
+      );
+      writeFileSync(join(fixture, '.test-critical'), 'apps/web/src/lib/safety/**  # safety\n');
+      executable(
+        'bin/git',
+        `if [ "$1" = diff ]; then printf '${changed}\\n'; else printf "1234567 unique commit\\n"; fi`,
+      );
+      executable('bin/npx', 'printf "%s\\n" "$*" >> "$CALLS"');
+    }
+
+    it('runs only related tests when no critical path changed', () => {
+      declare('apps/web/src/lib/utils/format.ts');
+      const result = run(0);
+      expect(result.status).toBe(0);
+      expect(result.output).toContain('running tests related to 1 changed file(s)');
+      expect(result.calls[0]).toMatch(/^vitest related .*apps\/web\/src\/lib\/utils\/format\.ts --run/);
+      expect(result.calls).not.toContain('run test:unit -- --reporter=dot --maxWorkers=2');
+    });
+
+    it('runs the full suite when a critical path changed', () => {
+      declare('apps/web/src/lib/safety/filter.ts');
+      const result = run(0);
+      expect(result.output).toContain('running the FULL unit suite');
+      expect(result.calls[0]).toBe('run test:unit -- --reporter=dot --maxWorkers=2');
+    });
+  });
 });
+
