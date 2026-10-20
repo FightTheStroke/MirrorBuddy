@@ -1,0 +1,56 @@
+name: nightly-tests
+
+# Full unit suite every night, plus the .test-budget ratchet (roberdan-os test rules).
+# PR CI stays as it is; this is the safety net for what related-test selection on push cannot see.
+on:
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-tests
+  cancel-in-progress: false
+
+jobs:
+  full-unit-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install ripgrep
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - run: npx prisma generate
+
+      - name: Full unit suite
+        id: suite
+        env:
+          NEXT_PUBLIC_SITE_URL: https://www.mirrorbuddy.org
+        run: |
+          start=$(date +%s)
+          npm run test:unit -- --reporter=dot
+          echo "wall=$(( $(date +%s) - start ))" >> "$GITHUB_OUTPUT"
+
+      - name: Test budget ratchet
+        if: always() && steps.suite.outputs.wall != ''
+        run: node scripts/test-rules/budget-check.mjs --wall "${{ steps.suite.outputs.wall }}"
+
+      - name: Test file count only (suite failed before finishing)
+        if: always() && steps.suite.outputs.wall == ''
+        run: node scripts/test-rules/budget-check.mjs

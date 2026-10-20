@@ -72,6 +72,7 @@ echo -e "${GREEN}✓ Proxy architecture OK${NC}"
 # =============================================================================
 # PHASE 2/5: FRESH PRISMA (simulates Vercel)
 # =============================================================================
+if [ "${PRE_PUSH_BUILD:-0}" = "1" ]; then
 echo -e "${BLUE}[2/5] Simulating Vercel fresh Prisma...${NC}"
 
 # Delete cached Prisma client to simulate Vercel's fresh build
@@ -102,6 +103,9 @@ if ! DISABLE_SENTRY_BUILD=true npm run build >"$TEMP_DIR/build.log" 2>&1; then
 fi
 release_build_lock
 echo -e "${GREEN}✓ Build passed${NC}"
+else
+	echo -e "${YELLOW}[2-3/5] Fresh Prisma + production build skipped (CI Build job owns it; PRE_PUSH_BUILD=1 to run)${NC}"
+fi
 
 # =============================================================================
 # PHASE 4/5: .env ↔ REQUIRED_VARS ALIGNMENT (ADR 0138)

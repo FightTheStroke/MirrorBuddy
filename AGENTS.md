@@ -119,9 +119,14 @@ task-state transitions and the global checkpoint; implementation alone is not ac
 - Pre-push (hook-enforced): the bash guard blocks standalone
   `npm run lint|typecheck|build|test:unit`, `gh run view --log`, and
   `git push --no-verify|--force`. Use `npm run ci:summary` instead.
-  The local hook always runs the full unit suite with two workers, including on
-  overloaded machines. Failures retain a private temporary log and print its path;
-  successful runs remove that log. Test selection and timeouts are unchanged.
+  Test rules (roberdan-os `docs/testing-template.md`): the hook runs only the unit tests
+  related to the push (`vitest related`) and NO production build (`PRE_PUSH_BUILD=1` opts in).
+  If the push touches a path in `.test-critical` (glob + reason; editing it is itself
+  critical) it runs the FULL unit suite, two workers; no `.test-critical` means everything is
+  critical. Failures retain a private temporary log and print its path. The full suite
+  also runs nightly (`.github/workflows/nightly-tests.yml`) with the `.test-budget` ratchet:
+  more than +10% test files or wall time over the record is red unless the PR carries a
+  `Test-budget: <why>` line. Extend an existing test before adding a file.
   `gh pr merge` is autonomous once CI is fully green and mergeable — never merge with
   failing/pending checks, unresolved review comments, or changes touching branch
   protection / security policy / release infra without explicit human approval.

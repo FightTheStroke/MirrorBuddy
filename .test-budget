@@ -1,0 +1,7 @@
+# Last recorded full-suite figures (roberdan-os docs/testing-template.md section 2).
+# More than +10% on test_files or wall_seconds without a "Test-budget: <why>" line (env TEST_BUDGET_NOTE) is red.
+# wall_seconds: `npm run test:unit` on a loaded Mac (shared with other agents), 4 workers. Nightly CI reports its own
+# figure; lower this record when the nightly proves the suite faster.
+wall_seconds=391
+test_files=1220
+recorded=2026-10-20 sha=e73a5b38
