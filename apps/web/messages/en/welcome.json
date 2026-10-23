@@ -366,7 +366,8 @@
       "readyToStart": "You're ready to start your adventure!",
       "preparedForYou": "I've prepared everything for you! Remember:",
       "enableVoice": "Enable voice",
-      "disableVoice": "Disable voice"
+      "disableVoice": "Disable voice",
+      "completionFailed": "We couldn't complete setup. Please try again."
     },
     "trialLimits": {
       "title": "Free trial limits",

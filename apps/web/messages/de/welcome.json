@@ -366,7 +366,8 @@
       "readyToStart": "Du bist bereit, dein Abenteuer zu beginnen!",
       "preparedForYou": "Ich habe alles für dich vorbereitet! Denk daran:",
       "enableVoice": "Stimme aktivieren",
-      "disableVoice": "Stimme deaktivieren"
+      "disableVoice": "Stimme deaktivieren",
+      "completionFailed": "Die Einrichtung konnte nicht abgeschlossen werden. Bitte versuche es erneut."
     },
     "trialLimits": {
       "title": "Grenzen der kostenlosen Testversion",

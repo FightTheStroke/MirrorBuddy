@@ -5,16 +5,8 @@
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
 import { isUndeliveredRequest } from './undelivered-request';
-import type { Theme, AIProvider } from '@/types';
 import { csrfFetch } from '@/lib/auth';
-import {
-  type TeachingStyle,
-  type LearningDifference,
-  type ExtendedStudentProfile,
-  type ProviderPreference,
-  type AppearanceSettings,
-  type AdaptiveDifficultyMode,
-} from './settings-types';
+import type { SettingsState } from './settings-types';
 
 export type {
   TeachingStyle,
@@ -22,51 +14,7 @@ export type {
   ExtendedStudentProfile,
   ProviderPreference,
   AdaptiveDifficultyMode,
-};
-
-// === STORE ===
-
-interface SettingsState {
-  theme: Theme;
-  provider: AIProvider;
-  model: string;
-  budgetLimit: number;
-  totalSpent: number;
-  studentProfile: ExtendedStudentProfile;
-  appearance: AppearanceSettings;
-  preferredProvider: ProviderPreference;
-  preferredMicrophoneId: string; // Empty string = system default
-  preferredOutputId: string; // Empty string = system default (speakers)
-  preferredCameraId: string; // Empty string = system default
-  adaptiveDifficultyMode: AdaptiveDifficultyMode;
-  // Voice settings (Azure Realtime API)
-  voiceVadThreshold: number; // VAD sensitivity (0.3-0.7, default 0.4)
-  voiceSilenceDuration: number; // Silence before turn ends (300-800ms, default 400)
-  voiceBargeInEnabled: boolean; // Allow interrupting maestro (default true)
-  // Sync state
-  lastSyncedAt: Date | null;
-  pendingSync: boolean;
-  // Actions
-  setTheme: (theme: Theme) => void;
-  setProvider: (provider: AIProvider) => void;
-  setModel: (model: string) => void;
-  setBudgetLimit: (limit: number) => void;
-  addCost: (cost: number) => void;
-  updateStudentProfile: (profile: Partial<ExtendedStudentProfile>) => void;
-  updateAppearance: (appearance: Partial<AppearanceSettings>) => void;
-  setPreferredProvider: (provider: ProviderPreference) => void;
-  setPreferredMicrophone: (microphoneId: string) => void;
-  setPreferredOutput: (outputId: string) => void;
-  setPreferredCamera: (cameraId: string) => void;
-  setAdaptiveDifficultyMode: (mode: AdaptiveDifficultyMode) => void;
-  // Voice settings actions
-  setVoiceVadThreshold: (threshold: number) => void;
-  setVoiceSilenceDuration: (duration: number) => void;
-  setVoiceBargeInEnabled: (enabled: boolean) => void;
-  // Sync actions
-  syncToServer: () => Promise<void>;
-  loadFromServer: () => Promise<void>;
-}
+} from './settings-types';
 
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
   theme: 'system',
@@ -76,7 +24,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   totalSpent: 0,
   studentProfile: {
     name: '',
-    age: 14,
+    age: undefined,
     schoolYear: 1,
     schoolLevel: 'superiore',
     gradeLevel: '',
@@ -156,7 +104,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
     try {
       // Sync settings - #88: Added totalSpent to persist budget tracking
-      await csrfFetch('/api/user/settings', {
+      const settingsResponse = await csrfFetch('/api/user/settings', {
         method: 'PUT',
         body: JSON.stringify({
           theme: state.theme,
@@ -167,11 +115,20 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
           adaptiveDifficultyMode: state.adaptiveDifficultyMode,
           language: state.appearance.language,
           accentColor: state.appearance.accentColor,
+          fontSize: state.studentProfile.fontSize,
+          highContrast: state.studentProfile.highContrast,
+          dyslexiaFont: state.studentProfile.dyslexiaFont,
+          voiceEnabled: state.studentProfile.voiceEnabled,
+          simplifiedLanguage: state.studentProfile.simplifiedLanguage,
+          adhdMode: state.studentProfile.adhdMode,
         }),
       });
+      if (!settingsResponse.ok) {
+        throw new Error(`Settings save failed (${settingsResponse.status})`);
+      }
 
       // Sync profile
-      await csrfFetch('/api/user/profile', {
+      const profileResponse = await csrfFetch('/api/user/profile', {
         method: 'PUT',
         body: JSON.stringify({
           name: state.studentProfile.name,
@@ -183,19 +140,13 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
           // Character preferences
           preferredCoach: state.studentProfile.preferredCoach,
           preferredBuddy: state.studentProfile.preferredBuddy,
-          crossMaestroEnabled: state.studentProfile.crossMaestroEnabled,
-          accessibility: {
-            fontSize: state.studentProfile.fontSize,
-            highContrast: state.studentProfile.highContrast,
-            dyslexiaFont: state.studentProfile.dyslexiaFont,
-            voiceEnabled: state.studentProfile.voiceEnabled,
-            simplifiedLanguage: state.studentProfile.simplifiedLanguage,
-            adhdMode: state.studentProfile.adhdMode,
-          },
         }),
       });
+      if (!profileResponse.ok) {
+        throw new Error(`Profile save failed (${profileResponse.status})`);
+      }
 
-      set({ lastSyncedAt: new Date(), pendingSync: false });
+      set({ lastSyncedAt: new Date(), pendingSync: get() !== state });
     } catch (error) {
       logger.error('Settings sync failed', { error: String(error) });
     }
@@ -212,6 +163,9 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (settingsRes.status === 401 || profileRes.status === 401) {
         return;
       }
+      if (!settingsRes.ok || !profileRes.ok) {
+        throw new Error(`Settings load failed (${settingsRes.status}, ${profileRes.status})`);
+      }
 
       if (settingsRes.ok) {
         const settings = await settingsRes.json();
@@ -227,13 +181,22 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
             language: settings.language ?? state.appearance.language,
             accentColor: settings.accentColor ?? state.appearance.accentColor,
           },
+          studentProfile: {
+            ...state.studentProfile,
+            fontSize: settings.fontSize ?? state.studentProfile.fontSize,
+            highContrast: settings.highContrast ?? state.studentProfile.highContrast,
+            dyslexiaFont: settings.dyslexiaFont ?? state.studentProfile.dyslexiaFont,
+            voiceEnabled: settings.voiceEnabled ?? state.studentProfile.voiceEnabled,
+            simplifiedLanguage:
+              settings.simplifiedLanguage ?? state.studentProfile.simplifiedLanguage,
+            adhdMode: settings.adhdMode ?? state.studentProfile.adhdMode,
+          },
         }));
       }
 
       if (profileRes.ok) {
         const profile = await profileRes.json();
         if (profile) {
-          const accessibility = profile.accessibility || {};
           // Never surface the PII decryption placeholder to the student. If the
           // server failed to decrypt the name (e.g. key rotation/mismatch), the
           // middleware returns the literal '[decryption-failed]'; treat it as no
@@ -245,7 +208,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
             studentProfile: {
               ...state.studentProfile,
               name: safeName ?? state.studentProfile.name,
-              age: profile.age ?? state.studentProfile.age,
+              age: profile.age ?? undefined,
               schoolYear: profile.schoolYear ?? state.studentProfile.schoolYear,
               schoolLevel: profile.schoolLevel ?? state.studentProfile.schoolLevel,
               gradeLevel: profile.gradeLevel ?? state.studentProfile.gradeLevel,
@@ -253,15 +216,6 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
               // Character preferences
               preferredCoach: profile.preferredCoach ?? state.studentProfile.preferredCoach,
               preferredBuddy: profile.preferredBuddy ?? state.studentProfile.preferredBuddy,
-              crossMaestroEnabled:
-                profile.crossMaestroEnabled ?? state.studentProfile.crossMaestroEnabled,
-              fontSize: accessibility.fontSize ?? state.studentProfile.fontSize,
-              highContrast: accessibility.highContrast ?? state.studentProfile.highContrast,
-              dyslexiaFont: accessibility.dyslexiaFont ?? state.studentProfile.dyslexiaFont,
-              voiceEnabled: accessibility.voiceEnabled ?? state.studentProfile.voiceEnabled,
-              simplifiedLanguage:
-                accessibility.simplifiedLanguage ?? state.studentProfile.simplifiedLanguage,
-              adhdMode: accessibility.adhdMode ?? state.studentProfile.adhdMode,
             },
           }));
         }

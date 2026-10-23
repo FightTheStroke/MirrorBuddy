@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from '@/i18n/navigation';
@@ -10,6 +11,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { useSettingsStore } from '@/lib/stores';
 import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
+import { csrfFetch, requireIdentityRefresh } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
 // Pre-defined sparkle offsets (avoids Math.random during render)
 const SPARKLE_OFFSETS = [5, -12, 18, -8, 15, -5];
@@ -19,13 +22,10 @@ interface ReadyStepProps {
   onAzureUnavailable?: () => void;
 }
 
-/**
- * Step 5: Ready to start CTA
- *
- * Final step - saves data and redirects to main app.
- */
 export function ReadyStep(_props: ReadyStepProps) {
   const t = useTranslations('welcome.ready');
+  const [saving, setSaving] = useState(false);
+  const [failed, setFailed] = useState(false);
   const router = useRouter();
   const { data, prevStep, completeOnboarding, isReplayMode, isVoiceMuted, setVoiceMuted } =
     useOnboardingStore();
@@ -43,37 +43,42 @@ export function ReadyStep(_props: ReadyStepProps) {
     setVoiceMuted(!isVoiceMuted);
   };
 
-  const _handlePrev = () => {
+  const handleStart = async () => {
     stop();
-    prevStep();
-  };
-
-  const handleStart = () => {
-    stop();
-    // Save collected data to settings store (only if not replay mode)
-    if (!isReplayMode) {
-      updateStudentProfile({
-        name: data.name,
-        age: data.age || 14,
-        schoolLevel: data.schoolLevel || 'superiore',
-        learningDifferences: (data.learningDifferences || []) as Array<
-          | 'dyslexia'
-          | 'dyscalculia'
-          | 'dysgraphia'
-          | 'adhd'
-          | 'autism'
-          | 'cerebralPalsy'
-          | 'visualImpairment'
-          | 'auditoryProcessing'
-        >,
-      });
+    setSaving(true);
+    setFailed(false);
+    try {
+      if (!isReplayMode) {
+        const response = await csrfFetch('/api/onboarding', {
+          method: 'POST',
+          body: JSON.stringify({ data, hasCompletedOnboarding: true }),
+        });
+        if (!response.ok) throw new Error(`Onboarding save failed (${response.status})`);
+        await requireIdentityRefresh('authenticated');
+        updateStudentProfile({
+          name: data.name,
+          age: data.age,
+          schoolLevel: data.schoolLevel || 'superiore',
+          learningDifferences: (data.learningDifferences || []) as Array<
+            | 'dyslexia'
+            | 'dyscalculia'
+            | 'dysgraphia'
+            | 'adhd'
+            | 'autism'
+            | 'cerebralPalsy'
+            | 'visualImpairment'
+            | 'auditoryProcessing'
+          >,
+        });
+      }
+      completeOnboarding();
+      router.push('/');
+    } catch (error) {
+      logger.error('Onboarding completion failed', { error: String(error) });
+      setFailed(true);
+    } finally {
+      setSaving(false);
     }
-
-    // Mark onboarding as complete
-    completeOnboarding();
-
-    // Navigate to main app
-    router.push('/');
   };
 
   return (
@@ -167,6 +172,11 @@ export function ReadyStep(_props: ReadyStepProps) {
 
         {/* Content */}
         <div className="p-8 space-y-6">
+          {failed && (
+            <p role="alert" className="text-red-700 dark:text-red-300">
+              {t('completionFailed')}
+            </p>
+          )}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -210,6 +220,7 @@ export function ReadyStep(_props: ReadyStepProps) {
             </Button>
             <Button
               onClick={handleStart}
+              disabled={saving}
               size="lg"
               className="flex-1 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white py-6 text-lg font-semibold shadow-lg"
             >

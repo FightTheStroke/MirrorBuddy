@@ -49,6 +49,50 @@ describe('loading conversation summaries across an identity refresh', () => {
     setClientIdentity({ status: 'anonymous' });
   });
 
+  it('loads summaries from the paginated conversations API response', async () => {
+    setClientIdentity(student('user-1'));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        Response.json({
+          items: summaries,
+          pagination: { page: 1, limit: 20, total: 1, totalPages: 1 },
+        }),
+      ),
+    );
+
+    await expect(loadConversationSummariesFromDB()).resolves.toEqual(summaries);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('accepts an empty paginated result without treating it as a failure', async () => {
+    setClientIdentity(student('user-1'));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        Response.json({
+          items: [],
+          pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+        }),
+      ),
+    );
+
+    await expect(loadConversationSummariesFromDB()).resolves.toEqual([]);
+  });
+
+  it.each([null, {}, { error: 'Unavailable' }, { items: null }, { items: {} }])(
+    'rejects a malformed conversations response: %j',
+    async (payload) => {
+      setClientIdentity(student('user-1'));
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(payload)));
+
+      await expect(loadConversationSummariesFromDB()).rejects.toThrow(
+        'Invalid conversations response',
+      );
+      expect(fetch).toHaveBeenCalledTimes(1);
+    },
+  );
+
   it('keeps the summaries when the refresh confirms the same student', async () => {
     setClientIdentity(student('user-1'));
     vi.stubGlobal(

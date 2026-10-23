@@ -366,7 +366,8 @@
       "readyToStart": "¡Estás listo para comenzar tu aventura!",
       "preparedForYou": "¡He preparado todo para ti! Recuerda:",
       "enableVoice": "Activar voz",
-      "disableVoice": "Desactivar voz"
+      "disableVoice": "Desactivar voz",
+      "completionFailed": "No se pudo completar la configuración. Inténtalo de nuevo."
     },
     "trialLimits": {
       "title": "Límites de la prueba gratuita",

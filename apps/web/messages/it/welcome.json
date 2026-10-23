@@ -361,6 +361,7 @@
       "earnXpDescription": "ogni lezione ti fa salire di livello!",
       "backButton": "Indietro",
       "startButton": "Iniziamo!",
+      "completionFailed": "Non è stato possibile completare la configurazione. Riprova.",
       "replayModeMessage": "Fine del tutorial. Clicca \"{action}\" per tornare all'app.",
       "perfectName": "Perfetto, {name}!",
       "readyToStart": "Sei pronto per iniziare la tua avventura!",

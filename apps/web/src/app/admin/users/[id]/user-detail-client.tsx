@@ -43,7 +43,7 @@ interface UserStats {
     disabled: boolean;
     createdAt: string;
     updatedAt: string;
-    lastActivity: string;
+    lastActivity: string | null;
     subscription: {
       tier: { code: string; name: string } | null;
       status: string;
@@ -105,7 +105,7 @@ export function UserDetailClient({ userId, initialUser }: UserDetailClientProps)
     ...initialUser,
     createdAt: initialUser.createdAt.toString(),
     updatedAt: '',
-    lastActivity: '',
+    lastActivity: null,
   };
   const stats = data?.stats;
   const settings = data?.settings;

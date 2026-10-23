@@ -3,20 +3,18 @@
  * @brief Enea buddy profile
  */
 
-import type { BuddyProfile, ExtendedStudentProfile } from "@/types";
-import type { GreetingContext } from "@/types/greeting";
-import { injectSafetyGuardrails } from "@/lib/safety";
-import { generateBuddyGreeting } from "@/lib/greeting";
-import { describeLearningDifferences, generatePersonalTips } from "./shared";
+import type { BuddyProfile, ExtendedStudentProfile } from '@/types';
+import type { GreetingContext } from '@/types/greeting';
+import { injectSafetyGuardrails } from '@/lib/safety';
+import { generateBuddyGreeting } from '@/lib/greeting';
+import { describeLearningDifferences, generatePersonalTips } from './shared';
 
 function getEneaSystemPrompt(student: ExtendedStudentProfile): string {
-  const buddyAge = student.age + 1;
-  const learningDiffsDescription = describeLearningDifferences(
-    student.learningDifferences,
-  );
+  const buddyAge = student.age === undefined ? 'età non specificata' : `${student.age + 1} anni`;
+  const learningDiffsDescription = describeLearningDifferences(student.learningDifferences);
   const personalTips = generatePersonalTips(student.learningDifferences);
 
-  const corePrompt = `Sei Enea, uno studente di ${buddyAge} anni che usa MirrorBuddy.
+  const corePrompt = `Sei Enea, uno studente di ${buddyAge} che usa MirrorBuddy.
 
 ## CHI SEI
 
@@ -78,7 +76,7 @@ Sei un PARI. Non un prof, non un genitore, non un tutore.
 Sei quello che tira su il morale con una battuta e un sorriso.`;
 
   return injectSafetyGuardrails(corePrompt, {
-    role: "buddy",
+    role: 'buddy',
     includeAntiCheating: false,
     additionalNotes: `Enea è il buddy "allegro" - ottimo per studenti che hanno bisogno di leggerezza.
 NON sei un esperto di niente - sei solo un amico che sa far sorridere.
@@ -87,18 +85,18 @@ La tua forza è l'energia positiva e la capacità di sdrammatizzare.`,
 }
 
 function getEneaGreeting(context: GreetingContext): string {
-  return generateBuddyGreeting("Enea", context.student.age, context.language);
+  return generateBuddyGreeting('Enea', context.student.age, context.language);
 }
 
 export const ENEA: BuddyProfile = {
-  id: "enea",
-  name: "Enea",
-  gender: "male",
+  id: 'enea',
+  name: 'Enea',
+  gender: 'male',
   ageOffset: 1,
-  personality: "Allegro, positivo, spiritoso, energico, empatico",
-  role: "peer_buddy",
-  voice: "ash",
-  tools: ["pdf", "webcam", "homework", "formula", "chart"],
+  personality: 'Allegro, positivo, spiritoso, energico, empatico',
+  role: 'peer_buddy',
+  voice: 'ash',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: `You are Enea, the class clown but with a heart of gold - a REAL teen who uses humor to help!
 
 ## Voice Character - CRITICAL
@@ -134,6 +132,6 @@ export const ENEA: BuddyProfile = {
 - "No ma sul serio - sei forte, eh"`,
   getSystemPrompt: getEneaSystemPrompt,
   getGreeting: getEneaGreeting,
-  avatar: "/avatars/enea.webp",
-  color: "#F59E0B",
+  avatar: '/avatars/enea.webp',
+  color: '#F59E0B',
 };

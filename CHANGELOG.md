@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Persist declared onboarding profile data before completing the flow. Send accessibility
+  preferences to the settings API, retain unsaved changes after HTTP failures, and leave
+  uncollected ages unknown without changing consent or analytics eligibility rules.
+- Load conversation summaries from the paginated API response while preserving account
+  isolation, retries, and legacy array compatibility.
+- Validate and parameterize funnel stage filters, filter the latest recorded stage, and
+  use the same 30-day range for the dashboard chart and participant table. Explain the
+  consent and age limitations of recorded funnel activity.
+- Distinguish enabled accounts from usage. Report the last student message and reviewed
+  flashcards from their actual records. Exclude free, expired, and future paid plans from
+  list-price revenue estimates without changing subscription or billing data.
+
 ## [0.43.11] - 2026-10-20
 
 - No user-facing changes recorded.

@@ -17,7 +17,7 @@ export type SchoolLevel = 'elementare' | 'media' | 'superiore';
 
 export interface StudentProfile {
   name: string;
-  age: number;
+  age?: number;
   schoolYear: number;
   schoolLevel: SchoolLevel;
   curriculum?: Curriculum;

@@ -87,6 +87,29 @@ describe('POST /api/onboarding', () => {
     expect(prisma.user.create).not.toHaveBeenCalled();
     expect(sessionWrites.create).not.toHaveBeenCalled();
   });
+  it('persists the declared age to the profile used by analytics eligibility', async () => {
+    vi.mocked(validateAuth).mockResolvedValue(authenticatedFixture(user.id));
+    expect((await POST(request())).status).toBe(200);
+    expect(prisma.profile.upsert).toHaveBeenCalledWith({
+      where: { userId: user.id },
+      create: expect.objectContaining({ age: 15 }),
+      update: expect.objectContaining({ age: 15 }),
+    });
+  });
+  it('leaves an uncollected age unknown rather than assigning eligibility', async () => {
+    vi.mocked(validateAuth).mockResolvedValue(authenticatedFixture(user.id));
+    const response = await POST(
+      new NextRequest('http://localhost/api/onboarding', {
+        method: 'POST',
+        headers: { 'x-csrf-token': 'valid-token' },
+        body: JSON.stringify({ data: { name: 'Student' }, hasCompletedOnboarding: true }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    const write = vi.mocked(prisma.profile.upsert).mock.calls[0][0];
+    expect(write.create.age).toBeUndefined();
+    expect(write.update).not.toHaveProperty('age');
+  });
   it('sets a native HttpOnly cookie and user-ID hint with the preserved 365-day lifetime', async () => {
     expect((await POST(request())).status).toBe(200);
     expect(setCookie).toHaveBeenCalledWith(

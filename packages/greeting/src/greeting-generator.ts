@@ -101,9 +101,14 @@ export function generateCoachGreeting(displayName: string, language: SupportedLa
  */
 export function generateBuddyGreeting(
   displayName: string,
-  studentAge: number,
+  studentAge: number | undefined,
   language: SupportedLanguage,
 ): string {
+  if (studentAge === undefined) {
+    return applyGreetingTemplate(GENERIC_GREETINGS[language] || GENERIC_GREETINGS.it, {
+      name: displayName,
+    });
+  }
   const buddyAge = studentAge + 1; // Buddies are always 1 year older
   const template = BUDDY_GREETINGS[language] || BUDDY_GREETINGS.it;
   return applyGreetingTemplate(template, {
