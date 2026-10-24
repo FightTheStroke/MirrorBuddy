@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Reject non-GET/HEAD requests to the root and all five localized homepages before
+  Server Action dispatch, including requests carrying prefetch headers. Preserve
+  normal navigation, API mutations, and admin authentication.
+
+### Security
+
+- Upgrade Next.js, Sentry (including the shared logger), HTML sanitizers, and
+  affected transitive dependencies to published compatible security fixes.
+- Upgrade the Lighthouse browser driver through its supported dependency chain
+  rather than forcing Zod 4 into a consumer that expects Zod 3.
+- Keep the unresolved upstream `body-parser` and `fast-uri` advisories visible:
+  their remaining patched versions are not published. No security exception or
+  release check is weakened.
+
 ## [0.43.12] - 2026-10-24
 
 ### Fixed
