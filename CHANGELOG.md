@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Load previous conversation context for conversations without a title. A missing title
+  stopped every summary from loading ("Cannot read properties of null").
+
 ## [0.43.13] - 2026-10-24
 
 ### Fixed

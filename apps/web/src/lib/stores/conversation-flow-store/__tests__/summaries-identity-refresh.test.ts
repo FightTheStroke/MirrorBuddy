@@ -24,6 +24,8 @@ vi.mock('@/lib/logger', () => ({
 
 import { setClientIdentity } from '@/lib/auth';
 import { loadConversationSummariesFromDB } from '../persistence';
+import { useConversationFlowStore } from '../store';
+import { logger } from '@/lib/logger';
 
 const student = (userId: string) =>
   ({
@@ -178,6 +180,40 @@ describe('loading conversation summaries across an identity refresh', () => {
 
     await expect(loadConversationSummariesFromDB()).rejects.toBe(error);
     expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  // Production 2026-10-24: conversations created without a title (the column is
+  // nullable) made the store call `null.replace` and drop every summary.
+  it('loads untitled conversations into the store without a warning', async () => {
+    setClientIdentity(student('user-1'));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        Response.json({
+          items: [
+            {
+              id: 'c1',
+              maestroId: 'mario',
+              title: null,
+              summary: null,
+              keyFacts: null,
+              topics: [],
+              messageCount: 2,
+              lastMessageAt: null,
+            },
+          ],
+          pagination: { page: 1, limit: 20, total: 1, totalPages: 1 },
+        }),
+      ),
+    );
+    vi.mocked(logger.warn).mockClear();
+
+    await useConversationFlowStore.getState().loadFromServer();
+
+    const loaded = useConversationFlowStore.getState().conversationsByCharacter.mario;
+    expect(loaded?.conversationId).toBe('c1');
+    expect(loaded?.characterName).toBeTruthy();
+    expect(logger.warn).not.toHaveBeenCalled();
   });
 
   it.each([401, 403, 429, 500, 503])('does not replay an HTTP %i response', async (status) => {

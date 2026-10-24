@@ -11,13 +11,12 @@
 
 import type { StateCreator } from 'zustand';
 import type { ExtendedStudentProfile, CharacterType } from '@/types';
-import type {
-  ConversationFlowState,
-  FlowMode,
-  FlowMessage,
-  CharacterConversation,
-} from '../types';
-import { getDefaultSupportTeacher, getSupportTeacherById, type CoachId } from '@/data/support-teachers';
+import type { ConversationFlowState, FlowMode, FlowMessage, CharacterConversation } from '../types';
+import {
+  getDefaultSupportTeacher,
+  getSupportTeacherById,
+  type CoachId,
+} from '@/data/support-teachers';
 import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
 import { getMaestroById } from '@/data/maestri';
 import { logger } from '@/lib/logger';
@@ -25,7 +24,11 @@ import { csrfFetch } from '@/lib/auth';
 import { IdentityUnavailableError } from '@/lib/auth/client-auth';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
 import { loadConversationSummariesFromDB } from '../persistence';
-import { createActiveCharacter, saveCurrentConversation, loadConversationMessages } from '../helpers';
+import {
+  createActiveCharacter,
+  saveCurrentConversation,
+  loadConversationMessages,
+} from '../helpers';
 
 export interface SessionSlice {
   // State
@@ -50,12 +53,10 @@ export interface SessionSlice {
   loadFromServer: () => Promise<void>;
 }
 
-export const createSessionSlice: StateCreator<
-  ConversationFlowState,
-  [],
-  [],
-  SessionSlice
-> = (set, get) => ({
+export const createSessionSlice: StateCreator<ConversationFlowState, [], [], SessionSlice> = (
+  set,
+  get,
+) => ({
   // Initial state
   mode: 'idle',
   isActive: false,
@@ -71,10 +72,7 @@ export const createSessionSlice: StateCreator<
 
     // Check if we have existing conversation with this coach
     const state = get();
-    const existingMessages = loadConversationMessages(
-      state.conversationsByCharacter,
-      coach.id
-    );
+    const existingMessages = loadConversationMessages(state.conversationsByCharacter, coach.id);
 
     // If no existing messages, start with greeting
     const messages: FlowMessage[] =
@@ -210,7 +208,7 @@ export const createSessionSlice: StateCreator<
 
         // Determine character type from ID prefix
         let characterType: CharacterType = 'maestro';
-        let characterName = conv.title.replace('Conversazione con ', '');
+        let characterName = conv.title?.replace('Conversazione con ', '') || characterId;
 
         if (characterId.startsWith('coach-')) {
           characterType = 'coach';
