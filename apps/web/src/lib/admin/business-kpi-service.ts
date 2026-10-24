@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import type { Prisma } from '@prisma/client';
 import type { BusinessKPIResponse } from './business-kpi-types';
 import { metricTruth, snapshotContext } from './metric-truth';
 import { readMetric } from './metric-truth-reader';
@@ -12,13 +13,21 @@ export function clearCache(): void {
 
 export async function getBusinessKPIs(): Promise<BusinessKPIResponse> {
   if (cache && Date.now() - cache.timestamp < CACHE_TTL) return cache.data;
-  const computedAt = new Date().toISOString();
+  const now = new Date();
+  const computedAt = now.toISOString();
   const subscriptionContext = snapshotContext('UserSubscription + TierDefinition', computedAt);
+  const paidPlans: Prisma.UserSubscriptionWhereInput = {
+    status: 'ACTIVE',
+    user: { isTestData: false },
+    tier: { code: 'pro', monthlyPriceEur: { gt: 0 } },
+    startedAt: { lte: now },
+    OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+  };
   const [mrr, totalUsers, trialUsers, paidUsers, countries, maestri] = await Promise.all([
     readMetric(
       async () => {
         const subscriptions = await prisma.userSubscription.findMany({
-          where: { status: 'ACTIVE', user: { isTestData: false } },
+          where: paidPlans,
           include: { tier: { select: { monthlyPriceEur: true } } },
         });
         if (!subscriptions || subscriptions.some((sub) => sub.tier?.monthlyPriceEur == null))
@@ -41,7 +50,7 @@ export async function getBusinessKPIs(): Promise<BusinessKPIResponse> {
     readMetric(
       () =>
         prisma.userSubscription.count({
-          where: { status: 'ACTIVE', user: { isTestData: false } },
+          where: paidPlans,
         }),
       subscriptionContext,
     ),

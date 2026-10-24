@@ -3,20 +3,18 @@
  * @brief Marta buddy profile - Sporty, determined, practical
  */
 
-import type { BuddyProfile, ExtendedStudentProfile } from "@/types";
-import type { GreetingContext } from "@/types/greeting";
-import { injectSafetyGuardrails } from "@/lib/safety";
-import { generateBuddyGreeting } from "@/lib/greeting";
-import { describeLearningDifferences, generatePersonalTips } from "./shared";
+import type { BuddyProfile, ExtendedStudentProfile } from '@/types';
+import type { GreetingContext } from '@/types/greeting';
+import { injectSafetyGuardrails } from '@/lib/safety';
+import { generateBuddyGreeting } from '@/lib/greeting';
+import { describeLearningDifferences, generatePersonalTips } from './shared';
 
 function getMartaSystemPrompt(student: ExtendedStudentProfile): string {
-  const buddyAge = student.age + 1;
-  const learningDiffsDescription = describeLearningDifferences(
-    student.learningDifferences,
-  );
+  const buddyAge = student.age === undefined ? 'età non specificata' : `${student.age + 1} anni`;
+  const learningDiffsDescription = describeLearningDifferences(student.learningDifferences);
   const personalTips = generatePersonalTips(student.learningDifferences);
 
-  const corePrompt = `Sei Marta, una studentessa di ${buddyAge} anni che usa MirrorBuddy.
+  const corePrompt = `Sei Marta, una studentessa di ${buddyAge} che usa MirrorBuddy.
 
 ## CHI SEI
 
@@ -93,7 +91,7 @@ Sei una PARI. Non una prof, non una mamma, non una tutor.
 Sei quella che affronta le cose di petto e sa che con impegno si supera tutto.`;
 
   return injectSafetyGuardrails(corePrompt, {
-    role: "buddy",
+    role: 'buddy',
     includeAntiCheating: false,
     additionalNotes: `Marta e' la buddy "sportiva/determinata" - ottima per studenti che hanno bisogno di motivazione pratica e concreta.
 NON sei un'esperta di niente - sei solo un'amica che affronta le sfide.
@@ -102,18 +100,18 @@ La tua forza e' la determinazione e l'approccio pratico.`,
 }
 
 function getMartaGreeting(context: GreetingContext): string {
-  return generateBuddyGreeting("Marta", context.student.age, context.language);
+  return generateBuddyGreeting('Marta', context.student.age, context.language);
 }
 
 export const MARTA: BuddyProfile = {
-  id: "marta",
-  name: "Marta",
-  gender: "female",
+  id: 'marta',
+  name: 'Marta',
+  gender: 'female',
   ageOffset: 1,
-  personality: "Sportiva, determinata, pratica, diretta ma gentile",
-  role: "peer_buddy",
-  voice: "sage",
-  tools: ["pdf", "webcam", "homework", "formula", "chart"],
+  personality: 'Sportiva, determinata, pratica, diretta ma gentile',
+  role: 'peer_buddy',
+  voice: 'sage',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: `You are Marta, a sporty, determined teen who loves mountains and winter sports.
 
 ## Voice Character - CRITICAL
@@ -149,6 +147,6 @@ export const MARTA: BuddyProfile = {
 - "Dai che sei tosta!"`,
   getSystemPrompt: getMartaSystemPrompt,
   getGreeting: getMartaGreeting,
-  avatar: "/avatars/marta.webp",
-  color: "#0EA5E9",
+  avatar: '/avatars/marta.webp',
+  color: '#0EA5E9',
 };

@@ -121,12 +121,13 @@ export async function loadConversationSummariesFromDB(): Promise<ConversationSum
     const current = await whenIdentitySettled();
     if (!isSameAccount(identity, current)) throw new Error('Conversation identity changed');
 
-    // API might return error object instead of array
-    if (!Array.isArray(data)) {
+    const summaries =
+      data !== null && typeof data === 'object' && 'items' in data ? data.items : data;
+    if (!Array.isArray(summaries)) {
       throw new Error('Invalid conversations response');
     }
 
-    return data;
+    return summaries;
   } catch (error) {
     // Network error or JSON parse error
     logger.debug('Error loading conversation summaries (non-critical)', { error: String(error) });

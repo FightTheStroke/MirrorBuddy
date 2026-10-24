@@ -366,7 +366,12 @@
       "readyToStart": "¡Estás listo para comenzar tu aventura!",
       "preparedForYou": "¡He preparado todo para ti! Recuerda:",
       "enableVoice": "Activar voz",
-      "disableVoice": "Desactivar voz"
+      "disableVoice": "Desactivar voz",
+      "completionFailed": "No se pudo completar la configuración. Inténtalo de nuevo.",
+      "parentEmailLabel": "Correo electrónico de tu madre o padre",
+      "parentEmailHint": "Para continuar necesitas el consentimiento de tu madre o padre. Introduce su correo para solicitarlo.",
+      "parentConsentPending": "Hemos solicitado el consentimiento de tu madre o padre. Cuando lo confirme, selecciona «Comprobar consentimiento».",
+      "checkParentConsent": "Comprobar consentimiento"
     },
     "trialLimits": {
       "title": "Límites de la prueba gratuita",

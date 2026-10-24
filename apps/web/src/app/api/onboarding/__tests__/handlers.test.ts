@@ -7,6 +7,7 @@ import { validateAuth, AuthenticationError } from '@/lib/auth/server';
 import { assignBaseTierToNewUser } from '@/lib/tier/server';
 import { requireCSRF } from '@/lib/security';
 import { calculateAndPublishAdminCounts } from '@/lib/helpers/publish-admin-counts';
+import { checkCoppaStatus, requestParentalConsent } from '@/lib/compliance/server';
 import {
   anonymousFixture,
   authenticatedFixture,
@@ -86,6 +87,82 @@ describe('POST /api/onboarding', () => {
     expect(assignBaseTierToNewUser).not.toHaveBeenCalled();
     expect(prisma.user.create).not.toHaveBeenCalled();
     expect(sessionWrites.create).not.toHaveBeenCalled();
+  });
+  it('persists the declared age to the profile used by analytics eligibility', async () => {
+    vi.mocked(validateAuth).mockResolvedValue(authenticatedFixture(user.id));
+    expect((await POST(request())).status).toBe(200);
+    expect(prisma.profile.upsert).toHaveBeenCalledWith({
+      where: { userId: user.id },
+      create: expect.objectContaining({ age: 15 }),
+      update: expect.objectContaining({ age: 15 }),
+    });
+  });
+  it('leaves an uncollected age unknown rather than assigning eligibility', async () => {
+    vi.mocked(validateAuth).mockResolvedValue(authenticatedFixture(user.id));
+    const response = await POST(
+      new NextRequest('http://localhost/api/onboarding', {
+        method: 'POST',
+        headers: { 'x-csrf-token': 'valid-token' },
+        body: JSON.stringify({ data: { name: 'Student' }, hasCompletedOnboarding: true }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    const write = vi.mocked(prisma.profile.upsert).mock.calls[0][0];
+    expect(write.create.age).toBeUndefined();
+    expect(write.update).not.toHaveProperty('age');
+  });
+  it('preserves the required-email, pending and granted parental-consent contract', async () => {
+    vi.mocked(validateAuth).mockResolvedValue(authenticatedFixture(user.id));
+    const status = {
+      requiresConsent: true,
+      consentGranted: false,
+      consentPending: false,
+      age: 12,
+    };
+    vi.mocked(checkCoppaStatus).mockResolvedValue(status);
+    vi.mocked(requestParentalConsent).mockResolvedValue({
+      verificationCode: 'ABC123',
+      expiresAt: new Date('2026-09-08T00:00:00Z'),
+      emailSent: true,
+    });
+    const save = (parentEmail?: string) =>
+      POST(
+        new NextRequest('http://localhost/api/onboarding', {
+          method: 'POST',
+          headers: { 'x-csrf-token': 'valid-token' },
+          body: JSON.stringify({
+            data: { name: 'Student', age: 12, ...(parentEmail ? { parentEmail } : {}) },
+            hasCompletedOnboarding: true,
+          }),
+        }),
+      );
+    const required = await save();
+    expect(required.status).toBe(400);
+    expect(await required.json()).toMatchObject({ requiresParentEmail: true });
+    expect(requestParentalConsent).not.toHaveBeenCalled();
+    const requested = await save('parent@example.test');
+    expect(requested.status).toBe(200);
+    expect(await requested.json()).toMatchObject({
+      success: true,
+      coppa: { consentRequired: true, consentPending: true, emailSent: true },
+    });
+    expect(requestParentalConsent).toHaveBeenCalledWith(
+      user.id,
+      12,
+      'parent@example.test',
+      'Student',
+    );
+    vi.mocked(checkCoppaStatus).mockResolvedValue({ ...status, consentPending: true });
+    const pending = await save();
+    expect(pending.status).toBe(200);
+    expect(await pending.json()).toMatchObject({ coppa: { consentPending: true } });
+    vi.mocked(checkCoppaStatus).mockResolvedValue({ ...status, consentGranted: true });
+    const granted = await save();
+    expect(granted.status).toBe(200);
+    expect(await granted.json()).toMatchObject({
+      coppa: { consentGranted: true, consentPending: false },
+    });
+    expect(requestParentalConsent).toHaveBeenCalledOnce();
   });
   it('sets a native HttpOnly cookie and user-ID hint with the preserved 365-day lifetime', async () => {
     expect((await POST(request())).status).toBe(200);

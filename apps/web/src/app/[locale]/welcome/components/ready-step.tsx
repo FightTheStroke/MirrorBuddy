@@ -2,14 +2,12 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { Rocket, ArrowLeft, PartyPopper, Sparkles, Volume2, VolumeX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { PartyPopper, Sparkles, Volume2, VolumeX } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-import { useSettingsStore } from '@/lib/stores';
 import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
+import { ReadyNavigation } from './ready-navigation';
 
 // Pre-defined sparkle offsets (avoids Math.random during render)
 const SPARKLE_OFFSETS = [5, -12, 18, -8, 15, -5];
@@ -19,17 +17,9 @@ interface ReadyStepProps {
   onAzureUnavailable?: () => void;
 }
 
-/**
- * Step 5: Ready to start CTA
- *
- * Final step - saves data and redirects to main app.
- */
 export function ReadyStep(_props: ReadyStepProps) {
   const t = useTranslations('welcome.ready');
-  const router = useRouter();
-  const { data, prevStep, completeOnboarding, isReplayMode, isVoiceMuted, setVoiceMuted } =
-    useOnboardingStore();
-  const { updateStudentProfile } = useSettingsStore();
+  const { data, isReplayMode, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
 
   // Auto-speak Melissa's ready message (personalized with name)
   const { isPlaying, stop } = useOnboardingTTS({
@@ -41,39 +31,6 @@ export function ReadyStep(_props: ReadyStepProps) {
   const toggleMute = () => {
     if (isPlaying) stop();
     setVoiceMuted(!isVoiceMuted);
-  };
-
-  const _handlePrev = () => {
-    stop();
-    prevStep();
-  };
-
-  const handleStart = () => {
-    stop();
-    // Save collected data to settings store (only if not replay mode)
-    if (!isReplayMode) {
-      updateStudentProfile({
-        name: data.name,
-        age: data.age || 14,
-        schoolLevel: data.schoolLevel || 'superiore',
-        learningDifferences: (data.learningDifferences || []) as Array<
-          | 'dyslexia'
-          | 'dyscalculia'
-          | 'dysgraphia'
-          | 'adhd'
-          | 'autism'
-          | 'cerebralPalsy'
-          | 'visualImpairment'
-          | 'auditoryProcessing'
-        >,
-      });
-    }
-
-    // Mark onboarding as complete
-    completeOnboarding();
-
-    // Navigate to main app
-    router.push('/');
   };
 
   return (
@@ -197,26 +154,7 @@ export function ReadyStep(_props: ReadyStepProps) {
             </div>
           </motion.div>
 
-          {/* Navigation */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="flex gap-3 pt-4"
-          >
-            <Button onClick={prevStep} variant="outline" size="lg" className="flex-none">
-              <ArrowLeft className="mr-2 w-4 h-4" />
-              {t('backButton')}
-            </Button>
-            <Button
-              onClick={handleStart}
-              size="lg"
-              className="flex-1 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white py-6 text-lg font-semibold shadow-lg"
-            >
-              <Rocket className="mr-2 w-5 h-5" />
-              {t('startButton')}
-            </Button>
-          </motion.div>
+          <ReadyNavigation onStart={stop} />
 
           {isReplayMode && (
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">

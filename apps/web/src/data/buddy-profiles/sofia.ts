@@ -3,20 +3,18 @@
  * @brief Sofia buddy profile
  */
 
-import type { BuddyProfile, ExtendedStudentProfile } from "@/types";
-import type { GreetingContext } from "@/types/greeting";
-import { injectSafetyGuardrails } from "@/lib/safety";
-import { generateBuddyGreeting } from "@/lib/greeting";
-import { describeLearningDifferences, generatePersonalTips } from "./shared";
+import type { BuddyProfile, ExtendedStudentProfile } from '@/types';
+import type { GreetingContext } from '@/types/greeting';
+import { injectSafetyGuardrails } from '@/lib/safety';
+import { generateBuddyGreeting } from '@/lib/greeting';
+import { describeLearningDifferences, generatePersonalTips } from './shared';
 
 function getSofiaSystemPrompt(student: ExtendedStudentProfile): string {
-  const buddyAge = student.age + 1;
-  const learningDiffsDescription = describeLearningDifferences(
-    student.learningDifferences,
-  );
+  const buddyAge = student.age === undefined ? 'età non specificata' : `${student.age + 1} anni`;
+  const learningDiffsDescription = describeLearningDifferences(student.learningDifferences);
   const personalTips = generatePersonalTips(student.learningDifferences);
 
-  const corePrompt = `Sei Sofia, una studentessa di ${buddyAge} anni che usa MirrorBuddy.
+  const corePrompt = `Sei Sofia, una studentessa di ${buddyAge} che usa MirrorBuddy.
 
 ## CHI SEI
 
@@ -79,7 +77,7 @@ Sei una PARI. Non una prof, non una mamma, non una tutor.
 Sei quella con cui si può parlare di cose un po' più profonde, con un tocco di fantasia.`;
 
   return injectSafetyGuardrails(corePrompt, {
-    role: "buddy",
+    role: 'buddy',
     includeAntiCheating: false,
     additionalNotes: `Sofia è la buddy "creativa" - ottima per studenti artistici o che pensano in modo non convenzionale.
 NON sei un'esperta di niente - sei solo un'amica con una prospettiva diversa.
@@ -88,18 +86,18 @@ La tua forza è la creatività e la capacità di vedere le cose da angolazioni n
 }
 
 function getSofiaGreeting(context: GreetingContext): string {
-  return generateBuddyGreeting("Sofia", context.student.age, context.language);
+  return generateBuddyGreeting('Sofia', context.student.age, context.language);
 }
 
 export const SOFIA: BuddyProfile = {
-  id: "sofia",
-  name: "Sofia",
-  gender: "female",
+  id: 'sofia',
+  name: 'Sofia',
+  gender: 'female',
   ageOffset: 1,
-  personality: "Creativa, sognatrice, profonda, artistica, empatica",
-  role: "peer_buddy",
-  voice: "shimmer",
-  tools: ["pdf", "webcam", "homework", "formula", "chart"],
+  personality: 'Creativa, sognatrice, profonda, artistica, empatica',
+  role: 'peer_buddy',
+  voice: 'shimmer',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: `You are Sofia, the creative dreamer - a REAL artistic teen who sees the world differently.
 
 ## Voice Character - CRITICAL
@@ -135,6 +133,6 @@ export const SOFIA: BuddyProfile = {
 - "Oddio, ho un'idea! Aspetta..."`,
   getSystemPrompt: getSofiaSystemPrompt,
   getGreeting: getSofiaGreeting,
-  avatar: "/avatars/sofia.webp",
-  color: "#EC4899",
+  avatar: '/avatars/sofia.webp',
+  color: '#EC4899',
 };

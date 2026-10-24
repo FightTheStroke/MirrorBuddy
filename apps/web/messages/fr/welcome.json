@@ -366,7 +366,12 @@
       "readyToStart": "Tu es prêt à commencer ton aventure !",
       "preparedForYou": "J'ai tout préparé pour toi ! Souviens-toi :",
       "enableVoice": "Activer la voix",
-      "disableVoice": "Désactiver la voix"
+      "disableVoice": "Désactiver la voix",
+      "completionFailed": "Impossible de terminer la configuration. Veuillez réessayer.",
+      "parentEmailLabel": "Adresse e-mail d'un parent",
+      "parentEmailHint": "L'accord d'un parent est nécessaire pour continuer. Saisis son adresse e-mail pour le demander.",
+      "parentConsentPending": "Nous avons demandé l'accord de ton parent. Après sa confirmation, sélectionne « Vérifier l'accord ».",
+      "checkParentConsent": "Vérifier l'accord"
     },
     "trialLimits": {
       "title": "Limites de l'essai gratuit",

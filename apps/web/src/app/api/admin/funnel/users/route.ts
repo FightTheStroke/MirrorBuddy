@@ -7,8 +7,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
+import { z } from 'zod';
 import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
-import { FunnelStage } from '@/lib/funnel/constants';
+import { FUNNEL_STAGES } from '@/lib/funnel/constants';
+
+const QuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().positive().default(20),
+  stage: z.enum(FUNNEL_STAGES).optional(),
+  days: z.coerce.number().int().min(1).max(365).optional(),
+  search: z.string().max(200).optional(),
+});
 
 // Types for Prisma query results
 interface EventCountResult {
@@ -57,6 +66,7 @@ interface FunnelUsersResponse {
   filters: {
     stage: string | null;
     search: string | null;
+    days: number | null;
   };
 }
 
@@ -65,32 +75,31 @@ export const GET = pipe(
   withAdminReadOnly,
 )(async (ctx) => {
   const url = new URL(ctx.req.url);
-  const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1'));
-  const pageSize = Math.min(100, Math.max(1, parseInt(url.searchParams.get('pageSize') ?? '20')));
-  const stage = url.searchParams.get('stage') as FunnelStage | null;
-  const search = url.searchParams.get('search');
+  const validation = QuerySchema.safeParse(Object.fromEntries(url.searchParams));
+  if (!validation.success) {
+    return NextResponse.json({ error: 'Invalid funnel filters' }, { status: 400 });
+  }
+  const { page, stage = null, search = null, days } = validation.data;
+  const pageSize = Math.min(100, validation.data.pageSize);
+  const since = days === undefined ? null : new Date();
+  if (since && days !== undefined) since.setDate(since.getDate() - days);
 
-  // Get latest event per user/visitor to determine current stage using parameterized query
-  const latestEvents = await prisma.$queryRaw<
-    Array<{
-      visitorId: string | null;
-      userId: string | null;
-      stage: string;
-      createdAt: Date;
-    }>
-  >`
-    SELECT DISTINCT ON (COALESCE("userId", "visitorId"))
-      "visitorId", "userId", "stage", "createdAt"
-    FROM "FunnelEvent"
-    WHERE "isTestData" = false
-    ${stage ? Prisma.raw(`AND "stage" = ${stage}`) : Prisma.empty}
-    ORDER BY COALESCE("userId", "visitorId"), "createdAt" DESC
-  `;
+  const latestEvents = await prisma.$queryRaw<LatestEventResult[]>(Prisma.sql`
+    SELECT * FROM (
+      SELECT DISTINCT ON (COALESCE("userId", "visitorId"))
+        "visitorId", "userId", "stage", "createdAt"
+      FROM "FunnelEvent"
+      WHERE "isTestData" = false
+      ${since ? Prisma.sql`AND "createdAt" >= ${since}` : Prisma.empty}
+      ORDER BY COALESCE("userId", "visitorId"), "createdAt" DESC
+    ) AS latest
+    ${stage ? Prisma.sql`WHERE "stage" = ${stage}` : Prisma.empty}
+  `);
 
   // Get event counts per user
   const eventCounts = await prisma.funnelEvent.groupBy({
     by: ['visitorId', 'userId'],
-    where: { isTestData: false },
+    where: { isTestData: false, ...(since && { createdAt: { gte: since } }) },
     _count: { _all: true },
   });
   const countMap = new Map(
@@ -178,6 +187,7 @@ export const GET = pipe(
     filters: {
       stage,
       search,
+      days: days ?? null,
     },
   };
 

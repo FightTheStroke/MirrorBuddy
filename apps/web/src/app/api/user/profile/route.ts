@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { pipe, withSentry, withAuth, withCSRF } from '@/lib/api/middlewares';
+import { Coach, Buddy } from '@/lib/validation/common';
 
 // #92: Zod schema for profile validation
 
@@ -20,11 +21,8 @@ const ProfileUpdateSchema = z
     schoolLevel: z.enum(['elementare', 'media', 'superiore']).optional(),
     gradeLevel: z.string().max(20).optional(),
     learningGoals: z.array(z.string().max(200)).max(20).optional(),
-    preferredCoach: z
-      .enum(['melissa', 'roberto', 'chiara', 'andrea', 'favij'])
-      .nullable()
-      .optional(),
-    preferredBuddy: z.enum(['mario', 'noemi', 'enea', 'bruno', 'sofia']).nullable().optional(),
+    preferredCoach: Coach.nullable().optional(),
+    preferredBuddy: Buddy.nullable().optional(),
   })
   .strict();
 

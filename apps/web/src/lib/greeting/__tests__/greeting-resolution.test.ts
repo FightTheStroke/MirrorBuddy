@@ -35,7 +35,7 @@ import type { Locale } from '@/i18n/config';
 const SUPPORTED_LOCALES: Locale[] = ['it', 'en', 'es', 'fr', 'de'];
 
 // Mock student profile for testing
-const mockStudent: ExtendedStudentProfile = {
+const mockStudent: ExtendedStudentProfile & { age: number } = {
   name: 'Test Student',
   age: 12,
   schoolYear: 7,
@@ -296,6 +296,14 @@ describe('Multilingual Greeting Resolution (T3-04)', () => {
   describe('Buddy greetings - locale coverage', () => {
     const studentAge = 12;
     const buddyAge = studentAge + 1; // Buddies are 1 year older
+
+    it('uses an age-free localized greeting when the age was not declared', () => {
+      SUPPORTED_LOCALES.forEach((locale) => {
+        const greeting = generateBuddyGreeting('Mario', undefined, locale);
+        expect(greeting).toContain('Mario');
+        expect(greeting).not.toMatch(/NaN|undefined|\d/);
+      });
+    });
 
     it('generates buddy greeting for all 5 locales', () => {
       const displayName = 'Mario';

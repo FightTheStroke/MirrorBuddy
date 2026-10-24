@@ -42,6 +42,34 @@ describe('business-kpi-service', () => {
   // ========================================================================
 
   describe('getBusinessKPIs - revenue metrics', () => {
+    it('excludes free Base/Trial and expired or not-yet-started plans from revenue and paid-plan counts', async () => {
+      vi.mocked(prisma.userSubscription.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.userSubscription.count).mockResolvedValue(0);
+      vi.mocked(prisma.user.count).mockResolvedValue(10);
+      vi.mocked(prisma.settings.groupBy).mockResolvedValue([]);
+      vi.mocked(prisma.conversation.groupBy).mockResolvedValue([]);
+
+      const result = await getBusinessKPIs();
+
+      const eligiblePlans = expect.objectContaining({
+        status: 'ACTIVE',
+        user: { isTestData: false },
+        tier: { code: 'pro', monthlyPriceEur: { gt: 0 } },
+        startedAt: { lte: expect.any(Date) },
+        OR: [{ expiresAt: null }, { expiresAt: { gt: expect.any(Date) } }],
+      });
+      expect(prisma.userSubscription.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: eligiblePlans,
+        }),
+      );
+      expect(prisma.userSubscription.count).toHaveBeenCalledWith({ where: eligiblePlans });
+      expect(result.revenue.mrr).toBe(0);
+      expect(result.users.paidUsers).toBe(0);
+      expect(result.metrics.mrr.status).toBe('estimated');
+      expect(result.revenue.totalRevenue).toBeNull();
+    });
+
     it('returns null for growthRate when previous month has 0 subs', async () => {
       // Setup: Mock active subscriptions
       vi.mocked(prisma.userSubscription.findMany).mockResolvedValueOnce([

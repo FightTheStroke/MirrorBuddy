@@ -4,27 +4,27 @@
  * Plan 069 - Conversion Funnel Dashboard
  */
 
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect, useCallback } from 'react';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Search, User, Eye } from "lucide-react";
-import { ResponsiveTable } from "@/components/admin/responsive-table";
-import { FUNNEL_STAGES } from "@/lib/funnel/constants";
-import { useTranslations } from "next-intl";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ChevronLeft, ChevronRight, Search, User, Eye } from 'lucide-react';
+import { ResponsiveTable } from '@/components/admin/responsive-table';
+import { FUNNEL_STAGES } from '@/lib/funnel/constants';
+import { useTranslations } from 'next-intl';
 
 interface FunnelUser {
   id: string;
-  type: "visitor" | "user";
+  type: 'visitor' | 'user';
   email: string | null;
   currentStage: string;
   stageEnteredAt: string;
@@ -34,62 +34,56 @@ interface FunnelUser {
 
 interface FunnelUsersTableProps {
   onSelectUser: (userId: string) => void;
+  days?: number;
 }
 
 const STAGE_BADGE_COLORS: Record<string, string> = {
-  VISITOR:
-    "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400",
-  TRIAL_START:
-    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  TRIAL_ENGAGED:
-    "bg-blue-200 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
-  LIMIT_HIT:
-    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  BETA_REQUEST:
-    "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-  APPROVED:
-    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  FIRST_LOGIN:
-    "bg-green-200 text-green-800 dark:bg-green-900/40 dark:text-green-300",
-  ACTIVE:
-    "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-  CHURNED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+  VISITOR: 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400',
+  TRIAL_START: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  TRIAL_ENGAGED: 'bg-blue-200 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
+  LIMIT_HIT: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  BETA_REQUEST: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  APPROVED: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  FIRST_LOGIN: 'bg-green-200 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+  ACTIVE: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+  CHURNED: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
 };
 
-export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
-  const t = useTranslations("admin");
+export function FunnelUsersTable({ onSelectUser, days }: FunnelUsersTableProps) {
+  const t = useTranslations('admin');
   const [users, setUsers] = useState<FunnelUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [stageFilter, setStageFilter] = useState<string>("all");
-  const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
+  const [stageFilter, setStageFilter] = useState<string>('all');
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        pageSize: "10",
+        pageSize: '10',
       });
-      if (stageFilter && stageFilter !== "all")
-        params.set("stage", stageFilter);
-      if (search) params.set("search", search);
+      if (stageFilter && stageFilter !== 'all') params.set('stage', stageFilter);
+      if (search) params.set('search', search);
+      if (days !== undefined) params.set('days', String(days));
 
       const res = await fetch(`/api/admin/funnel/users?${params}`);
-      if (!res.ok) throw new Error("Failed to fetch users");
+      if (!res.ok) throw new Error('Failed to fetch users');
 
       const data = await res.json();
       setUsers(data.users);
       setTotalPages(data.pagination.totalPages);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
-  }, [page, stageFilter, search]);
+  }, [page, stageFilter, search, days]);
 
   useEffect(() => {
     fetchUsers();
@@ -101,18 +95,18 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
   };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("it-IT", {
-      day: "2-digit",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(dateStr).toLocaleDateString('it-IT', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
   if (error) {
     return (
       <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg">
-        {t("error")} {error}
+        {t('error')} {error}
       </div>
     );
   }
@@ -123,10 +117,10 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 flex gap-2">
           <Input
-            placeholder={t("searchByEmailOrId")}
+            placeholder={t('searchByEmailOrId')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             className="flex-1"
           />
           <Button variant="outline" size="icon" onClick={handleSearch}>
@@ -141,10 +135,10 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
           }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={t("filterByStage")} />
+            <SelectValue placeholder={t('filterByStage')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t("allStages")}</SelectItem>
+            <SelectItem value="all">{t('allStages')}</SelectItem>
             {FUNNEL_STAGES.map((stage) => (
               <SelectItem key={stage} value={stage}>
                 {stage}
@@ -161,72 +155,55 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  {t("user")}
+                  {t('user')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  {t("stage")}
+                  {t('stage')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">
-                  {t("events")}
+                  {t('events')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">
-                  {t("lastActivity")}
+                  {t('lastActivity')}
                 </th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  {t("action")}
+                  {t('action')}
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-8 text-center text-muted-foreground"
-                  >
-                    {t("loading")}
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                    {t('loading')}
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-8 text-center text-muted-foreground"
-                  >
-                    {t("noUsersFound")}
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                    {t('noUsersFound')}
                   </td>
                 </tr>
               ) : (
                 users.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                  >
+                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-muted-foreground" />
                         <div>
                           <div className="font-medium text-sm truncate max-w-[150px]">
-                            {user.email || user.id.slice(0, 12) + "..."}
+                            {user.email || user.id.slice(0, 12) + '...'}
                           </div>
-                          <div className="text-xs text-muted-foreground">
-                            {user.type}
-                          </div>
+                          <div className="text-xs text-muted-foreground">{user.type}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge
-                        className={
-                          STAGE_BADGE_COLORS[user.currentStage] || "bg-gray-100"
-                        }
-                      >
+                      <Badge className={STAGE_BADGE_COLORS[user.currentStage] || 'bg-gray-100'}>
                         {user.currentStage}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 hidden md:table-cell text-sm">
-                      {user.eventsCount}
-                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell text-sm">{user.eventsCount}</td>
                     <td className="px-4 py-3 hidden lg:table-cell text-sm text-muted-foreground">
                       {formatDate(user.lastActivity)}
                     </td>
@@ -235,7 +212,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => onSelectUser(user.id)}
-                        aria-label={t("viewDetailsFor", { user: user.email || user.id })}
+                        aria-label={t('viewDetailsFor', { user: user.email || user.id })}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -251,7 +228,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">
-          {t("page")} {page} {t("of")} {totalPages}
+          {t('page')} {page} {t('of')} {totalPages}
         </span>
         <div className="flex gap-2">
           <Button
@@ -259,7 +236,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
             size="sm"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            aria-label={t("previousPage")}
+            aria-label={t('previousPage')}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -268,7 +245,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
             size="sm"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            aria-label={t("nextPage")}
+            aria-label={t('nextPage')}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

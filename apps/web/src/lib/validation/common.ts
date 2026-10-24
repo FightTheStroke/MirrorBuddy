@@ -90,12 +90,12 @@ export const SchoolLevel = z.enum(['elementare', 'media', 'superiore']);
 /**
  * Coach enum
  */
-export const Coach = z.enum(['melissa', 'roberto', 'chiara', 'andrea', 'favij']);
+export const Coach = z.enum(['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura']);
 
 /**
  * Buddy enum
  */
-export const Buddy = z.enum(['mario', 'noemi', 'enea', 'bruno', 'sofia']);
+export const Buddy = z.enum(['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta']);
 
 /**
  * Maestro ID enum (all 17 maestros)

@@ -366,7 +366,12 @@
       "readyToStart": "Du bist bereit, dein Abenteuer zu beginnen!",
       "preparedForYou": "Ich habe alles für dich vorbereitet! Denk daran:",
       "enableVoice": "Stimme aktivieren",
-      "disableVoice": "Stimme deaktivieren"
+      "disableVoice": "Stimme deaktivieren",
+      "completionFailed": "Die Einrichtung konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
+      "parentEmailLabel": "E-Mail-Adresse eines Elternteils",
+      "parentEmailHint": "Zum Fortfahren ist die Zustimmung eines Elternteils nötig. Gib die E-Mail-Adresse ein, um sie anzufordern.",
+      "parentConsentPending": "Wir haben die Zustimmung deines Elternteils angefordert. Wähle nach der Bestätigung „Zustimmung prüfen“.",
+      "checkParentConsent": "Zustimmung prüfen"
     },
     "trialLimits": {
       "title": "Grenzen der kostenlosen Testversion",

@@ -47,6 +47,7 @@ export const GET = pipe(
     conversationsByMaestro,
     totalMessages,
     totalFlashcards,
+    reviewedFlashcards,
     totalMaterials,
     sessionMetrics,
     settings,
@@ -66,6 +67,7 @@ export const GET = pipe(
       where: { conversation: { userId } },
     }),
     prisma.flashcardProgress.count({ where: { userId } }),
+    prisma.flashcardProgress.count({ where: { userId, reps: { gt: 0 } } }),
     prisma.material.count({ where: { userId } }),
     prisma.sessionMetrics.aggregate({
       where: { userId },
@@ -78,16 +80,16 @@ export const GET = pipe(
     }),
   ]);
 
-  const lastActivity = await prisma.conversation.findFirst({
-    where: { userId },
-    orderBy: { updatedAt: 'desc' },
-    select: { updatedAt: true },
+  const lastActivity = await prisma.message.findFirst({
+    where: { conversation: { userId }, role: 'user' },
+    orderBy: { createdAt: 'desc' },
+    select: { createdAt: true },
   });
 
   return NextResponse.json({
     user: {
       ...user,
-      lastActivity: lastActivity?.updatedAt || user.updatedAt,
+      lastActivity: lastActivity?.createdAt ?? null,
     },
     stats: {
       conversations: {
@@ -97,7 +99,7 @@ export const GET = pipe(
       messages: totalMessages,
       flashcards: {
         total: totalFlashcards,
-        reviewed: sessionMetrics._count || 0,
+        reviewed: reviewedFlashcards,
       },
       materials: totalMaterials,
       voiceMinutes: Math.round(sessionMetrics._sum.voiceMinutes || 0),
