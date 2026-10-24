@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.43.12] - 2026-10-24
+
 ### Fixed
 
 - Persist declared onboarding profile data before completing the flow. Collect the required
