@@ -9,6 +9,7 @@
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NextRequest } from 'next/server';
+import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server';
 import { _resetForTesting } from '@/lib/feature-flags/feature-flags-service';
 
 // Mock next-intl createIntlMiddleware to avoid locale routing side effects
@@ -62,6 +63,74 @@ describe('proxy.ts - waitlist routing', () => {
   beforeEach(() => {
     _resetForTesting();
     vi.clearAllMocks();
+  });
+
+  describe('homepage request methods', () => {
+    const paths = [
+      '/',
+      ...['it', 'en', 'fr', 'de', 'es'].flatMap((locale) => [`/${locale}`, `/${locale}/`]),
+    ];
+    const prefetchHeaders: Record<string, string>[] = [
+      { 'next-router-prefetch': '1' },
+      { purpose: 'prefetch' },
+      { 'next-router-prefetch': '1', purpose: 'prefetch' },
+    ];
+
+    it.each(paths)('rejects mutations to %s before Server Action dispatch', async (pathname) => {
+      const { default: proxy } = await import('@/proxy');
+      for (const method of ['POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']) {
+        const response = proxy(
+          new NextRequest(`http://localhost:3000${pathname}`, {
+            method,
+            headers: { 'next-action': 'x', 'content-type': 'text/plain' },
+          }),
+        );
+        expect(response.status).toBe(405);
+        expect(response.headers.get('allow')).toBe('GET, HEAD');
+        expect(response.headers.get('cache-control')).toBe('no-store');
+        expect(response.headers.get('x-request-id')).toBeTruthy();
+      }
+    });
+
+    it.each(['GET', 'HEAD'])('preserves normal %s homepage requests', async (method) => {
+      const { default: proxy } = await import('@/proxy');
+      for (const pathname of paths) {
+        const response = proxy(new NextRequest(`http://localhost:3000${pathname}`, { method }));
+        expect(response.status).toBe(200);
+      }
+    });
+
+    it.each(prefetchHeaders)('does not let %j bypass the homepage matcher', async (headers) => {
+      const { config } = await import('@/proxy');
+      for (const pathname of paths) {
+        expect(
+          unstable_doesMiddlewareMatch({
+            config,
+            url: `http://localhost:3000${pathname}`,
+            headers,
+          }),
+        ).toBe(true);
+      }
+      expect(
+        unstable_doesMiddlewareMatch({
+          config,
+          url: 'http://localhost:3000/it/chat',
+          headers,
+        }),
+      ).toBe(false);
+    });
+
+    it('does not intercept API mutations or change admin authentication', async () => {
+      const { default: proxy } = await import('@/proxy');
+      const api = proxy(
+        new NextRequest('http://localhost:3000/api/auth/login', { method: 'POST' }),
+      );
+      expect(api.status).toBe(200);
+      expect(api.headers.get('x-middleware-next')).toBe('1');
+      const admin = proxy(new NextRequest('http://localhost:3000/admin/users', { method: 'POST' }));
+      expect(admin.status).toBe(307);
+      expect(new URL(admin.headers.get('location')!).pathname).toBe('/login');
+    });
   });
 
   // =========================================================================

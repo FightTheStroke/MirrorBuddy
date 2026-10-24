@@ -12,7 +12,7 @@
 // See: https://nextjs.org/docs/app/api-reference/file-conventions/proxy
 // ============================================================================
 
-import { NextResponse, NextRequest, type NextFetchEvent } from 'next/server';
+import { NextResponse, NextRequest, type NextFetchEvent, type ProxyConfig } from 'next/server';
 import createIntlMiddleware from 'next-intl/middleware';
 import { generateNonce, CSP_NONCE_HEADER } from '@/lib/security';
 import { metricsStore } from '@/lib/observability/metrics-store';
@@ -305,6 +305,20 @@ export default function proxy(request: NextRequest, event?: NextFetchEvent) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(REQUEST_ID_HEADER, requestId);
 
+  const isHomepage =
+    pathname === '/' ||
+    routing.locales.some((locale) => pathname === `/${locale}` || pathname === `/${locale}/`);
+  if (isHomepage && request.method !== 'GET' && request.method !== 'HEAD') {
+    return new NextResponse(null, {
+      status: 405,
+      headers: {
+        Allow: 'GET, HEAD',
+        'Cache-Control': 'no-store',
+        [REQUEST_ID_HEADER]: requestId,
+      },
+    });
+  }
+
   // Track metrics for API routes
   const trackMetrics = shouldTrackMetrics(pathname);
   const route = trackMetrics ? normalizeRoute(pathname) : pathname;
@@ -497,8 +511,10 @@ export default function proxy(request: NextRequest, event?: NextFetchEvent) {
   return finalizeResponse(NextResponse.next({ request: { headers: requestHeaders } }));
 }
 
-export const config = {
+export const config: ProxyConfig = {
   matcher: [
+    '/',
+    '/(it|en|fr|de|es)',
     // Match all routes except static files, excluding prefetch requests
     // Prefetch requests don't need CSP nonce processing
     {
