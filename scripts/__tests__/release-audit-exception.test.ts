@@ -1,13 +1,12 @@
 // @vitest-environment node
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { evaluateAudit } from '../lib/release-audit-exception.mjs';
 import { runtimeAbsence } from '../lib/release-audit-runtime.mjs';
 import { digest } from '../lib/release-evidence-inputs.mjs';
 import { readReceipt, recipe, reports } from '../lib/release-evidence-store.mjs';
 import { buildFixture } from './release-native-fixture';
-
 const approval = JSON.parse(
   readFileSync(new URL('../security/braces-exception.json', import.meta.url), 'utf8'),
 );
@@ -61,10 +60,10 @@ function fixture() {
   return { audit, context };
 }
 const directories: string[] = [];
-afterEach(() =>
-  directories.splice(0).forEach((path) => rmSync(path, { recursive: true, force: true })),
-);
-
+afterEach(() => {
+  vi.restoreAllMocks();
+  directories.splice(0).forEach((path) => rmSync(path, { recursive: true, force: true }));
+});
 describe('the one approved development-only audit exception', () => {
   it('retains raw counts and reports the exact approval expiry', () => {
     const { audit, context } = fixture();
@@ -198,6 +197,7 @@ describe('current completed build runtime absence', () => {
     },
   );
   function receiptFixture() {
+    vi.spyOn(Date, 'now').mockReturnValue(now);
     const state = runtimeFixture();
     const directory = join(state.root, 'evidence');
     const policy = join(state.root, 'scripts/security');
