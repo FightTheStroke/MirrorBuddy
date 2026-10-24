@@ -79,7 +79,8 @@ export interface CharacterConversation {
 export interface ConversationSummary {
   id: string;
   maestroId: string;
-  title: string;
+  /** Nullable in the database: conversations can be created without a title. */
+  title: string | null;
   summary: string | null;
   keyFacts: string[] | null;
   topics: string[];
@@ -161,7 +162,7 @@ export interface ConversationFlowState {
     character: MaestroFull | SupportTeacher | BuddyProfile,
     type: CharacterType,
     profile: ExtendedStudentProfile,
-    reason?: string
+    reason?: string,
   ) => Promise<void>;
   switchToCoach: (profile: ExtendedStudentProfile) => Promise<void>;
   switchToMaestro: (maestro: MaestroFull, profile: ExtendedStudentProfile) => Promise<void>;
@@ -180,6 +181,6 @@ export interface ConversationFlowState {
     userId: string,
     characterId: string,
     studentName: string,
-    maestroName: string
+    maestroName: string,
   ) => Promise<string | null>;
 }
