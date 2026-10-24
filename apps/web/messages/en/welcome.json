@@ -367,7 +367,11 @@
       "preparedForYou": "I've prepared everything for you! Remember:",
       "enableVoice": "Enable voice",
       "disableVoice": "Disable voice",
-      "completionFailed": "We couldn't complete setup. Please try again."
+      "completionFailed": "We couldn't complete setup. Please try again.",
+      "parentEmailLabel": "A parent's email",
+      "parentEmailHint": "A parent's consent is needed to continue. Enter their email to request it.",
+      "parentConsentPending": "We have requested your parent's consent. After they confirm, select \"Check consent\".",
+      "checkParentConsent": "Check consent"
     },
     "trialLimits": {
       "title": "Free trial limits",

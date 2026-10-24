@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Persist declared onboarding profile data before completing the flow. Send accessibility
+- Persist declared onboarding profile data before completing the flow. Collect the required
+  parent email and wait for parental approval before completing under-13 onboarding. Send accessibility
   preferences to the settings API, retain unsaved changes after HTTP failures, and leave
   uncollected ages unknown without changing consent or analytics eligibility rules.
 - Load conversation summaries from the paginated API response while preserving account

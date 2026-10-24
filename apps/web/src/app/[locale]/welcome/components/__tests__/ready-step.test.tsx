@@ -112,4 +112,87 @@ describe('ReadyStep persistence', () => {
     expect(complete).not.toHaveBeenCalled();
     expect(mocks.push).not.toHaveBeenCalled();
   });
+
+  it('collects a required parental email and validates it before retrying', async () => {
+    vi.mocked(useOnboardingStore).mockReturnValue({
+      ...useOnboardingStore(),
+      data: { name: 'Student', age: 12 },
+    });
+    mocks.csrf.mockResolvedValueOnce(
+      Response.json({ requiresParentEmail: true, coppaRequired: true }, { status: 400 }),
+    );
+    render(<ReadyStep />);
+    fireEvent.click(screen.getByRole('button', { name: 'startButton' }));
+
+    const input = await screen.findByRole('textbox', { name: 'parentEmailLabel' });
+    expect(complete).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'startButton' }));
+    expect(mocks.csrf).toHaveBeenCalledTimes(1);
+    fireEvent.change(input, { target: { value: 'invalid' } });
+    fireEvent.click(screen.getByRole('button', { name: 'startButton' }));
+    expect(mocks.csrf).toHaveBeenCalledTimes(1);
+    fireEvent.change(input, { target: { value: 'parent@example.test' } });
+    fireEvent.click(screen.getByRole('button', { name: 'startButton' }));
+
+    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith('/'));
+    const payload = JSON.parse(String(mocks.csrf.mock.calls[1]?.[1]?.body));
+    expect(payload.data).toEqual({
+      name: 'Student',
+      age: 12,
+      parentEmail: 'parent@example.test',
+    });
+    expect(mocks.updateProfile.mock.calls[0]?.[0]).not.toHaveProperty('parentEmail');
+  });
+
+  it('waits for parental approval and checks again without completing early', async () => {
+    vi.mocked(useOnboardingStore).mockReturnValue({
+      ...useOnboardingStore(),
+      data: { name: 'Student', age: 12 },
+    });
+    mocks.csrf
+      .mockResolvedValueOnce(Response.json({ requiresParentEmail: true }, { status: 400 }))
+      .mockResolvedValueOnce(
+        Response.json({
+          success: true,
+          coppa: { consentRequired: true, consentPending: true, emailSent: true },
+        }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({
+          success: true,
+          coppa: { consentRequired: true, consentGranted: true, consentPending: false },
+        }),
+      );
+    render(<ReadyStep />);
+    fireEvent.click(screen.getByRole('button', { name: 'startButton' }));
+    fireEvent.change(await screen.findByRole('textbox', { name: 'parentEmailLabel' }), {
+      target: { value: 'parent@example.test' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'startButton' }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent('parentConsentPending');
+    expect(complete).not.toHaveBeenCalled();
+    expect(mocks.refresh).not.toHaveBeenCalled();
+    expect(mocks.push).not.toHaveBeenCalled();
+    expect(screen.queryByRole('textbox', { name: 'parentEmailLabel' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'checkParentConsent' }));
+
+    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith('/'));
+    expect(complete).toHaveBeenCalledOnce();
+    const retry = JSON.parse(String(mocks.csrf.mock.calls[2]?.[1]?.body));
+    expect(retry.data).not.toHaveProperty('parentEmail');
+  });
+
+  it.each([
+    null,
+    { success: false },
+    { success: true, coppa: { consentRequired: true, consentPending: true, emailSent: false } },
+  ])('rejects an unacknowledged save or failed consent delivery: %j', async (body) => {
+    mocks.csrf.mockResolvedValue(Response.json(body));
+    render(<ReadyStep />);
+    fireEvent.click(screen.getByRole('button', { name: 'startButton' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('completionFailed');
+    expect(complete).not.toHaveBeenCalled();
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
 });
