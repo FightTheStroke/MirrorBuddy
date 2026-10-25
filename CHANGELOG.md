@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.43.16] - 2026-10-25
+
 ### Fixed
 
 - Stop reporting a handled Azure temperature refusal as a production error. The request is
