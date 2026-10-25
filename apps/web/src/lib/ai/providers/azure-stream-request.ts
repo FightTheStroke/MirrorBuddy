@@ -80,14 +80,18 @@ export async function fetchStreamWithCompatibility(
 
       const errorText = await response.text();
       const sanitized = sanitizeUpstreamError(response.status, errorText);
-      logger.error(`[Azure Streaming] Error ${response.status}`, {
-        deployment: attempt.deployment,
-        tokenParamName: attempt.tokenParamName,
-        ...sanitized,
-      });
+      // A refused temperature is retried below without it and reported as a warning.
+      const refusedTemperature = sanitized.unsupportedTemperature && includeTemperature;
+      if (!refusedTemperature) {
+        logger.error(`[Azure Streaming] Error ${response.status}`, {
+          deployment: attempt.deployment,
+          tokenParamName: attempt.tokenParamName,
+          ...sanitized,
+        });
+      }
       lastFailure = replayable(response.status, errorText);
 
-      if (sanitized.unsupportedTemperature && includeTemperature) {
+      if (refusedTemperature) {
         includeTemperature = rememberTemperatureRefusal(attempt.deployment);
         logger.warn(
           '[Azure Streaming] Deployment rejects a custom temperature; using its default',

@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { logger } from '@/lib/logger';
 import { azureChatCompletion, azureCircuitBreaker } from '../azure';
 import type { ProviderConfig } from '../types';
 import { forgetTemperatureRefusals } from '../temperature-support';
@@ -321,6 +322,7 @@ describe('azureChatCompletion - Resilience', () => {
     }
 
     it('retries without temperature when the deployment only accepts the default', async () => {
+      const errorSpy = vi.spyOn(logger, 'error');
       let callCount = 0;
       global.fetch = vi.fn().mockImplementation(() => {
         callCount++;
@@ -347,6 +349,9 @@ describe('azureChatCompletion - Resilience', () => {
       const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
       expect(bodyOf(calls[0])).toHaveProperty('temperature', 0.7);
       expect(bodyOf(calls[1])).not.toHaveProperty('temperature');
+      // A handled temperature refusal is a warning, not a production error (Sentry MIRRORBUDDY-3Q).
+      expect(errorSpy).not.toHaveBeenCalled();
+      errorSpy.mockRestore();
     });
 
     it('omits temperature up front once the deployment has refused it', async () => {

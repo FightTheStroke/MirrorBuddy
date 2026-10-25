@@ -115,6 +115,8 @@ export async function azureChatCompletion(
 
     const errorText = await fetchResponse.text();
     const sanitized = sanitizeUpstreamError(fetchResponse.status, errorText);
+    // A refused temperature is retried without it; the caller reports that as a warning.
+    if (sanitized.unsupportedTemperature && includeTemperature) throw new AzureHttpError(sanitized);
     logger.error(`[Azure Chat] Error ${fetchResponse.status}`, {
       deployment,
       tokenParamName,
