@@ -383,6 +383,31 @@ describe('azureChatCompletion - Resilience', () => {
       expect(bodyOf(calls[2])).not.toHaveProperty('temperature');
     });
 
+    // Sentry MIRRORBUDDY-3P: the default GPT-6.1 Sol deployment always refuses a
+    // custom temperature, so every cold start paid a 400 and a warning first.
+    it('never sends a custom temperature to the GPT-6.1 Sol deployment', async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            choices: [{ message: { content: '56' }, finish_reason: 'stop' }],
+            usage: { total_tokens: 5 },
+          }),
+      });
+
+      await azureChatCompletion(
+        { ...config, model: 'mb-gpt-61-sol' },
+        messages,
+        'System',
+        0.7,
+        100,
+      );
+
+      const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
+      expect(calls).toHaveLength(1);
+      expect(bodyOf(calls[0])).not.toHaveProperty('temperature');
+    });
+
     it('keeps the token-parameter fallback available after dropping temperature', async () => {
       const unsupportedTokenParamBody = JSON.stringify({
         error: { message: "Unsupported parameter: 'max_completion_tokens' is invalid" },

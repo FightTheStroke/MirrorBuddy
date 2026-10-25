@@ -56,6 +56,11 @@ import { logger } from '@/lib/logger';
  */
 const GPT61_SOL_DEPLOYMENT =
   process.env.AZURE_OPENAI_GPT61_SOL_DEPLOYMENT?.trim() || 'mb-gpt-61-sol';
+/** GPT-6.1 Sol accepts only its default temperature (Sentry MIRRORBUDDY-3P). */
+export function acceptsOnlyDefaultTemperature(deployment: string): boolean {
+  return deployment === GPT61_SOL_DEPLOYMENT;
+}
+
 const CHAT_DEFAULT_DEPLOYMENT =
   process.env.AZURE_OPENAI_CHAT_DEPLOYMENT?.trim() || GPT61_SOL_DEPLOYMENT;
 

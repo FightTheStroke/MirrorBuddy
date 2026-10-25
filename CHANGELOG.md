@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Never send a custom temperature to the default GPT-6.1 Sol deployment, which only accepts
+  its default. This removes a rejected request and a warning on every server cold start.
+
 ## [0.43.16] - 2026-10-25
 
 ### Fixed
