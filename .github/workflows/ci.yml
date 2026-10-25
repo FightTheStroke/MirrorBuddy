@@ -920,7 +920,8 @@ jobs:
   # Must pass before any merge to main
   smoke-tests:
     name: Smoke Tests (BLOCKING)
-    runs-on: ubuntu-latest
+    # Playwright cannot install Chromium on ubuntu-26.04 runners yet (2026-10-24).
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     needs: [build]
 
@@ -1053,7 +1054,8 @@ jobs:
   # Smart mode: full E2E suite when UI changes, unit test baseline otherwise
   accessibility-tests:
     name: Accessibility Tests (${{ matrix.shard }})
-    runs-on: ubuntu-latest
+    # Playwright cannot install Chromium on ubuntu-26.04 runners yet (2026-10-24).
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     needs: [build, detect-changes]
 
@@ -1190,7 +1192,8 @@ jobs:
   # Conditional: skipped when no UI or mobile files changed
   mobile-smoke:
     name: Mobile Smoke (PR)
-    runs-on: ubuntu-latest
+    # Playwright cannot install Chromium on ubuntu-26.04 runners yet (2026-10-24).
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     needs: [build, detect-changes]
     if: >
@@ -1400,7 +1403,8 @@ jobs:
   # Runs on push (full mobile matrix). PRs use mobile-smoke for fast feedback.
   mobile-e2e:
     name: Mobile E2E Tests
-    runs-on: ubuntu-latest
+    # Playwright cannot install Chromium on ubuntu-26.04 runners yet (2026-10-24).
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: [build]
     if: github.event_name != 'pull_request'
@@ -1540,7 +1544,8 @@ jobs:
   # Includes retry logic (2 retries) to handle transient CI issues
   e2e-tests:
     name: E2E Tests
-    runs-on: ubuntu-latest
+    # Playwright cannot install Chromium on ubuntu-26.04 runners yet (2026-10-24).
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     needs: [build]
     if: github.event_name != 'pull_request'
@@ -1664,7 +1669,8 @@ jobs:
   # BLOCKING: Ensures security controls are not regressed
   security-e2e:
     name: Security E2E Tests
-    runs-on: ubuntu-latest
+    # Playwright cannot install Chromium on ubuntu-26.04 runners yet (2026-10-24).
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     needs: [build]
     if: github.event_name != 'pull_request'
@@ -1771,7 +1777,8 @@ jobs:
   # BLOCKING: Ensures regulatory compliance controls are not regressed
   compliance-e2e:
     name: Compliance E2E Tests
-    runs-on: ubuntu-latest
+    # Playwright cannot install Chromium on ubuntu-26.04 runners yet (2026-10-24).
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     needs: [build]
     if: github.event_name != 'pull_request'
@@ -2594,7 +2601,8 @@ jobs:
   # ============================================================================
   sync-admin-credentials:
     name: '🔑 Sync Admin Credentials'
-    runs-on: ubuntu-latest
+    # Playwright cannot install Chromium on ubuntu-26.04 runners yet (2026-10-24).
+    runs-on: ubuntu-24.04
     # Setup precedes issuance; the browser has a separate 30-minute ceiling,
     # leaving time for scoped cleanup even when it fails or times out.
     timeout-minutes: 90
