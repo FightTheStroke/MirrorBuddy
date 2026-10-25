@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { logger } from '@/lib/logger';
 import { fetchStreamWithCompatibility } from '../azure-stream-request';
 import { forgetTemperatureRefusals } from '../temperature-support';
 
@@ -76,6 +77,7 @@ describe('fetchStreamWithCompatibility', () => {
   });
 
   it('retries without temperature when the deployment only accepts the default', async () => {
+    vi.mocked(logger.error).mockClear();
     const responses = [failure(400, UNSUPPORTED_TEMPERATURE), success()];
     global.fetch = vi.fn().mockImplementation(() => Promise.resolve(responses.shift()));
 
@@ -87,6 +89,8 @@ describe('fetchStreamWithCompatibility', () => {
     expect(bodyOf(calls[0])).toHaveProperty('temperature', 0.7);
     expect(bodyOf(calls[1])).not.toHaveProperty('temperature');
     expect(bodyOf(calls[1])).toHaveProperty('max_completion_tokens', 100);
+    // A handled temperature refusal is a warning, not a production error (Sentry MIRRORBUDDY-3Q).
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
   it('omits temperature up front once the deployment has refused it', async () => {
