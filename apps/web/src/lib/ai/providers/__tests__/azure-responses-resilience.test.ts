@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { logger } from '@/lib/logger';
 import { azureChatCompletion, azureCircuitBreaker } from '../azure';
+import { forgetTemperatureRefusals } from '../temperature-support';
 import type { ProviderConfig, ToolDefinition } from '../types';
 
 const config: ProviderConfig = {
@@ -27,6 +28,7 @@ const call = (override: ProviderConfig = config) =>
 describe('Azure Responses resilience and failure handling', () => {
   beforeEach(() => {
     azureCircuitBreaker.reset();
+    forgetTemperatureRefusals();
     vi.stubEnv('AZURE_OPENAI_CHAT_DEPLOYMENT', '');
   });
 
@@ -165,6 +167,42 @@ describe('Azure Responses resilience and failure handling', () => {
     expect(url).toBe('https://test.openai.azure.com/openai/v1/responses');
     expect(JSON.parse(String(options?.body)).model).toBe('mb-gpt-61-sol');
     expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    {
+      deployment: 'retired-deployment',
+      fallback: 'mb-gpt-61-sol',
+      fallbackTemperature: {},
+    },
+    {
+      deployment: 'mb-gpt-61-sol',
+      fallback: 'custom-temperature-model',
+      fallbackTemperature: { temperature: 0.7 },
+    },
+  ])('uses the temperature supported by chat fallback $fallback', async (options) => {
+    vi.stubEnv('AZURE_OPENAI_CHAT_DEPLOYMENT', options.fallback);
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(response({ error: { code: 'DeploymentNotFound' } }, 404))
+        .mockResolvedValueOnce(
+          response({ choices: [{ message: { content: 'OK' }, finish_reason: 'stop' }] }),
+        ),
+    );
+
+    expect(
+      await azureChatCompletion({ ...config, model: options.deployment }, messages, '', 0.7, 128),
+    ).toMatchObject({ content: 'OK', model: options.fallback });
+    expect(fetch).toHaveBeenCalledTimes(2);
+    const [url, init] = vi.mocked(fetch).mock.calls[1];
+    expect(String(url)).toContain(`/deployments/${options.fallback}/chat/completions`);
+    expect(JSON.parse(String(init?.body))).toEqual({
+      messages,
+      max_completion_tokens: 128,
+      ...options.fallbackTemperature,
+    });
   });
 
   it('supports a configured custom name for the current-model deployment', async () => {

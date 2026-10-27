@@ -122,18 +122,39 @@ describe('fetchStreamWithCompatibility', () => {
     expect(bodyOf(calls[2])).toHaveProperty('max_tokens', 100);
   });
 
-  it('falls back to the configured deployment when the primary is unknown', async () => {
+  it.each([
+    {
+      deployment: 'gpt-5.6-terra',
+      fallbackDeployment: 'gpt-5.6-sol',
+      fallbackTemperature: { temperature: 0.7 },
+    },
+    {
+      deployment: 'retired-deployment',
+      fallbackDeployment: 'mb-gpt-61-sol',
+      fallbackTemperature: {},
+    },
+    {
+      deployment: 'mb-gpt-61-sol',
+      fallbackDeployment: 'custom-temperature-model',
+      fallbackTemperature: { temperature: 0.7 },
+    },
+  ])('uses the temperature supported by fallback $fallbackDeployment', async (options) => {
     const responses = [failure(404, DEPLOYMENT_NOT_FOUND), success()];
     global.fetch = vi.fn().mockImplementation(() => Promise.resolve(responses.shift()));
 
-    const response = await fetchStreamWithCompatibility(
-      baseOptions({ fallbackDeployment: 'gpt-5.6-sol' }),
-    );
+    const response = await fetchStreamWithCompatibility(baseOptions(options));
 
     expect(response.ok).toBe(true);
     const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
-    expect(urlOf(calls[0])).toContain('gpt-5.6-terra');
-    expect(urlOf(calls[1])).toContain('gpt-5.6-sol');
+    expect(calls).toHaveLength(2);
+    expect(urlOf(calls[0])).toContain(options.deployment);
+    expect(urlOf(calls[1])).toContain(options.fallbackDeployment);
+    expect(bodyOf(calls[1])).toEqual({
+      messages: [{ role: 'user', content: 'hi' }],
+      stream: true,
+      max_completion_tokens: 100,
+      ...options.fallbackTemperature,
+    });
   });
 
   it('returns a replayable failure for errors it cannot work around', async () => {
