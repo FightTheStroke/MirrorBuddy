@@ -1,7 +1,4 @@
-/**
- * @file azure.ts
- * @brief Azure OpenAI implementation with resilience (F-06)
- */
+/** Azure OpenAI implementation with resilience (F-06). */
 
 import { logger } from '@/lib/logger';
 import { CircuitBreaker, withRetry } from '@/lib/resilience/circuit-breaker';
@@ -70,10 +67,6 @@ export async function azureChatCompletion(
     messages: allMessages,
   };
 
-  // GPT-5 class deployments reject a custom temperature; dropped on first refusal
-  // and kept dropped for every later compatibility attempt.
-  let includeTemperature = acceptsCustomTemperature(config.model);
-
   if (tools && tools.length > 0) {
     baseRequestBody.tools = tools;
     baseRequestBody.tool_choice = tool_choice ?? 'auto';
@@ -84,7 +77,11 @@ export async function azureChatCompletion(
     });
   }
 
-  async function doFetch(deployment: string, tokenParamName: TokenParamName): Promise<FetchResult> {
+  async function doFetch(
+    deployment: string,
+    tokenParamName: TokenParamName,
+    includeTemperature: boolean,
+  ): Promise<FetchResult> {
     if (tools?.length && usesResponsesForTools(deployment)) {
       const responsesConfig = { ...config, model: deployment };
       return azureResponsesCompletion(responsesConfig, allMessages, maxTokens, tools, tool_choice);
@@ -158,10 +155,11 @@ export async function azureChatCompletion(
       if (seen.has(key)) continue;
       seen.add(key);
 
+      let includeTemperature = acceptsCustomTemperature(attempt.deployment);
       // Inner loop only re-runs the SAME attempt after temperature is dropped.
       for (;;) {
         try {
-          return await doFetch(attempt.deployment, attempt.tokenParamName);
+          return await doFetch(attempt.deployment, attempt.tokenParamName, includeTemperature);
         } catch (error) {
           if (!(error instanceof AzureHttpError)) {
             throw error;

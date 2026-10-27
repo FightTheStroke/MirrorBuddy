@@ -1,3 +1,5 @@
+import { acceptsOnlyDefaultTemperature } from './deployment-mapping';
+
 /**
  * Deployments that refused a custom temperature in this process.
  *
@@ -7,7 +9,7 @@
 const refusedTemperature = new Set<string>();
 
 export function acceptsCustomTemperature(deployment: string): boolean {
-  return !refusedTemperature.has(deployment);
+  return !refusedTemperature.has(deployment) && !acceptsOnlyDefaultTemperature(deployment);
 }
 
 /** Records the refusal and returns false, the new "include temperature" value. */

@@ -42,10 +42,6 @@ export async function fetchStreamWithCompatibility(
       ? options.fallbackDeployment
       : undefined;
 
-  // GPT-5 class deployments accept only their default temperature. Once refused,
-  // it stays dropped for every later attempt.
-  let includeTemperature = acceptsCustomTemperature(deployment);
-
   const attempts: Array<{ deployment: string; tokenParamName: TokenParamName }> = [
     { deployment, tokenParamName: 'max_completion_tokens' },
     ...(fallbackDeployment
@@ -57,7 +53,11 @@ export async function fetchStreamWithCompatibility(
       : []),
   ];
 
-  async function doFetch(target: string, tokenParamName: TokenParamName): Promise<Response> {
+  async function doFetch(
+    target: string,
+    tokenParamName: TokenParamName,
+    includeTemperature: boolean,
+  ): Promise<Response> {
     return fetch(endpointUrl(target), {
       method: 'POST',
       headers: { 'api-key': apiKey, 'Content-Type': 'application/json' },
@@ -73,9 +73,14 @@ export async function fetchStreamWithCompatibility(
   let lastFailure: Response | null = null;
 
   attemptLoop: for (const attempt of attempts) {
+    let includeTemperature = acceptsCustomTemperature(attempt.deployment);
     // Inner loop only re-runs the SAME attempt after temperature is dropped.
     for (;;) {
-      const response = await doFetch(attempt.deployment, attempt.tokenParamName);
+      const response = await doFetch(
+        attempt.deployment,
+        attempt.tokenParamName,
+        includeTemperature,
+      );
       if (response.ok) return response;
 
       const errorText = await response.text();
