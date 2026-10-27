@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.43.17] - 2026-10-27
+
 ### Fixed
 
 - Never send a custom temperature to the default GPT-6.1 Sol deployment, which only accepts
