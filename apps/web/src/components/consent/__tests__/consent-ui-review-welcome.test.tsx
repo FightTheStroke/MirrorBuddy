@@ -145,9 +145,11 @@ describe('welcome separates recorded terms from trial completion', () => {
   );
 
   it('retries failed email storage as trial preparation without rewriting accepted terms', async () => {
-    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('Session storage unavailable');
-    });
+    const setItem = vi
+      .spyOn(Object.getPrototypeOf(sessionStorage), 'setItem')
+      .mockImplementation(() => {
+        throw new Error('Session storage unavailable');
+      });
     const complete = vi.fn();
     const user = await submit(complete);
     expect(await screen.findByRole('alert')).toHaveTextContent(t('consent.sync.trialStartFailed'));

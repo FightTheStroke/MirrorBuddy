@@ -41,7 +41,7 @@ if [ -z "$related_files" ]; then
 else
   echo "pre-push: running tests related to $(printf '%s\n' "$related_files" | wc -l | tr -d ' ') changed file(s)"
   # shellcheck disable=SC2086
-  unit_cmd=(nice -n 19 npx vitest related $related_files --run --root apps/web --passWithNoTests --reporter=dot --maxWorkers=2)
+  unit_cmd=(nice -n 19 npx vitest related $related_files --run --root apps/web --passWithNoTests --reporter=dot --maxWorkers=2 --no-file-parallelism)
 fi
 
 if [ "${#unit_cmd[@]}" -eq 0 ] || "${unit_cmd[@]}" >"$unit_log" 2>&1; then

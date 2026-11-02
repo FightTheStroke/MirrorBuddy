@@ -14,6 +14,7 @@ import {
 } from '../unified-consent-storage';
 import { getConsentSyncSnapshot, resetConsentSnapshot } from '../consent-store';
 import { UNIFIED_CONSENT_KEY } from '../unified-consent';
+import { logger } from '@/lib/logger';
 import { installConsentTransportMock, setConsentTestAccount } from './consent-test-transport';
 
 const date = '2026-09-01T00:00:00.000Z';
@@ -146,6 +147,20 @@ describe('T6 recovery boundaries', () => {
     expect(getConsentSyncSnapshot()).toMatchObject({ ready: true, status: 'idle' });
     expect(getUnifiedConsent()).toBeNull();
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('reports an offline consent read as debug but a server failure as a warning', async () => {
+    const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
+    const debug = vi.spyOn(logger, 'debug').mockImplementation(() => undefined);
+    signIn();
+    vi.mocked(fetch).mockRejectedValue(new TypeError('Offline'));
+    await expect(initializeConsent()).rejects.toMatchObject({ code: 'network' });
+    expect(warn).not.toHaveBeenCalledWith('Consent operation failed', expect.anything());
+    expect(debug).toHaveBeenCalledWith('Consent operation failed', { code: 'network' });
+    resetConsentSnapshot();
+    vi.mocked(fetch).mockResolvedValue(Response.json({}, { status: 500 }));
+    await expect(initializeConsent()).rejects.toMatchObject({ code: 'http' });
+    expect(warn).toHaveBeenCalledWith('Consent operation failed', { code: 'http', status: 500 });
   });
 
   it('recovers initialization without repeating either legal decision', async () => {

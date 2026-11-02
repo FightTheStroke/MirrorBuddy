@@ -8,6 +8,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
+import { sentryInventoryEvidence } from './production-watch/sentry-inventory';
 
 import {
   issueBody,
@@ -144,6 +145,9 @@ async function main(): Promise<void> {
       // Public workflow logs must not contain event payloads, user text or request URLs.
       console.log(
         `${alert.key} | lifetime occurrences=${alert.occurrences} | lastSeen=${alert.lastSeen}`,
+      );
+      console.log(
+        `${alert.key} | ${await sentryInventoryEvidence(fetch, alert, SENTRY_AUTH_TOKEN)}`,
       );
     }
     return;

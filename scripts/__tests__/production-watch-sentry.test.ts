@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { fetchSentryAlerts, sentryIssueToAlert } from '../production-watch/sources';
 import { issueBody, issueTitle, markerFor, planIssues } from '../production-watch/plan';
+import { sentryInventoryEvidence } from '../production-watch/sentry-inventory';
 
 const now = Date.parse('2026-09-13T16:00:00Z');
 const config = { org: 'test', project: 'test', token: 'test-only' };
@@ -21,6 +22,27 @@ function feed(data: unknown): typeof fetch {
 }
 
 describe('Sentry recent-activity evidence', () => {
+  it('keeps event payloads private while reporting fixed technical classifications', async () => {
+    const fetchImpl: typeof fetch = async () =>
+      new Response(
+        JSON.stringify({
+          message: 'private user text',
+          request: { url: 'https://private.example/user' },
+          exception: { values: [{ type: 'TypeError', value: 'private exception text' }] },
+          extra: { errorName: 'NetworkError', statusCode: 503, name: 'Private Person' },
+        }),
+      );
+    const evidence = await sentryInventoryEvidence(
+      fetchImpl,
+      sentryIssueToAlert(issue),
+      'test-only',
+    );
+    expect(evidence).toBe(
+      'category=unclassified | errorTypes=NetworkError,TypeError | httpStatuses=503',
+    );
+    expect(evidence).not.toContain('private');
+    expect(evidence).not.toContain('Private Person');
+  });
   it.each(['preview', 'production', 'development'])(
     'preserves and truthfully labels the latest event environment %s',
     async (environment) => {

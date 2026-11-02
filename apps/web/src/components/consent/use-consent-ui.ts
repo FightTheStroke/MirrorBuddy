@@ -83,7 +83,15 @@ export function useConsentUI() {
         releasePreviousIntent();
         return true;
       } catch (error) {
-        clientLogger.error('Consent UI operation failed', { component: 'ConsentUI' }, error);
+        if (error instanceof ConsentSyncError && error.code === 'network') {
+          // Offline or dropped connection: the user already gets a retryable alert.
+          clientLogger.debug('Consent UI operation failed', {
+            component: 'ConsentUI',
+            code: error.code,
+          });
+        } else {
+          clientLogger.error('Consent UI operation failed', { component: 'ConsentUI' }, error);
+        }
         // A staged fresh intent may retry; a pre-intent identity failure must not revive the old choice.
         if (
           error instanceof ConsentSyncError &&
