@@ -55,7 +55,14 @@ export function useConsentUI() {
       await operation();
       return true;
     } catch (error) {
-      clientLogger.error('Consent follow-up operation failed', { component: 'ConsentUI' }, error);
+      if (error instanceof ConsentSyncError && error.code === 'network') {
+        clientLogger.debug('Consent follow-up operation failed', {
+          component: 'ConsentUI',
+          code: error.code,
+        });
+      } else {
+        clientLogger.error('Consent follow-up operation failed', { component: 'ConsentUI' }, error);
+      }
       setCompletionFailure(error instanceof Error ? error : new Error('Consent follow-up failed'));
       return false;
     } finally {
