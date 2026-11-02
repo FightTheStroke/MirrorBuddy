@@ -18,6 +18,82 @@ const errorNames = new Set([
   'NotSupportedError',
   'ConsentSyncError',
 ]);
+const errorCodes = new Set([
+  'network',
+  'http',
+  'storage',
+  'identity',
+  'invalid-response',
+  'superseded',
+]);
+const endpoints = new Map([
+  ['/api/auth/me', 'auth'],
+  ['/api/user', 'user'],
+  ['/api/user/settings', 'settings'],
+  ['/api/user/profile', 'profile'],
+  ['/api/user/accessibility', 'accessibility'],
+  ['/api/progress', 'progress'],
+  ['/api/progress/sessions', 'sessions'],
+  ['/api/conversations', 'conversations'],
+  ['/api/learnings', 'learnings'],
+]);
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function eventAttribution(event: Record<string, unknown>): string {
+  const version = isRecord(event.release) ? event.release.version : event.release;
+  const candidate =
+    typeof version === 'string' && version.length <= 96 ? version.replace(/^mirrorbuddy@/, '') : '';
+  const parts = candidate.split('+');
+  const base = parts[0] ?? '';
+  const suffix = parts[1];
+  const release =
+    parts.length <= 2 &&
+    (/^[a-f0-9]{40}$/.test(base) || /^v?\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(base)) &&
+    (suffix === undefined || /^[a-f0-9]{7,40}$/.test(suffix))
+      ? candidate
+      : undefined;
+  const codes = new Set<string>();
+  const inspectCodes = (value: unknown, depth = 0): void => {
+    if (!isRecord(value) || depth > 6) return;
+    for (const [key, item] of Object.entries(value)) {
+      if (['code', 'errorCode'].includes(key) && typeof item === 'string' && errorCodes.has(item)) {
+        codes.add(item);
+      }
+      inspectCodes(item, depth + 1);
+    }
+  };
+  inspectCodes(event.extra);
+  inspectCodes(event.context);
+  const requests: string[] = [];
+  for (const entry of Array.isArray(event.entries) ? event.entries : []) {
+    if (!isRecord(entry) || entry.type !== 'breadcrumbs' || !isRecord(entry.data)) continue;
+    for (const breadcrumb of Array.isArray(entry.data.values) ? entry.data.values : []) {
+      if (!isRecord(breadcrumb) || !isRecord(breadcrumb.data)) continue;
+      const { url, status_code: status } = breadcrumb.data;
+      if (typeof url !== 'string' || typeof status !== 'number' || !Number.isInteger(status))
+        continue;
+      let parsed: URL;
+      try {
+        parsed = new URL(url, 'https://www.mirrorbuddy.org');
+      } catch {
+        continue;
+      }
+      if (
+        !['www.mirrorbuddy.org', 'mirrorbuddy.org', 'mirrorbuddy.vercel.app'].includes(
+          parsed.hostname,
+        ) &&
+        !(parsed.hostname.startsWith('mirrorbuddy-') && parsed.hostname.endsWith('.vercel.app'))
+      )
+        continue;
+      const endpoint = endpoints.get(parsed.pathname);
+      if (endpoint && status >= 100 && status <= 599) requests.push(`${endpoint}:${status}`);
+    }
+  }
+  return `release=${release ?? 'unknown'} | contextCodes=${[...codes].sort().join(',') || 'unknown'} | requests=${requests.slice(-20).join(',') || 'unknown'}`;
+}
 
 /** Only fixed vocabulary and numeric HTTP statuses may reach public workflow logs. */
 export async function sentryInventoryEvidence(
@@ -33,7 +109,7 @@ export async function sentryInventoryEvidence(
   });
   if (!response.ok) throw new Error('Sentry inventory event unavailable');
   const event: unknown = await response.json();
-  if (!event || typeof event !== 'object') throw new Error('Invalid Sentry inventory event');
+  if (!isRecord(event)) throw new Error('Invalid Sentry inventory event');
   const names = new Set<string>();
   const statuses = new Set<number>();
   function inspect(value: unknown, depth = 0): void {
@@ -58,5 +134,5 @@ export async function sentryInventoryEvidence(
     }
   }
   inspect(event);
-  return `category=${categories.get(alert.title) ?? 'unclassified'} | errorTypes=${[...names].sort().join(',') || 'unknown'} | httpStatuses=${[...statuses].sort().join(',') || 'unknown'}`;
+  return `category=${categories.get(alert.title) ?? 'unclassified'} | errorTypes=${[...names].sort().join(',') || 'unknown'} | httpStatuses=${[...statuses].sort().join(',') || 'unknown'} | ${eventAttribution(event)}`;
 }

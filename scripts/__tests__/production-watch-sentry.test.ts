@@ -27,9 +27,15 @@ describe('Sentry recent-activity evidence', () => {
       new Response(
         JSON.stringify({
           message: 'private user text',
+          release: { version: 'private-release' },
           request: { url: 'https://private.example/user' },
           exception: { values: [{ type: 'TypeError', value: 'private exception text' }] },
-          extra: { errorName: 'NetworkError', statusCode: 503, name: 'Private Person' },
+          extra: {
+            errorName: 'NetworkError',
+            statusCode: 503,
+            name: 'Private Person',
+            code: 'private-code',
+          },
         }),
       );
     const evidence = await sentryInventoryEvidence(
@@ -38,10 +44,52 @@ describe('Sentry recent-activity evidence', () => {
       'test-only',
     );
     expect(evidence).toBe(
-      'category=unclassified | errorTypes=NetworkError,TypeError | httpStatuses=503',
+      'category=unclassified | errorTypes=NetworkError,TypeError | httpStatuses=503 | release=unknown | contextCodes=unknown | requests=unknown',
     );
     expect(evidence).not.toContain('private');
     expect(evidence).not.toContain('Private Person');
+  });
+  it('attributes allowlisted request statuses without exposing event content', async () => {
+    const fetchImpl: typeof fetch = async () =>
+      new Response(
+        JSON.stringify({
+          release: { version: 'a'.repeat(40) },
+          extra: { code: 'network', error: 'private error message', email: 'private@example.test' },
+          entries: [
+            {
+              type: 'breadcrumbs',
+              data: {
+                values: [
+                  {
+                    data: {
+                      url: 'https://www.mirrorbuddy.org/api/auth/me?private=value',
+                      status_code: 401,
+                    },
+                  },
+                  {
+                    data: { url: 'https://www.mirrorbuddy.org/api/user', status_code: 200 },
+                  },
+                  {
+                    data: {
+                      url: 'https://private.example/api/user?secret=value',
+                      status_code: 503,
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      );
+    const evidence = await sentryInventoryEvidence(
+      fetchImpl,
+      sentryIssueToAlert(issue),
+      'test-only',
+    );
+    expect(evidence).toContain(`release=${'a'.repeat(40)}`);
+    expect(evidence).toContain('contextCodes=network');
+    expect(evidence).toContain('requests=auth:401,user:200');
+    expect(evidence).not.toMatch(/private|secret|example|@|https:/);
   });
   it.each(['preview', 'production', 'development'])(
     'preserves and truthfully labels the latest event environment %s',
