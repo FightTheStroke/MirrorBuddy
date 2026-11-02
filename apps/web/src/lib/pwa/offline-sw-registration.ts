@@ -50,9 +50,15 @@ export async function registerOfflineServiceWorker(): Promise<boolean> {
 
     return true;
   } catch (error) {
-    logger.warn('[Offline SW] Registration failed', {
-      errorName: error instanceof Error ? error.name : 'UnknownError',
-    });
+    const errorName =
+      error instanceof Error || error instanceof DOMException ? error.name : 'UnknownError';
+    // The browser refuses service workers by policy (private browsing, blocked site data):
+    // a user setting, not a fault. Network and programming failures stay reported.
+    if (error instanceof DOMException && error.name === 'SecurityError') {
+      logger.debug('[Offline SW] Registration blocked by the browser', { errorName });
+    } else {
+      logger.warn('[Offline SW] Registration failed', { errorName });
+    }
     return false;
   }
 }

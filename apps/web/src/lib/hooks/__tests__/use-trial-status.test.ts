@@ -85,7 +85,7 @@ describe('useTrialStatus authoritative separation', () => {
     expect(track).not.toHaveBeenCalled();
   });
   it('network failure does not mint default quotas', async () => {
-    fetchMock.mockRejectedValue(new TypeError('Offline'));
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
     const { result } = renderHook(() => useTrialStatus());
     await waitFor(() => expect(result.current.error).toBeTruthy());
     expect(result.current.toolsRemaining).toBe(0);

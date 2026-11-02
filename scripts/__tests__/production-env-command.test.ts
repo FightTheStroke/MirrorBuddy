@@ -117,9 +117,8 @@ describe('existing publication and deployment wiring', () => {
     expect(metadataJob).toContain('VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}');
     expect(metadataJob).toContain('exit 1');
     for (const gate of ['pr-gate', 'deployment-gate']) {
-      expect(workflow.split(`\n  ${gate}:`)[1]).toContain(
-        "needs.production-metadata.result != 'success'",
-      );
+      const section = workflow.split(`\n  ${gate}:`)[1]?.split(/\n  [a-z][a-z0-9-]*:/)[0];
+      expect(section).toContain("needs.production-metadata.result != 'success'");
     }
     for (const marker of [
       'check-schema-drift.sh',

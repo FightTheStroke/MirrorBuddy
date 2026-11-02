@@ -14,7 +14,7 @@ import {
   type ConsentIdentity,
   type ConsentSyncSnapshot,
 } from './unified-consent';
-export { decisionFor, ConsentSyncError } from './unified-consent';
+export { decisionFor, ConsentSyncError, toConsentSyncError } from './unified-consent';
 export type { ConsentErrorCode, ConsentSyncSnapshot } from './unified-consent';
 const initial = (): ConsentSyncSnapshot => ({
   ready: false,

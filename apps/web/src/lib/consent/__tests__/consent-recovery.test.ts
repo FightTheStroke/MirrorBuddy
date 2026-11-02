@@ -153,7 +153,7 @@ describe('T6 recovery boundaries', () => {
     const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
     const debug = vi.spyOn(logger, 'debug').mockImplementation(() => undefined);
     signIn();
-    vi.mocked(fetch).mockRejectedValue(new TypeError('Offline'));
+    vi.mocked(fetch).mockRejectedValue(new TypeError('Failed to fetch'));
     await expect(initializeConsent()).rejects.toMatchObject({ code: 'network' });
     expect(warn).not.toHaveBeenCalledWith('Consent operation failed', expect.anything());
     expect(debug).toHaveBeenCalledWith('Consent operation failed', { code: 'network' });
@@ -161,11 +161,22 @@ describe('T6 recovery boundaries', () => {
     vi.mocked(fetch).mockResolvedValue(Response.json({}, { status: 500 }));
     await expect(initializeConsent()).rejects.toMatchObject({ code: 'http' });
     expect(warn).toHaveBeenCalledWith('Consent operation failed', { code: 'http', status: 500 });
+    resetConsentSnapshot();
+    const bug = new TypeError("Cannot read properties of undefined (reading 'ok')");
+    vi.mocked(fetch).mockRejectedValue(bug);
+    await expect(initializeConsent()).rejects.toMatchObject({
+      code: 'invalid-response',
+      cause: bug,
+    });
+    expect(warn).toHaveBeenCalledWith('Consent operation failed', {
+      code: 'invalid-response',
+      status: undefined,
+    });
   });
 
   it('recovers initialization without repeating either legal decision', async () => {
     signIn();
-    vi.mocked(fetch).mockRejectedValue(new TypeError('Offline'));
+    vi.mocked(fetch).mockRejectedValue(new TypeError('Failed to fetch'));
     await expect(initializeConsent()).rejects.toMatchObject({ code: 'network' });
     vi.mocked(fetch).mockImplementation(async (input, init) => {
       expect(init?.method).toBe('GET');

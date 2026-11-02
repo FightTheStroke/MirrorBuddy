@@ -158,6 +158,20 @@ describe('registerOfflineServiceWorker', () => {
     });
   });
 
+  it('treats a browser SecurityError as a blocked setting, not a warning', async () => {
+    mockServiceWorker.register.mockRejectedValue(
+      new DOMException('The operation is insecure.', 'SecurityError'),
+    );
+
+    expect(await registerOfflineServiceWorker()).toBe(false);
+    expect(mockServiceWorker.register).toHaveBeenCalledTimes(1);
+    expect(logger.warn).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.debug).toHaveBeenCalledWith('[Offline SW] Registration blocked by the browser', {
+      errorName: 'SecurityError',
+    });
+  });
+
   it('should return false when registration fails', async () => {
     const error = new Error('Registration failed');
     mockServiceWorker.register.mockRejectedValueOnce(error);

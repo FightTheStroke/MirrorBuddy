@@ -120,7 +120,7 @@ describe('T6 synchronization races and readiness', () => {
   it('surfaces initialization failure without rendering stale mandatory acceptance as ready', async () => {
     saveTermsConsent(true);
     signIn();
-    vi.mocked(fetch).mockRejectedValue(new TypeError('Offline'));
+    vi.mocked(fetch).mockRejectedValue(new TypeError('Failed to fetch'));
     await expect(initializeConsent()).rejects.toMatchObject({ code: 'network' });
     expect(getConsentSyncSnapshot()).toMatchObject({ ready: true, status: 'error' });
     expect(getConsentSnapshot()).toBe(false);

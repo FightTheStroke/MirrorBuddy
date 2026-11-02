@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Treat a recoverable consent network failure as an offline condition while preserving
   the retry prompt and reporting server, identity, storage, and response failures.
+- Keep browser-denied offline caching distinct from unexpected service worker failures,
+  and record safe technical context for otherwise unexplained store initialization failures.
 - Keep complete tests and authenticated hosting checks in required cloud release gates,
   rather than requiring full local suites or local production credentials.
 - Inventory all unresolved Sentry issues across their full history, with pagination and

@@ -8,6 +8,7 @@ import {
 } from './unified-consent';
 import {
   ConsentSyncError,
+  toConsentSyncError,
   confirmAnalyticsPermission,
   confirmConsent,
   currentRevision,
@@ -89,7 +90,7 @@ export function deliverConsent(intent: ConsentIntent): Promise<void> {
     try {
       await sendIntent(intent);
     } catch (error) {
-      const failure = error instanceof ConsentSyncError ? error : new ConsentSyncError('network');
+      const failure = toConsentSyncError(error);
       if (currentRevision(intent.purpose) === intent.revision && failure.code !== 'superseded')
         failConsent(failure, intent.purpose);
       throw failure;

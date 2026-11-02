@@ -126,7 +126,7 @@ describe('UI recovery at consent identity boundaries', () => {
     setConsentTestAccount(true);
     const transport = vi.mocked(fetch).getMockImplementation()!;
     vi.mocked(fetch).mockImplementation(async (input, init) => {
-      if (input === '/api/user/consent') throw new TypeError('Offline');
+      if (input === '/api/user/consent') throw new TypeError('Failed to fetch');
       return transport(input, init);
     });
     const user = userEvent.setup();
