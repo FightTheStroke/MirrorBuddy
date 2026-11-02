@@ -5,6 +5,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  realpathSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
@@ -15,7 +16,7 @@ export const repository = process.cwd();
 const roots: string[] = [];
 
 export function selectorFixture(files: string[]) {
-  const root = mkdtempSync(join(tmpdir(), 'mirrorbuddy-selection-'));
+  const root = realpathSync(mkdtempSync(join(tmpdir(), 'mirrorbuddy-selection-')));
   roots.push(root);
   for (const name of ['scripts', 'bin', 'elsewhere']) mkdirSync(join(root, name));
   for (const script of ['smart-test.sh', 'test-affected.sh']) {

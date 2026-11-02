@@ -191,15 +191,7 @@ fi
 # =============================================================================
 # PHASE 5/5: VERCEL PRODUCTION ENV METADATA
 # =============================================================================
-echo -e "${BLUE}[5/5] Vercel production environment names (no secret download)...${NC}"
-
-# Worktrees reuse the main tree's project link, never its environment files.
-source "$SCRIPT_DIR_PPV/lib/vercel-link.sh"
-VERCEL_CWD=$(resolve_vercel_cwd "$PWD") || exit 1
-
-# Required names come from the pre-deploy critical policy, not optional fallbacks.
-# Value integrity is enforced in the trusted Vercel build and CI pre-deploy runtime.
-"$SCRIPT_DIR_PPV/../node_modules/.bin/tsx" "$SCRIPT_DIR_PPV/check-production-env.ts" metadata "$VERCEL_CWD"
+echo -e "${BLUE}[5/5] Production environment metadata is mandatory in cloud CI before integration and deployment.${NC}"
 
 # =============================================================================
 # SUMMARY
@@ -213,4 +205,4 @@ echo -e "${GREEN} ✓ PRE-PUSH VERCEL CHECK PASSED${NC}"
 echo " Total time: ${TOTAL}s"
 echo "=========================================="
 echo ""
-echo "Safe to push to GitHub/Vercel."
+echo "Local checks passed. Cloud PR and deployment gates must pass before release."

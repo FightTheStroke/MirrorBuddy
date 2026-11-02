@@ -119,7 +119,8 @@ export function staleReleaseAlert(
   const live = status.liveVersion?.trim();
   const release = status.latestRelease?.trim();
   if (!live) throw new Error('Live version unknown — cannot judge whether production is behind');
-  if (!release) throw new Error('Latest release unknown — cannot judge whether production is behind');
+  if (!release)
+    throw new Error('Latest release unknown — cannot judge whether production is behind');
 
   const releasedAt = Date.parse(status.releasedAt);
   if (!Number.isFinite(releasedAt)) throw new Error('Invalid release timestamp');
@@ -178,30 +179,51 @@ export async function fetchReleaseAlerts(
 
 export async function fetchSentryAlerts(
   fetchImpl: typeof fetch,
-  config: { org: string; project: string; token: string },
+  config: { org: string; project: string; token: string; allUnresolved?: boolean },
   now = Date.now(),
 ): Promise<ProductionAlert[]> {
   if (!Number.isFinite(now)) throw new Error('Invalid Sentry observation time');
-  const url =
-    `https://sentry.io/api/0/projects/${config.org}/${config.project}` +
-    `/issues/?statsPeriod=24h&query=${encodeURIComponent('is:unresolved')}`;
-
-  const response = await fetchImpl(url, {
-    headers: { Authorization: `Bearer ${config.token}` },
-  });
-  if (!response.ok) {
-    throw new Error(`Sentry replied ${response.status}: ${await response.text()}`);
+  const endpoint = `https://sentry.io/api/0/projects/${config.org}/${config.project}` + '/issues/';
+  const url = new URL(endpoint);
+  url.searchParams.set('statsPeriod', config.allUnresolved ? '' : '24h');
+  url.searchParams.set('query', 'is:unresolved');
+  url.searchParams.set('limit', '100');
+  const issues: SentryIssue[] = [];
+  const cursors = new Set<string>();
+  while (true) {
+    const response = await fetchImpl(url.toString(), {
+      headers: { Authorization: `Bearer ${config.token}` },
+      redirect: 'error',
+    });
+    if (!response.ok) throw new Error(`Sentry replied ${response.status}`);
+    issues.push(...z.array(sentryIssueSchema).parse(await response.json()));
+    const next = response.headers
+      .get('Link')
+      ?.split(',')
+      .find((link) => /rel="next"/.test(link));
+    if (!next || !/results="true"/.test(next)) break;
+    const destination = next.match(/<([^>]+)>/)?.[1];
+    const cursor = next.match(/cursor="([^"]+)"/)?.[1];
+    if (!destination || !cursor) throw new Error('Invalid Sentry pagination');
+    const nextUrl = new URL(destination);
+    if (nextUrl.origin + nextUrl.pathname !== endpoint || cursors.has(cursor)) {
+      throw new Error('Unsafe or repeated Sentry pagination');
+    }
+    cursors.add(cursor);
+    url.searchParams.set('cursor', cursor);
   }
-
-  const issues = z.array(sentryIssueSchema).parse(await response.json());
   if (issues.some((issue) => Date.parse(issue.lastSeen) > now)) {
     throw new Error('Sentry feed contains a future lastSeen timestamp');
   }
   const alerts: ProductionAlert[] = [];
   for (const issue of issues.filter(
-    (issue) => Date.parse(issue.lastSeen) >= now - 24 * 60 * 60 * 1000,
+    (issue) => config.allUnresolved || Date.parse(issue.lastSeen) >= now - 24 * 60 * 60 * 1000,
   )) {
     const alert = sentryIssueToAlert(issue);
+    if (config.allUnresolved) {
+      alerts.push(alert);
+      continue;
+    }
     let environment = 'unknown';
     try {
       const eventResponse = await fetchImpl(

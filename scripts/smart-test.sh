@@ -60,20 +60,20 @@ while IFS= read -r -d '' file; do
 	esac
 done <"$changes_file"
 
-run_full_unit() {
-	echo "Running the full unit suite; related coverage is insufficient or configuration changed."
-	npx vitest run --root apps/web --passWithNoTests=false --retry=0 --reporter=dot
+require_cloud_coverage() {
+	echo "Complete unit suite is mandatory in cloud CI; local related coverage is insufficient."
 }
 
 if $full_unit; then
-	run_full_unit
-elif [[ "$unit_count" -gt 0 ]]; then
+	require_cloud_coverage
+fi
+if [[ "$unit_count" -gt 0 ]]; then
 	echo "Running tests related to $unit_count staged files..."
 	unit_report=$(mktemp)
 	unit_log=$(mktemp)
 	status=0
 	# A scalar outputFile overrides the app config's shared report path.
-	npx vitest related "${unit_files[@]}" --run --root apps/web \
+	nice -n 19 npx vitest related "${unit_files[@]}" --run --root apps/web --maxWorkers=2 --no-file-parallelism \
 		--passWithNoTests=false --retry=0 --reporter=dot --reporter=json \
 		"--outputFile=$unit_report" >"$unit_log" 2>&1 || status=$?
 	cat "$unit_log"
@@ -89,7 +89,7 @@ const empty = report && typeof report === "object" && report.success === false
   && Array.isArray(report.testResults) && report.testResults.length === 0;
 process.exit(empty ? 0 : 1);
 ' "$unit_report"; then
-			run_full_unit
+			require_cloud_coverage
 		else
 			exit "$status"
 		fi

@@ -88,6 +88,51 @@ describe('Sentry recent-activity evidence', () => {
     expect(plan).toEqual({ create: [], update: [], close: [] });
   });
 
+  it('includes historical unresolved issues and follows every results-bearing page on request', async () => {
+    const urls: URL[] = [];
+    const fetchImpl: typeof fetch = async (input) => {
+      const url = new URL(String(input));
+      urls.push(url);
+      const secondPage = url.searchParams.has('cursor');
+      return new Response(
+        JSON.stringify([
+          { ...issue, shortId: secondPage ? 'TEST-2' : 'TEST-1', lastSeen: '2026-03-02T00:00:00Z' },
+        ]),
+        {
+          headers: {
+            Link: `<${url.origin}${url.pathname}?cursor=next>; rel="next"; results="${!secondPage}"; cursor="next"`,
+          },
+        },
+      );
+    };
+    const alerts = await fetchSentryAlerts(fetchImpl, { ...config, allUnresolved: true }, now);
+    expect(alerts.map((alert) => alert.key)).toEqual(['sentry:TEST-1', 'sentry:TEST-2']);
+    expect(urls).toHaveLength(2);
+    expect(urls[0].searchParams.get('statsPeriod')).toBe('');
+    expect(urls[0].searchParams.get('query')).toBe('is:unresolved');
+    expect(urls[1].searchParams.get('cursor')).toBe('next');
+  });
+
+  it.each([
+    'https://untrusted.example/issues/?cursor=next',
+    'https://sentry.io/api/0/other/?cursor=next',
+  ])(
+    'refuses a pagination destination outside the original Sentry endpoint: %s',
+    async (destination) => {
+      let requests = 0;
+      const fetchImpl: typeof fetch = async () => {
+        requests++;
+        return new Response(JSON.stringify([issue]), {
+          headers: { Link: `<${destination}>; rel="next"; results="true"; cursor="next"` },
+        });
+      };
+      await expect(
+        fetchSentryAlerts(fetchImpl, { ...config, allUnresolved: true }, now),
+      ).rejects.toThrow('pagination');
+      expect(requests).toBe(1);
+    },
+  );
+
   it.each([
     ['2026-09-13T15:00:00Z', 1],
     ['2026-09-12T16:00:00Z', 1],

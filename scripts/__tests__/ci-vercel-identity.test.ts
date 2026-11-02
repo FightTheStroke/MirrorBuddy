@@ -8,6 +8,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 const repository = resolve(import.meta.dirname, '../..');
 const workflow = readFileSync(join(repository, '.github/workflows/ci.yml'), 'utf8');
 const sentryJob = workflow.split('\n  sentry-config:')[1]?.split('\n  smoke-tests:')[0] ?? '';
+const metadataJob =
+  workflow.split('\n  production-metadata:')[1]?.split('\n  sentry-config:')[0] ?? '';
 const roots: string[] = [];
 
 // Git environment inherited from a hook would redirect the resolver's fallback to the
@@ -61,6 +63,22 @@ afterEach(() => {
 });
 
 describe('Vercel project identity in the CI Sentry configuration check', () => {
+  it('requires authenticated production metadata before trusted integration and deployment', () => {
+    expect(metadataJob).toContain('github.event.pull_request.base.sha || github.sha');
+    expect(metadataJob).toContain('pnpm install --frozen-lockfile --ignore-scripts');
+    expect(metadataJob).toContain('scripts/check-production-env.ts release-metadata');
+    expect(metadataJob).toContain('VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}');
+    expect(metadataJob).toContain('VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}');
+    expect(metadataJob).toContain('VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}');
+    expect(metadataJob).toContain('exit 1');
+    for (const name of ['pr-gate', 'deployment-gate']) {
+      const gate = workflow.split(`\n  ${name}:`)[1]?.split('\n  # ====')[0] ?? '';
+      expect(gate).toContain('- production-metadata');
+      expect(gate).toContain("needs.production-metadata.result != 'success'");
+      expect(gate).toContain("needs.production-metadata.result == 'success'");
+    }
+  });
+
   it('supplies the project identity to the script that resolves the linked project', () => {
     const step = sentryJob
       .split('- name: Verify Sentry configuration against Vercel production env')[1]

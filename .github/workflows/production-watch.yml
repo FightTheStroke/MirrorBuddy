@@ -6,11 +6,15 @@ name: Production Watch
 
 on:
   schedule:
-    - cron: "0 3 * * *"
+    - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Report only, do not touch issues"
+        description: 'Report only, do not touch issues'
+        type: boolean
+        default: false
+      all_unresolved:
+        description: 'Inventory all unresolved Sentry issues, without a time limit (requires dry_run)'
         type: boolean
         default: false
 
@@ -24,7 +28,7 @@ concurrency:
 
 jobs:
   watch:
-    name: "🌙 Watch production"
+    name: '🌙 Watch production'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -54,7 +58,7 @@ jobs:
           test "$STATUS" = "200"
 
       - name: Open an issue if the site is unhealthy
-        if: steps.health.outcome == 'failure'
+        if: steps.health.outcome == 'failure' && inputs.dry_run != true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -72,7 +76,10 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
         run: |
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
+          if [ "${{ inputs.all_unresolved }}" = "true" ]; then
+            test "${{ inputs.dry_run }}" = "true" || { echo "All-unresolved inventory requires dry_run"; exit 1; }
+            pnpm run script scripts/production-error-watch.ts -- --dry-run --all-unresolved
+          elif [ "${{ inputs.dry_run }}" = "true" ]; then
             pnpm run script scripts/production-error-watch.ts -- --dry-run
           else
             pnpm run script scripts/production-error-watch.ts

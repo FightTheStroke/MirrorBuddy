@@ -12,7 +12,8 @@ Language — code, comments and docs in English; UI strings via next-intl (it/en
 
 ## Quality gates (MANDATORY, pre-commit)
 
-1. `npm run test:unit -- --reporter=dot` before EVERY commit.
+1. Run targeted related unit tests locally (`nice -n 19`, at most four workers);
+   the complete unit suite is mandatory in cloud CI before integration and release.
 2. After ANY UI text change: `npx tsx scripts/i18n-sync-namespaces.ts --add-missing`.
 3. Run `npm run i18n:check` before commit even if `apps/web/messages/` is not staged.
 4. New env var → update ALL of: `.env.example`, `scripts/validate-pre-deploy.ts`,
@@ -121,9 +122,11 @@ task-state transitions and the global checkpoint; implementation alone is not ac
   `git push --no-verify|--force`. Use `npm run ci:summary` instead.
   Test rules (roberdan-os `docs/testing-template.md`): the hook runs only the unit tests
   related to the push (`vitest related`) and NO production build (`PRE_PUSH_BUILD=1` opts in).
-  If the push touches a path in `.test-critical` (glob + reason; editing it is itself
-  critical) it runs the FULL unit suite, two workers; no `.test-critical` means everything is
-  critical. Failures retain a private temporary log and print its path. The full suite
+  Complete unit coverage, including critical paths, runs in cloud CI and is required by
+  both the PR and deployment gates, never as a full suite on the Mac.
+  Authenticated production metadata validation also runs in cloud CI and blocks trusted
+  integration and deployment; local checks do not require hosting credentials.
+  Failures retain a private temporary log and print its path. The full suite
   also runs nightly (`.github/workflows/nightly-tests.yml`) with the `.test-budget` ratchet:
   more than +10% test files or wall time over the record is red unless the PR carries a
   `Test-budget: <why>` line. Extend an existing test before adding a file.
