@@ -19,6 +19,7 @@ import {
   confirmAnalyticsPermission,
   consentClearing,
   ConsentSyncError,
+  toConsentSyncError,
   currentRevision,
   failConsent,
   getConsentSyncSnapshot,
@@ -74,8 +75,7 @@ export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | n
         }
       });
     } catch (error) {
-      if (error instanceof ConsentSyncError) throw error;
-      throw new ConsentSyncError('network');
+      throw toConsentSyncError(error);
     }
   };
   const terms = await get('/api/tos');
@@ -189,10 +189,7 @@ subscribeClientIdentity(() => {
     if (!initializedIdentity || getClientIdentity() !== next) return;
     void initializeConsent().catch((error: unknown) => {
       if (error instanceof ConsentSyncError && error.code === 'superseded') return;
-      failConsent(
-        error instanceof ConsentSyncError ? error : new ConsentSyncError('network'),
-        'initialization',
-      );
+      failConsent(toConsentSyncError(error), 'initialization');
     });
   });
 });

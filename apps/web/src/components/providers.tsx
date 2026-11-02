@@ -102,7 +102,13 @@ function StoreInitializer() {
           logger.debug('Store hydration skipped: the session is no longer valid');
           return;
         }
-        logger.warn('Store hydration failed; retry when identity is refreshed');
+        const message = error instanceof Error ? error.message : '';
+        const status =
+          /\(([1-5]\d\d), ([1-5]\d\d)\)$/.exec(message) ?? /\(([1-5]\d\d)\)$/.exec(message);
+        logger.warn('Store hydration failed; retry when identity is refreshed', {
+          errorName: error instanceof Error ? error.name : 'UnknownError',
+          ...(status && { status: status.slice(1).filter(Boolean).join(',') }),
+        });
       });
 
     // Load conversation summaries for context

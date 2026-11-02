@@ -9,6 +9,7 @@ import { setConsentTestAccount } from '@/lib/consent/__tests__/consent-test-tran
 import { TRIAL_CONSENT_COOKIE } from '@/lib/auth';
 import { TOS_VERSION } from '@/lib/tos/constants';
 import { installConsentUITransport } from './consent-ui-fixture';
+import { clientLogger } from '@mirrorbuddy/logger/client';
 import { getTranslation as t } from '@/test/i18n-helpers';
 
 const captured = vi.hoisted(() => ({
@@ -57,8 +58,13 @@ describe('welcome separates recorded terms from trial completion', () => {
       .mockRejectedValueOnce(error)
       .mockResolvedValue(undefined);
     const save = vi.spyOn(consentStorage, 'saveTermsConsent');
+    const report = vi.spyOn(clientLogger, 'error').mockImplementation(() => undefined);
+    const debug = vi.spyOn(clientLogger, 'debug').mockImplementation(() => undefined);
     const user = await submit(complete);
     expect(await screen.findByRole('alert')).toHaveTextContent(t('consent.sync.trialStartFailed'));
+    const offline = error instanceof consentStorage.ConsentSyncError;
+    expect(report).toHaveBeenCalledTimes(offline ? 0 : 1);
+    expect(debug).toHaveBeenCalledTimes(offline ? 1 : 0);
     expect(screen.queryByText(t('consent.sync.failed'))).not.toBeInTheDocument();
     expect(consentStorage.hasUnifiedConsent()).toBe(true);
     expect(getConsentSyncSnapshot().error).toBeNull();
@@ -145,9 +151,11 @@ describe('welcome separates recorded terms from trial completion', () => {
   );
 
   it('retries failed email storage as trial preparation without rewriting accepted terms', async () => {
-    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('Session storage unavailable');
-    });
+    const setItem = vi
+      .spyOn(Object.getPrototypeOf(sessionStorage), 'setItem')
+      .mockImplementation(() => {
+        throw new Error('Session storage unavailable');
+      });
     const complete = vi.fn();
     const user = await submit(complete);
     expect(await screen.findByRole('alert')).toHaveTextContent(t('consent.sync.trialStartFailed'));

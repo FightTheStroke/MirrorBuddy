@@ -13,9 +13,7 @@ import { cleanupSelectorFixtures, repository, selectorFixture } from './smart-te
 
 afterEach(cleanupSelectorFixtures);
 
-// `vitest related` cannot establish relatedness for these inputs, so the
-// safety fallback runs the complete unit suite. Two measured runs took about
-// 553 seconds; keep a finite budget with enough headroom for shared runners.
+// Isolated-index related-test discovery can be slow on shared runners.
 const SMART_TEST_NESTED_SPAWN_TIMEOUT_MS = 750_000;
 const SMART_TEST_NESTED_TEST_TIMEOUT_MS = 780_000;
 
@@ -143,7 +141,7 @@ describe('actual execution and collection', () => {
 [[ "$1" == vitest ]] || exit 91
 shift
 status=0
-"$REAL_NODE" "$REAL_CLI" "$@" --maxWorkers=1 || status=$?
+"$REAL_NODE" "$REAL_CLI" "$@" || status=$?
 for arg in "$@"; do
   if [[ "$arg" == --outputFile=* ]]; then cp "\${arg#--outputFile=}" "$PROOF"; fi
 done

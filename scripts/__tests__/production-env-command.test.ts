@@ -103,11 +103,23 @@ describe('existing publication and deployment wiring', () => {
     expect(registered.filter((name) => !known.has(name))).toEqual([]);
   });
 
-  it('retains all earlier pre-push phases, but cannot skip or download in phase five', () => {
+  it('retains earlier local phases and requires authenticated metadata in both cloud gates', () => {
     const script = source('scripts/pre-push-vercel.sh');
     const phase = script.split('# PHASE 5/5:')[1];
-    expect(phase).toContain('check-production-env.ts" metadata "$VERCEL_CWD"');
+    expect(phase).toContain('Production environment metadata is mandatory in cloud CI');
     expect(phase).not.toMatch(/env pull|SKIP_VERCEL_ENV_CHECK|skipping|env vars OK/);
+    expect(phase).not.toContain('check-production-env.ts');
+    const workflow = source('.github/workflows/ci.yml');
+    const metadataJob = workflow
+      .split('\n  production-metadata:')[1]
+      ?.split('\n  sentry-config:')[0];
+    expect(metadataJob).toContain('check-production-env.ts release-metadata "$VERCEL_CWD"');
+    expect(metadataJob).toContain('VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}');
+    expect(metadataJob).toContain('exit 1');
+    for (const gate of ['pr-gate', 'deployment-gate']) {
+      const section = workflow.split(`\n  ${gate}:`)[1]?.split(/\n  [a-z][a-z0-9-]*:/)[0];
+      expect(section).toContain("needs.production-metadata.result != 'success'");
+    }
     for (const marker of [
       'check-schema-drift.sh',
       'npx prisma generate',

@@ -14,7 +14,7 @@ import {
   type ConsentIdentity,
   type ConsentSyncSnapshot,
 } from './unified-consent';
-export { decisionFor, ConsentSyncError } from './unified-consent';
+export { decisionFor, ConsentSyncError, toConsentSyncError } from './unified-consent';
 export type { ConsentErrorCode, ConsentSyncSnapshot } from './unified-consent';
 const initial = (): ConsentSyncSnapshot => ({
   ready: false,
@@ -62,7 +62,11 @@ export function failConsent(
     snapshot.error.scope === scope
   )
     return;
-  logger.warn('Consent operation failed', { code: error.code, status: error.status });
+  // A failed fetch (offline, dropped connection) is surfaced to the user with a retry; the
+  // other codes (http, invalid-response, storage, identity) stay reported.
+  const detail = { code: error.code, status: error.status };
+  if (error.code === 'network') logger.debug('Consent operation failed', detail);
+  else logger.warn('Consent operation failed', detail);
   updateConsentState({
     status: 'error',
     error: { code: error.code, status: error.status, retryable: error.retryable, scope },

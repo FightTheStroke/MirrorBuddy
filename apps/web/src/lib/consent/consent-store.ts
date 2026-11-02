@@ -5,6 +5,7 @@ import {
 } from './unified-consent-storage';
 import {
   ConsentSyncError,
+  toConsentSyncError,
   failConsent,
   getConsentSyncSnapshot,
   getServerConsentSyncSnapshot,
@@ -22,10 +23,7 @@ export function getConsentSnapshot(): boolean {
     if (!getConsentSyncSnapshot().ready) {
       void initializeConsent().catch((error) => {
         if (error instanceof ConsentSyncError && error.code === 'superseded') return;
-        failConsent(
-          error instanceof ConsentSyncError ? error : new ConsentSyncError('network'),
-          'initialization',
-        );
+        failConsent(toConsentSyncError(error), 'initialization');
       });
     }
   }

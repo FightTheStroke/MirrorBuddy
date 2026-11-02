@@ -39,7 +39,7 @@ describe('consent callers retain and retry real failed intents', () => {
         vi.mocked(fetch).mockImplementation(async (input, init) => {
           if (input === '/api/user/consent' && init?.method === 'POST') {
             requests.push(String(init.body));
-            if (failing && failure === 'network') throw new TypeError('Offline');
+            if (failing && failure === 'network') throw new TypeError('Failed to fetch');
             if (failing && failure === 403)
               return Response.json({ error: 'CSRF' }, { status: 403 });
           }
@@ -95,7 +95,7 @@ describe('consent callers retain and retry real failed intents', () => {
     const user = userEvent.setup();
     const transport = vi.mocked(fetch).getMockImplementation()!;
     vi.mocked(fetch).mockImplementation(async (input, init) => {
-      if (input === '/api/user/consent') throw new TypeError('Offline');
+      if (input === '/api/user/consent') throw new TypeError('Failed to fetch');
       return transport(input, init);
     });
     render(
@@ -176,7 +176,7 @@ describe('consent callers retain and retry real failed intents', () => {
     const transport = vi.mocked(fetch).getMockImplementation()!;
     let failing = true;
     vi.mocked(fetch).mockImplementation(async (input, init) => {
-      if (input === '/api/user/consent' && failing) throw new TypeError('Offline');
+      if (input === '/api/user/consent' && failing) throw new TypeError('Failed to fetch');
       return transport(input, init);
     });
     render(

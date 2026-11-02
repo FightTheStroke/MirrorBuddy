@@ -207,7 +207,7 @@ describe('T5 actual consent caller compatibility', () => {
       if (!transport) throw new Error('Missing HTTP fixture');
       vi.mocked(fetch).mockImplementation(async (input, init) => {
         if (input !== '/api/user/consent') return transport(input, init);
-        if (failure === 'network') throw new TypeError('Offline');
+        if (failure === 'network') throw new TypeError('Failed to fetch');
         return Response.json({ error: 'Save rejected' }, { status: failure });
       });
       saveTermsConsent(true);

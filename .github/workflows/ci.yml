@@ -762,6 +762,39 @@ jobs:
       - name: Version and changelog agree
         run: npx --yes tsx scripts/ci/check-version-consistency.ts
 
+  production-metadata:
+    name: Production Environment Metadata
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      # Never run candidate code with hosting credentials on a pull request.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies without lifecycle scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Install Vercel CLI
+        run: npm install -g "vercel@${VERCEL_CLI_VERSION}"
+      - name: Verify production and Sentry environment names
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ] || [ -z "$VERCEL_ORG_ID" ]; then
+            echo "::error::Vercel token and project identity are required for production metadata validation."
+            exit 1
+          fi
+          source scripts/lib/vercel-link.sh
+          VERCEL_CWD=$(resolve_vercel_cwd "$PWD")
+          pnpm exec tsx scripts/check-production-env.ts release-metadata "$VERCEL_CWD"
+
   # Lane 5c: Sentry Production Configuration (runs on push only, uses Vercel CLI)
   sentry-config:
     name: Sentry Config (Vercel)
@@ -2017,6 +2050,7 @@ jobs:
       - security
       - llm-safety-tests
       - unit-tests
+      - production-metadata
       - docs
       - migrations
       - quality
@@ -2037,6 +2071,9 @@ jobs:
           needs.security.result != 'success' ||
           needs.llm-safety-tests.result != 'success' ||
           needs.unit-tests.result != 'success' ||
+          (needs.production-metadata.result != 'success' &&
+            (needs.production-metadata.result != 'skipped' ||
+             github.event.pull_request.head.repo.full_name == github.repository)) ||
           needs.docs.result != 'success' ||
           needs.quality.result != 'success' ||
           needs.smoke-tests.result != 'success' ||
@@ -2065,6 +2102,7 @@ jobs:
           echo "  security: ${{ needs.security.result }}"
           echo "  llm-safety-tests: ${{ needs.llm-safety-tests.result }}"
           echo "  unit-tests: ${{ needs.unit-tests.result }}"
+          echo "  production-metadata: ${{ needs.production-metadata.result }}"
           echo "  docs: ${{ needs.docs.result }}"
           echo "  quality: ${{ needs.quality.result }}"
           echo "  smoke-tests: ${{ needs.smoke-tests.result }}"
@@ -2088,6 +2126,9 @@ jobs:
           needs.security.result == 'success' &&
           needs.llm-safety-tests.result == 'success' &&
           needs.unit-tests.result == 'success' &&
+          (needs.production-metadata.result == 'success' ||
+            (needs.production-metadata.result == 'skipped' &&
+             github.event.pull_request.head.repo.full_name != github.repository)) &&
           needs.docs.result == 'success' &&
           needs.quality.result == 'success' &&
           needs.smoke-tests.result == 'success' &&
@@ -2125,6 +2166,7 @@ jobs:
       - security
       - llm-safety-tests
       - unit-tests
+      - production-metadata
       - docs
       - migrations
       - quality
@@ -2149,6 +2191,7 @@ jobs:
           needs.security.result != 'success' ||
           needs.llm-safety-tests.result != 'success' ||
           needs.unit-tests.result != 'success' ||
+          needs.production-metadata.result != 'success' ||
           needs.docs.result != 'success' ||
           needs.migrations.result != 'success' ||
           needs.quality.result != 'success' ||
@@ -2173,6 +2216,7 @@ jobs:
           echo "  security: ${{ needs.security.result }}"
           echo "  llm-safety-tests: ${{ needs.llm-safety-tests.result }}"
           echo "  unit-tests: ${{ needs.unit-tests.result }}"
+          echo "  production-metadata: ${{ needs.production-metadata.result }}"
           echo "  docs: ${{ needs.docs.result }}"
           echo "  migrations: ${{ needs.migrations.result }}"
           echo "  quality: ${{ needs.quality.result }}"
@@ -2196,6 +2240,7 @@ jobs:
           needs.security.result == 'success' &&
           needs.llm-safety-tests.result == 'success' &&
           needs.unit-tests.result == 'success' &&
+          needs.production-metadata.result == 'success' &&
           needs.docs.result == 'success' &&
           needs.migrations.result == 'success' &&
           needs.quality.result == 'success' &&

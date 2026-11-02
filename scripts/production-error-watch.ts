@@ -8,6 +8,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
+import { sentryInventoryEvidence } from './production-watch/sentry-inventory';
 
 import {
   issueBody,
@@ -24,6 +25,7 @@ import {
 } from './production-watch/sources';
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const ALL_UNRESOLVED = process.argv.includes('--all-unresolved');
 const LABEL = 'production-watch';
 
 function gh(args: string[], stdin?: string): string {
@@ -122,6 +124,34 @@ async function collectAlerts(): Promise<{
 }
 
 async function main(): Promise<void> {
+  if (ALL_UNRESOLVED) {
+    if (!DRY_RUN) throw new Error('All-unresolved inventory requires --dry-run');
+    const { SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT } = process.env;
+    if (!SENTRY_AUTH_TOKEN || !SENTRY_ORG || !SENTRY_PROJECT) {
+      throw new Error('Sentry credentials missing for all-unresolved inventory');
+    }
+    const alerts = await fetchSentryAlerts(fetch, {
+      org: SENTRY_ORG,
+      project: SENTRY_PROJECT,
+      token: SENTRY_AUTH_TOKEN,
+      allUnresolved: true,
+    });
+    console.log(
+      `All-history Sentry inventory: ${alerts.length} unresolved issue(s); pagination complete.`,
+    );
+    for (const alert of alerts) {
+      if (!/^sentry:[A-Z0-9_-]+$/.test(alert.key))
+        throw new Error('Invalid Sentry issue identifier');
+      // Public workflow logs must not contain event payloads, user text or request URLs.
+      console.log(
+        `${alert.key} | lifetime occurrences=${alert.occurrences} | lastSeen=${alert.lastSeen}`,
+      );
+      console.log(
+        `${alert.key} | ${await sentryInventoryEvidence(fetch, alert, SENTRY_AUTH_TOKEN)}`,
+      );
+    }
+    return;
+  }
   const observedAt = new Date().toISOString();
   const { alerts, answered, failures } = await collectAlerts();
 
@@ -174,6 +204,9 @@ async function main(): Promise<void> {
 }
 
 main().catch((error: unknown) => {
-  console.error('Production watch failed:', error);
+  console.error(
+    'Production watch failed:',
+    ALL_UNRESOLVED ? 'Sentry inventory failed; no issue data published.' : error,
+  );
   process.exit(1);
 });

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { TOS_VERSION } from '@/lib/tos/constants';
+import { isTransientNetworkError } from '@/lib/resilience/network-read';
 
 export const UNIFIED_CONSENT_KEY = 'mirrorbuddy-unified-consent';
 export const CONSENT_VERSION = '1.0';
@@ -18,11 +19,19 @@ export class ConsentSyncError extends Error {
   constructor(
     readonly code: ConsentErrorCode,
     readonly status?: number,
+    cause?: unknown,
   ) {
-    super(`Consent ${code}${status === undefined ? '' : ` (${status})`}`);
+    super(`Consent ${code}${status === undefined ? '' : ` (${status})`}`, { cause });
     this.name = 'ConsentSyncError';
     this.retryable = code !== 'invalid-intent' && code !== 'superseded';
   }
+}
+/** Only a failed fetch is a network failure; anything else is an unexpected, reported fault. */
+export function toConsentSyncError(error: unknown): ConsentSyncError {
+  if (error instanceof ConsentSyncError) return error;
+  return isTransientNetworkError(error)
+    ? new ConsentSyncError('network', undefined, error)
+    : new ConsentSyncError('invalid-response', undefined, error);
 }
 /** Transient auth-context generation, never part of the persisted consent record. */
 export interface ConsentIdentity {
