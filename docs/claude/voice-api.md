@@ -19,7 +19,7 @@
 | ------------------------ | ----------- | ------------------ | --------------------------------------- | ------------------------------------------------ | ------------------------ |
 | `gpt-realtime-2.1`       | v2026-07-07 | Voice (Preview)    | `voice_realtime_21`                     | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V21`           | `gpt-realtime-2.1`       |
 | `gpt-realtime-2`         | v2026-05-06 | Voice (Preview)    | `voice_realtime_2`                      | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V2`            | `gpt-realtime-2`         |
-| `gpt-realtime-whisper`   | v2026-05-06 | Live transcription | `voice_realtime_whisper_transcription`  | `AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT` | `gpt-realtime-whisper`   |
+| `gpt-4o-transcribe`      | 2025-03-20  | Live transcription | `voice_realtime_whisper_transcription`  | `AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT` | `gpt-4o-transcribe`      |
 | `gpt-realtime-translate` | v2026-05-06 | Live translation † | `voice_realtime_translate` (`degraded`) | `AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT`     | `gpt-realtime-translate` |
 | `gpt-realtime-1.5`       | v2026-02-23 | Voice (GA)         | `voice_realtime_15`                     | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15`           | `gpt-realtime-15`        |
 | `gpt-realtime`           | v2025-08-28 | Voice (GA)         | -                                       | `AZURE_OPENAI_REALTIME_DEPLOYMENT`               | `gpt-realtime`           |
@@ -31,7 +31,7 @@
 **Fallback chains** (ADR 0159 + ADR 0165 + ADR 0169):
 
 - **Realtime**: `gpt-realtime-2.1` (flag on) → `gpt-realtime-2` → `gpt-realtime-1.5` → `gpt-realtime`
-- **Live transcription**: `gpt-realtime-whisper` (flag on) → `whisper-1`
+- **Live transcription**: `gpt-4o-transcribe` (DataZoneStandard, EU; flag on) → `whisper-1`
 - **TTS**: `gpt-audio-1.5` → `tts-hd` → OpenAI TTS API
 
 `gpt-audio-1.5` uses Chat Completions API with `modalities: ["text", "audio"]` instead of dedicated TTS endpoint.

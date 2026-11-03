@@ -107,15 +107,15 @@ describe('deployment-mapping', () => {
       expect(getDeploymentForModel('gpt-realtime-2.1')).toBe('custom-rt21');
     });
 
-    it('should map gpt-realtime-whisper to its deployment name', async () => {
+    it('should map gpt-4o-transcribe (DataZone EU) to its deployment name', async () => {
       const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
-      expect(getDeploymentForModel('gpt-realtime-whisper')).toBe('gpt-realtime-whisper');
+      expect(getDeploymentForModel('gpt-4o-transcribe')).toBe('gpt-4o-transcribe');
     });
 
-    it('should respect env var override for gpt-realtime-whisper', async () => {
-      process.env.AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT = 'custom-whisper-rt';
+    it('should respect env var override for gpt-4o-transcribe', async () => {
+      process.env.AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT = 'custom-transcribe';
       const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
-      expect(getDeploymentForModel('gpt-realtime-whisper')).toBe('custom-whisper-rt');
+      expect(getDeploymentForModel('gpt-4o-transcribe')).toBe('custom-transcribe');
     });
 
     it('should map gpt-realtime-translate to its deployment name', async () => {

@@ -123,12 +123,12 @@ describe('GA Realtime rejects transcription.prompt', () => {
     expect('prompt' in transcription).toBe(false);
   });
 
-  it('omits the prompt on GA with the realtime whisper deployment', async () => {
+  it('omits the prompt on GA with the EU gpt-4o-transcribe deployment', async () => {
     flagState.voice_realtime_whisper_transcription = true;
 
     const transcription = (await sendConfig()).session.audio!.input.transcription;
 
-    expect(transcription.model).toBe('gpt-realtime-whisper');
+    expect(transcription.model).toBe('gpt-4o-transcribe');
     expect('prompt' in transcription).toBe(false);
   });
 

@@ -34,7 +34,7 @@ export const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'u
   voice_realtime_whisper_transcription: {
     name: 'Realtime Whisper Transcription',
     description:
-      'ADR 0165: Use gpt-realtime-whisper as input.transcription.model — tighter caption deltas for DSA profiles.',
+      'ADR 0165: Use gpt-4o-transcribe (EU DataZone) as input.transcription.model — tighter caption deltas for DSA profiles.',
     status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,

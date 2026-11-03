@@ -48,7 +48,7 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
   },
   voice_realtime_whisper_transcription: {
     name: 'Realtime Whisper Transcription',
-    description: 'ADR 0165: gpt-realtime-whisper as input.transcription.model.',
+    description: 'ADR 0165: gpt-4o-transcribe (EU DataZone) as input.transcription.model.',
     status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,

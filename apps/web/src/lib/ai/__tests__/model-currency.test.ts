@@ -5,7 +5,7 @@
  * 2026-09-16 with `az cognitiveservices model list` / `deployment list`. Since
  * 2026-10-04 MirrorBuddy runs on `mirrorbuddy-aoai-swc` in the FightTheStroke
  * tenant (ADR 0183), which hosts only mb-gpt-61-sol, gpt-5-nano,
- * text-embedding-3-small, gpt-realtime-2.1, gpt-realtime-whisper and tts-hd:
+ * text-embedding-3-small, gpt-realtime-2.1, gpt-4o-transcribe and tts-hd:
  *
  * - gpt-6-astra          2026-09-03  GA       retires 2028-01-11  (deployed, unused)
  * - gpt-5.6-terra        2026-07-09  GA       retires 2028-01-11  (current default)
