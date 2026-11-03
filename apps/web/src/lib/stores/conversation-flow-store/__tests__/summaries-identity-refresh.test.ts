@@ -22,7 +22,7 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-import { setClientIdentity } from '@/lib/auth';
+import { IdentityUnavailableError, setClientIdentity } from '@/lib/auth';
 import { loadConversationSummariesFromDB } from '../persistence';
 import { useConversationFlowStore } from '../store';
 import { logger } from '@/lib/logger';
@@ -125,8 +125,8 @@ describe('loading conversation summaries across an identity refresh', () => {
       fetchThatRefreshesIdentity(() => setClientIdentity(student('user-2'))),
     );
 
-    await expect(loadConversationSummariesFromDB()).rejects.toThrow(
-      'Conversation identity changed',
+    await expect(loadConversationSummariesFromDB()).rejects.toBeInstanceOf(
+      IdentityUnavailableError,
     );
   });
 
@@ -153,10 +153,30 @@ describe('loading conversation summaries across an identity refresh', () => {
       }),
     );
 
-    await expect(loadConversationSummariesFromDB()).rejects.toThrow(
-      'Conversation identity changed',
+    await expect(loadConversationSummariesFromDB()).rejects.toBeInstanceOf(
+      IdentityUnavailableError,
     );
     expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not warn when signing out interrupts the final network attempt', async () => {
+    setClientIdentity(student('user-1'));
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockRejectedValueOnce(new TypeError('Load failed'))
+        .mockImplementationOnce(async () => {
+          setClientIdentity({ status: 'anonymous' });
+          throw new TypeError('Load failed');
+        }),
+    );
+    vi.mocked(logger.warn).mockClear();
+
+    await useConversationFlowStore.getState().loadFromServer();
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(logger.warn).not.toHaveBeenCalled();
   });
 
   it('stops after one network retry and preserves the original failure', async () => {

@@ -9,7 +9,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import { retryNetworkRead } from '@/lib/resilience/network-read';
+import { isTransientNetworkError, retryNetworkRead } from '@/lib/resilience/network-read';
 import { csrfFetch } from '@/lib/auth';
 import {
   getClientIdentity,
@@ -103,7 +103,7 @@ export async function loadConversationSummariesFromDB(): Promise<ConversationSum
   try {
     const data: unknown = await retryNetworkRead(async () => {
       if (!isSameAccount(identity, await whenIdentitySettled()))
-        throw new Error('Conversation identity changed');
+        throw new IdentityUnavailableError('IDENTITY_CHANGED');
       const response = await fetch('/api/conversations?limit=20&active=true');
 
       // A stale tab is an expired session, not a transport failure to retry.
@@ -119,7 +119,7 @@ export async function loadConversationSummariesFromDB(): Promise<ConversationSum
     });
     // Another hook may re-check /api/auth/me meanwhile: same account, new object.
     const current = await whenIdentitySettled();
-    if (!isSameAccount(identity, current)) throw new Error('Conversation identity changed');
+    if (!isSameAccount(identity, current)) throw new IdentityUnavailableError('IDENTITY_CHANGED');
 
     const summaries =
       data !== null && typeof data === 'object' && 'items' in data ? data.items : data;
@@ -129,6 +129,9 @@ export async function loadConversationSummariesFromDB(): Promise<ConversationSum
 
     return summaries;
   } catch (error) {
+    if (isTransientNetworkError(error) && !isSameAccount(identity, await whenIdentitySettled())) {
+      throw new IdentityUnavailableError('IDENTITY_CHANGED');
+    }
     // Network error or JSON parse error
     logger.debug('Error loading conversation summaries (non-critical)', { error: String(error) });
     throw error;
