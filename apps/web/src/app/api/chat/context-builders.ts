@@ -106,6 +106,72 @@ export async function injectToolContextData(
   return { enhancedPrompt: systemPrompt, hasToolContext: false };
 }
 
+type RAGHit = { content: string; similarity: number; sourceType?: string };
+type RAGLoad = {
+  materials: Awaited<ReturnType<typeof findSimilarMaterials>>;
+  studyKits: Awaited<ReturnType<typeof findRelatedConcepts>>;
+} | null;
+
+/**
+ * Start the two student-corpus vector searches together. They are independent,
+ * so running them back to back only adds latency (and trips Sentry's N+1 detector).
+ * Never rejects: a failure yields null and the prompt stays unchanged.
+ */
+export async function loadRAGResults(
+  userId: string,
+  query: string,
+  embedding?: number[],
+): Promise<RAGLoad> {
+  try {
+    const [materials, studyKits] = await Promise.all([
+      findSimilarMaterials({ userId, query, embedding, limit: 3, minSimilarity: 0.6 }),
+      findRelatedConcepts({
+        userId,
+        query,
+        embedding,
+        limit: 3,
+        minSimilarity: 0.5,
+        includeFlashcards: false,
+        includeStudykits: true,
+      }),
+    ]);
+    return { materials, studyKits };
+  } catch (ragError) {
+    logger.warn('Failed to load RAG context', {
+      userId,
+      error: String(ragError),
+    });
+    return null;
+  }
+}
+
+function applyRAGResults(
+  systemPrompt: string,
+  userId: string,
+  loaded: RAGLoad,
+): { enhancedPrompt: string; hasRAG: boolean; ragResults: RAGHit[] } {
+  if (loaded) {
+    const allResults = [...loaded.materials, ...loaded.studyKits];
+    if (allResults.length > 0) {
+      const ragResults = allResults.map((r) => ({
+        content: r.content,
+        similarity: r.similarity,
+        sourceType: 'material',
+      }));
+      const ragContext = allResults.map((m) => `- ${m.content}`).join('\n');
+      const enhanced = `${systemPrompt}\n\n[Materiali rilevanti dello studente]\n${ragContext}`;
+      logger.debug('RAG context injected', {
+        userId,
+        materialCount: loaded.materials.length,
+        studyKitCount: loaded.studyKits.length,
+        topSimilarity: allResults[0]?.similarity,
+      });
+      return { enhancedPrompt: enhanced, hasRAG: true, ragResults };
+    }
+  }
+  return { enhancedPrompt: systemPrompt, hasRAG: false, ragResults: [] };
+}
+
 /**
  * Inject RAG context (relevant materials and study kits)
  */
@@ -114,59 +180,8 @@ export async function injectRAGContext(
   userId: string,
   query: string,
   embedding?: number[],
-): Promise<{
-  enhancedPrompt: string;
-  hasRAG: boolean;
-  ragResults: Array<{
-    content: string;
-    similarity: number;
-    sourceType?: string;
-  }>;
-}> {
-  try {
-    const relevantMaterials = await findSimilarMaterials({
-      userId,
-      query,
-      embedding,
-      limit: 3,
-      minSimilarity: 0.6,
-    });
-
-    const relatedStudyKits = await findRelatedConcepts({
-      userId,
-      query,
-      embedding,
-      limit: 3,
-      minSimilarity: 0.5,
-      includeFlashcards: false,
-      includeStudykits: true,
-    });
-
-    const allResults = [...relevantMaterials, ...relatedStudyKits];
-    const ragResults = allResults.map((r) => ({
-      content: r.content,
-      similarity: r.similarity,
-      sourceType: 'material',
-    }));
-
-    if (allResults.length > 0) {
-      const ragContext = allResults.map((m) => `- ${m.content}`).join('\n');
-      const enhanced = `${systemPrompt}\n\n[Materiali rilevanti dello studente]\n${ragContext}`;
-      logger.debug('RAG context injected', {
-        userId,
-        materialCount: relevantMaterials.length,
-        studyKitCount: relatedStudyKits.length,
-        topSimilarity: allResults[0]?.similarity,
-      });
-      return { enhancedPrompt: enhanced, hasRAG: true, ragResults };
-    }
-  } catch (ragError) {
-    logger.warn('Failed to load RAG context', {
-      userId,
-      error: String(ragError),
-    });
-  }
-  return { enhancedPrompt: systemPrompt, hasRAG: false, ragResults: [] };
+): Promise<{ enhancedPrompt: string; hasRAG: boolean; ragResults: RAGHit[] }> {
+  return applyRAGResults(systemPrompt, userId, await loadRAGResults(userId, query, embedding));
 }
 
 /**
@@ -212,6 +227,38 @@ export async function injectAdaptiveContext(
 }
 
 /**
+ * Fetch maestro-specific didactic knowledge via RAG retrieval.
+ * Never rejects: a failure yields an empty string.
+ */
+export async function loadMaestroKnowledge(
+  maestroId: string,
+  query: string,
+  embedding?: number[],
+): Promise<string> {
+  try {
+    return await retrieveMaestroKnowledge(maestroId, query, undefined, embedding);
+  } catch (error) {
+    logger.warn('Failed to load maestro knowledge', {
+      maestroId,
+      error: String(error),
+    });
+    return '';
+  }
+}
+
+function applyMaestroKnowledge(
+  systemPrompt: string,
+  maestroId: string,
+  knowledge: string,
+): { enhancedPrompt: string; hasMaestroKB: boolean } {
+  if (knowledge) {
+    logger.debug('Maestro knowledge injected', { maestroId });
+    return { enhancedPrompt: `${systemPrompt}\n\n${knowledge}`, hasMaestroKB: true };
+  }
+  return { enhancedPrompt: systemPrompt, hasMaestroKB: false };
+}
+
+/**
  * Inject maestro-specific didactic knowledge via RAG retrieval
  */
 export async function injectMaestroKnowledgeContext(
@@ -220,22 +267,11 @@ export async function injectMaestroKnowledgeContext(
   query: string,
   embedding?: number[],
 ): Promise<{ enhancedPrompt: string; hasMaestroKB: boolean }> {
-  try {
-    const knowledge = await retrieveMaestroKnowledge(maestroId, query, undefined, embedding);
-    if (knowledge) {
-      logger.debug('Maestro knowledge injected', { maestroId });
-      return {
-        enhancedPrompt: `${systemPrompt}\n\n${knowledge}`,
-        hasMaestroKB: true,
-      };
-    }
-  } catch (error) {
-    logger.warn('Failed to load maestro knowledge', {
-      maestroId,
-      error: String(error),
-    });
-  }
-  return { enhancedPrompt: systemPrompt, hasMaestroKB: false };
+  return applyMaestroKnowledge(
+    systemPrompt,
+    maestroId,
+    await loadMaestroKnowledge(maestroId, query, embedding),
+  );
 }
 
 /**
@@ -267,6 +303,17 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
     ? await resolveQueryEmbedding(options.lastUserMessage)
     : undefined;
 
+  // The three vector searches (maestro KB, materials, study kits) are
+  // independent: start them together, apply them below in the original order.
+  const maestroKnowledgePending =
+    options.maestroId && options.lastUserMessage
+      ? loadMaestroKnowledge(options.maestroId, options.lastUserMessage, queryEmbedding)
+      : undefined;
+  const ragPending =
+    options.userId && options.lastUserMessage
+      ? loadRAGResults(options.userId, options.lastUserMessage, queryEmbedding)
+      : undefined;
+
   // Memory context
   if (options.enableMemory && options.userId && options.maestroId) {
     const memoryResult = await injectMemoryContext(
@@ -279,12 +326,11 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
   }
 
   // Maestro knowledge context (after memory, before tools)
-  if (options.maestroId && options.lastUserMessage) {
-    const maestroKBResult = await injectMaestroKnowledgeContext(
+  if (options.maestroId && maestroKnowledgePending) {
+    const maestroKBResult = applyMaestroKnowledge(
       enhancedPrompt,
       options.maestroId,
-      options.lastUserMessage,
-      queryEmbedding,
+      await maestroKnowledgePending,
     );
     enhancedPrompt = maestroKBResult.enhancedPrompt;
   }
@@ -301,13 +347,8 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
   }
 
   // RAG context
-  if (options.userId && options.lastUserMessage) {
-    const ragResult = await injectRAGContext(
-      enhancedPrompt,
-      options.userId,
-      options.lastUserMessage,
-      queryEmbedding,
-    );
+  if (options.userId && ragPending) {
+    const ragResult = applyRAGResults(enhancedPrompt, options.userId, await ragPending);
     enhancedPrompt = ragResult.enhancedPrompt;
     hasRAG = ragResult.hasRAG;
     ragResultsForTransparency = ragResult.ragResults;
