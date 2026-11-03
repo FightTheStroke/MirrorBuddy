@@ -37,11 +37,72 @@ describe('Sentry recent-activity evidence', () => {
       sentryIssueToAlert(issue),
       'test-only',
     );
-    expect(evidence).toBe(
+    expect(evidence).toContain(
       'category=unclassified | errorTypes=NetworkError,TypeError | httpStatuses=503',
     );
     expect(evidence).not.toContain('private');
     expect(evidence).not.toContain('Private Person');
+  });
+
+  it('reports vector-query counts and optional tool context without disclosing SQL or parameters', async () => {
+    const fetchImpl: typeof fetch = async () =>
+      Response.json({
+        extra: { hasUserId: true, hasSessionId: false },
+        spans: [1, 2].map((id) => ({
+          span_id: String(id),
+          op: 'db',
+          description: 'SELECT * FROM search_similar_embeddings($1)',
+          start_timestamp: id,
+          timestamp: id + 0.1,
+          data: { 'db.params': ['private user text', id] },
+        })),
+      });
+    const evidence = await sentryInventoryEvidence(
+      fetchImpl,
+      sentryIssueToAlert(issue),
+      'test-only',
+    );
+    expect(evidence).toContain('toolContext=user:true,session:false');
+    expect(evidence).toContain('vectorSpans=2');
+    expect(evidence).toContain('uniqueSqlText=1');
+    expect(evidence).toContain('distinctParameterSets=2');
+    expect(evidence).not.toMatch(/SELECT|private|span_id/);
+  });
+
+  it('distinguishes nested instrumentation from separate vector queries without exposing span ids', async () => {
+    const fetchImpl: typeof fetch = async () =>
+      Response.json({
+        spans: [
+          {
+            span_id: 'private-parent',
+            description: 'SELECT * FROM search_similar_embeddings($1)',
+            start_timestamp: 1,
+          },
+          {
+            span_id: 'private-child',
+            parent_span_id: 'private-parent',
+            description: 'SELECT * FROM search_similar_embeddings($1)',
+            start_timestamp: 1,
+          },
+          {
+            span_id: 'private-independent',
+            description: 'SELECT * FROM search_similar_embeddings($1)',
+            start_timestamp: 2,
+          },
+        ],
+      });
+    const alert = sentryIssueToAlert({
+      ...issue,
+      title: 'Failed to execute setRemoteDescription on RTCPeerConnection: private context',
+    });
+
+    const evidence = await sentryInventoryEvidence(fetchImpl, alert, 'test-only');
+
+    expect(evidence).toContain('vectorSpans=3');
+    expect(evidence).toContain('nestedVectorSpans=1');
+    expect(evidence).toContain('vectorStartTimes=2');
+    expect(evidence).toContain('failureSignals=webrtc');
+    expect(evidence).not.toMatch(/private|SELECT|RTCPeerConnection/);
   });
   it.each(['preview', 'production', 'development'])(
     'preserves and truthfully labels the latest event environment %s',
