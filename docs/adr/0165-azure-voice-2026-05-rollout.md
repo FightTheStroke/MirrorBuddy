@@ -4,6 +4,22 @@
 
 Accepted — 2026-05-25
 Corrected — 2026-09-22 (GA transcription prompts; preserve the broader production fix)
+Amended — 2026-11-03 (EU residency of live transcription, #1288)
+
+## Amendment 2026-11-03: EU transcription (#1288)
+
+This ADR treated swedencentral as EU. That was wrong for `gpt-realtime-whisper`:
+it is deployed as **GlobalStandard**, which may process data in any Azure
+region, so student audio was not guaranteed to stay in the EU. The default
+live-transcription deployment is now `gpt-4o-transcribe` (2025-03-20),
+**DataZoneStandard** (EU processing), on `mirrorbuddy-aoai-swc`. The env vars
+`AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT` /
+`NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT` and the feature flag
+`voice_realtime_whisper_transcription` keep their names. Verified live against a
+`gpt-realtime-2.1` GA session: `input.transcription.model=gpt-4o-transcribe`
+returned `conversation.item.input_audio_transcription.completed` for Italian and
+English audio. The old GlobalStandard deployment is left in place but unused. Any
+mention of `gpt-realtime-whisper` below is historical.
 
 ## GA transcription contract (2026-09-22)
 

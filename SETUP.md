@@ -123,11 +123,11 @@ AZURE_OPENAI_AUDIO_DEPLOYMENT=gpt-audio-15
 AZURE_OPENAI_REALTIME_DEPLOYMENT_V2=gpt-realtime-2
 # Voice v2.1 / 2026-07 wave (ADR 0169 — feature flag voice_realtime_21). Cedar voice.
 AZURE_OPENAI_REALTIME_DEPLOYMENT_V21=gpt-realtime-2.1
-AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT=gpt-realtime-whisper
-# Client-side mirror for the whisper deployment name. Required when the
-# Azure deployment name differs from the literal "gpt-realtime-whisper",
+AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT=gpt-4o-transcribe
+# Client-side mirror for the transcription deployment name (DataZoneStandard, EU).
+# Required when the Azure deployment name differs from the literal "gpt-4o-transcribe",
 # because session.audio.input.transcription.model is set in browser code.
-NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT=gpt-realtime-whisper
+NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT=gpt-4o-transcribe
 # AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT=gpt-realtime-translate  # blocked: Azure /realtime/translations endpoint not yet rolled out
 
 # RAG Embeddings (optional - enables semantic search)

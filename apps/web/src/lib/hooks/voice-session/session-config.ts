@@ -144,13 +144,15 @@ export function useSendSessionConfig(
     // Build session config — GA protocol nests voice/audio under session.audio
     const voice = a11yState.settings.voicePreference || maestro.voice || 'alloy';
 
-    // ADR 0165: prefer gpt-realtime-whisper for tighter live caption deltas.
+    // ADR 0165 (amended 2026-11-03): live captions use gpt-4o-transcribe on a
+    // DataZoneStandard (EU) deployment; the GlobalStandard gpt-realtime-whisper
+    // could process student audio outside the EU.
     // Azure accepts the deployment name as the transcription model (see MS Learn
     // realtime-audio-reference: "input_audio_transcription.model accepts the name
     // of the existing model deployment"). Falls back to whisper-1 when flag off.
     const useWhisperRealtime = isFeatureEnabled('voice_realtime_whisper_transcription').enabled;
     const transcriptionModel = useWhisperRealtime
-      ? process.env.NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-realtime-whisper'
+      ? process.env.NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-4o-transcribe'
       : 'whisper-1';
 
     const useGAProtocol = isFeatureEnabled('voice_ga_protocol').enabled;

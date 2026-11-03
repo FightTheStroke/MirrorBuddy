@@ -71,14 +71,14 @@ flowchart TB
 
 ### 2.1 Primary Data Flows
 
-| #   | Service                   | Purpose        | Data Sent                                             | Region                                   | Transfer Type  | Protection Mechanism               | Compliance   |
-| --- | ------------------------- | -------------- | ----------------------------------------------------- | ---------------------------------------- | -------------- | ---------------------------------- | ------------ |
-| 1   | **Supabase**              | Database       | User profiles, conversations, preferences, audit logs | 🇪🇺 **EU** (Frankfurt, Germany)           | EU-only        | N/A (no transfer)                  | ✅ Compliant |
-| 2   | **Azure OpenAI Chat**     | AI tutoring    | Conversation messages, context, maestro prompts       | 🇪🇺 **EU** (West Europe)                  | EU-only        | N/A (no transfer)                  | ✅ Compliant |
-| 3   | **Azure OpenAI Realtime** | Voice features | Audio stream, transcription, conversation             | 🇪🇺 **EU** (Sweden Central)               | EU-only        | N/A (no transfer)                  | ✅ Compliant |
-| 4   | **Vercel**                | Hosting        | Application code, logs, analytics, session cookies    | 🇪🇺 **EU** (`fra1`) + vendor global infra | EU → EU/Global | Standard Contractual Clauses (SCC) | ✅ Compliant |
-| 5   | **Resend**                | Email          | Email addresses, message content, delivery metadata   | 🇺🇸 **US** (AWS us-east-1, us-west-2)     | EU → US        | Standard Contractual Clauses (SCC) | ✅ Compliant |
-| 6   | **Upstash Redis**         | Rate limiting  | User ID hashes, request counts, timestamps            | 🌍 **Global** (Multi-region)             | EU → US/Global | Standard Contractual Clauses (SCC) | ✅ Compliant |
+| #   | Service                   | Purpose        | Data Sent                                             | Region                                                                                                                 | Transfer Type  | Protection Mechanism               | Compliance   |
+| --- | ------------------------- | -------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------- | ---------------------------------- | ------------ |
+| 1   | **Supabase**              | Database       | User profiles, conversations, preferences, audit logs | 🇪🇺 **EU** (Frankfurt, Germany)                                                                                         | EU-only        | N/A (no transfer)                  | ✅ Compliant |
+| 2   | **Azure OpenAI Chat**     | AI tutoring    | Conversation messages, context, maestro prompts       | 🇪🇺 **EU** (West Europe)                                                                                                | EU-only        | N/A (no transfer)                  | ✅ Compliant |
+| 3   | **Azure OpenAI Realtime** | Voice features | Audio stream, transcription, conversation             | 🇪🇺 **EU** (Sweden Central, DataZoneStandard; live transcription `gpt-4o-transcribe` DataZoneStandard since 2026-11-03) | EU-only        | N/A (no transfer)                  | ✅ Compliant |
+| 4   | **Vercel**                | Hosting        | Application code, logs, analytics, session cookies    | 🇪🇺 **EU** (`fra1`) + vendor global infra                                                                               | EU → EU/Global | Standard Contractual Clauses (SCC) | ✅ Compliant |
+| 5   | **Resend**                | Email          | Email addresses, message content, delivery metadata   | 🇺🇸 **US** (AWS us-east-1, us-west-2)                                                                                   | EU → US        | Standard Contractual Clauses (SCC) | ✅ Compliant |
+| 6   | **Upstash Redis**         | Rate limiting  | User ID hashes, request counts, timestamps            | 🌍 **Global** (Multi-region)                                                                                           | EU → US/Global | Standard Contractual Clauses (SCC) | ✅ Compliant |
 
 ### 2.2 Ancillary Data Flows (Minimal PII)
 

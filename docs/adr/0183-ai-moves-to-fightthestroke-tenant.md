@@ -38,6 +38,10 @@ closed because that tenant did not exist. It now exists and is used.
    | gpt-realtime-whisper   | gpt-realtime-whisper | GlobalStandard (no EU data zone yet) |
    | tts-hd-deployment      | tts-hd               | Standard (regional, Sweden)          |
 
+   Update 2026-11-03 (#1288): `gpt-4o-transcribe` (DataZoneStandard, EU) was
+   added and is now the live-transcription default; `gpt-realtime-whisper`
+   is retained but no longer referenced by production.
+
    Every voice alias (`gpt-realtime`, `-mini`, `-1.5`, `-2`) points to
    `gpt-realtime-2.1`; `gpt-5.6-terra`/`gpt-5.6-sol` resolve to `mb-gpt-61-sol`.
    `gpt-audio-1.5` is not provisioned: without `AZURE_OPENAI_AUDIO_DEPLOYMENT`

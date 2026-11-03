@@ -13,7 +13,7 @@
  * `az cognitiveservices model list` and `az cognitiveservices account deployment list`.
  * Since 2026-10-04 (ADR 0183) production uses `mirrorbuddy-aoai-swc` in the
  * FightTheStroke tenant, which hosts ONLY: mb-gpt-61-sol, gpt-5-nano,
- * text-embedding-3-small, gpt-realtime-2.1, gpt-realtime-whisper, tts-hd-deployment.
+ * text-embedding-3-small, gpt-realtime-2.1, gpt-4o-transcribe, tts-hd-deployment.
  * Rows below that are not in that list are history, not live deployments.
  *
  * | Deployment       | Underlying model | Status  | Inference retires |
@@ -124,7 +124,7 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
 
   // 2026-05-06 wave (ADR 0165) — EU swedencentral only
   // gpt-realtime-2:        next-gen successor of 1.5 (Preview). Drop-in.
-  // gpt-realtime-whisper:  used as input.transcription.model inside realtime session.
+  // gpt-4o-transcribe:     used as input.transcription.model inside realtime session (EU DataZone).
   // gpt-realtime-translate: PROVISIONED but Azure endpoint not yet enabled — see ADR 0165.
   'gpt-realtime-2': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2 || 'gpt-realtime-2',
 
@@ -134,8 +134,9 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   'gpt-realtime-2.1': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21 || 'gpt-realtime-2.1',
   'gpt-realtime-2.1-mini':
     process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21_MINI || 'gpt-realtime-2.1-mini',
-  'gpt-realtime-whisper':
-    process.env.AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-realtime-whisper',
+  // Live transcription (ADR 0165, amended 2026-11-03): DataZoneStandard = EU processing.
+  'gpt-4o-transcribe':
+    process.env.AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-4o-transcribe',
   'gpt-realtime-translate':
     process.env.AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT || 'gpt-realtime-translate',
 };
