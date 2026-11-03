@@ -21,6 +21,14 @@ const errorNames = new Set([
   'NotSupportedError',
   'ConsentSyncError',
 ]);
+const failurePatterns: [string, RegExp][] = [
+  ['webrtc', /webrtc|rtcpeerconnection|remotedescription|localdescription/i],
+  ['realtime', /realtime|websocket/i],
+  ['network', /network|fetch|connection/i],
+  ['timeout', /timeout|timed out/i],
+  ['audio', /audio|microphone/i],
+  ['null-reference', /cannot read properties|undefined|null/i],
+];
 
 /** Only fixed vocabulary and numeric HTTP statuses may reach public workflow logs. */
 export async function sentryInventoryEvidence(
@@ -44,6 +52,8 @@ export async function sentryInventoryEvidence(
     ['hasSessionId', new Set<boolean>()],
   ]);
   const vectorSpans = new Set<string>();
+  const vectorParents: string[] = [];
+  const vectorStartTimes = new Set<number>();
   const sqlTexts = new Set<string>();
   const parameterSets = new Set<string>();
   let vectorDurationMs = 0;
@@ -57,6 +67,9 @@ export async function sentryInventoryEvidence(
     )
       return;
     vectorSpans.add(span.span_id);
+    if (typeof span.parent_span_id === 'string') vectorParents.push(span.parent_span_id);
+    if (typeof span.start_timestamp === 'number' && Number.isFinite(span.start_timestamp))
+      vectorStartTimes.add(span.start_timestamp);
     sqlTexts.add(span.description);
     if (
       typeof span.start_timestamp === 'number' &&
@@ -107,5 +120,9 @@ export async function sentryInventoryEvidence(
     const values = toolFlags.get(key);
     return values?.size === 1 ? String([...values][0]) : 'unknown';
   };
-  return `category=${categories.get(alert.title) ?? 'unclassified'} | errorTypes=${[...names].sort().join(',') || 'unknown'} | httpStatuses=${[...statuses].sort().join(',') || 'unknown'} | toolContext=user:${flag('hasUserId')},session:${flag('hasSessionId')} | vectorSpans=${vectorSpans.size} | uniqueSqlText=${sqlTexts.size} | distinctParameterSets=${parameterSets.size || 'unknown'} | vectorDurationMs=${Math.round(vectorDurationMs)}`;
+  const failureSignals = failurePatterns
+    .filter(([, pattern]) => pattern.test(alert.title))
+    .map(([name]) => name);
+  const nestedVectorSpans = vectorParents.filter((id) => vectorSpans.has(id)).length;
+  return `category=${categories.get(alert.title) ?? 'unclassified'} | errorTypes=${[...names].sort().join(',') || 'unknown'} | httpStatuses=${[...statuses].sort().join(',') || 'unknown'} | toolContext=user:${flag('hasUserId')},session:${flag('hasSessionId')} | vectorSpans=${vectorSpans.size} | uniqueSqlText=${sqlTexts.size} | distinctParameterSets=${parameterSets.size || 'unknown'} | vectorDurationMs=${Math.round(vectorDurationMs)} | nestedVectorSpans=${nestedVectorSpans} | vectorStartTimes=${vectorStartTimes.size} | failureSignals=${failureSignals.join(',') || 'unknown'}`;
 }
