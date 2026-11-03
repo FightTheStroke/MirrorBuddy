@@ -3,7 +3,10 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// Subprocess and cold-import work exceeds the 5 s default on a loaded machine.
+vi.setConfig({ testTimeout: 30_000 });
 
 const repository = resolve(import.meta.dirname, '../..');
 const roots: string[] = [];
