@@ -1,0 +1,71 @@
+name: Sentry Monitor
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/sentry-monitor.yml'
+      - 'scripts/sentry-recent-watch.ts'
+      - 'scripts/production-watch/sentry-recent-check.ts'
+      - 'scripts/__tests__/sentry-recent-check.test.ts'
+  schedule:
+    # Offset from the hour to reduce scheduler congestion; runs without a local session.
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+    inputs:
+      project_health:
+        description: 'Also run the full project health check in the cloud'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sentry-monitor-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sentry:
+    name: Recent Sentry activity
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Check recent activity without modifying issues
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        run: pnpm exec tsx scripts/sentry-recent-watch.ts
+
+  project-health:
+    name: Project health receipt
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.project_health)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OLLAMA_URL: http://localhost:11434
+      NEXT_PUBLIC_SITE_URL: https://www.mirrorbuddy.org
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec prisma generate
+      - name: Run existing project health check
+        run: ./scripts/health-check.sh
