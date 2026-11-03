@@ -253,7 +253,7 @@ export const createSessionSlice: StateCreator<ConversationFlowState, [], [], Ses
       }
       // Non-critical: app works fine without previous conversation context
       logger.warn('Failed to load conversation summaries', {
-        error: error instanceof Error ? error.message : String(error),
+        errorName: error instanceof Error ? error.name : 'UnknownError',
       });
     }
   },

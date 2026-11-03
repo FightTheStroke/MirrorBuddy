@@ -117,6 +117,19 @@ describe('Hydrating the stores for a session that has expired', () => {
     await expect(initializeStores()).rejects.toBeInstanceOf(IdentityUnavailableError);
     expect(fetch).toHaveBeenCalledTimes(1);
   });
+
+  it('recognises sign-out during the final network attempt as an identity change', async () => {
+    global.fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError('Load failed'))
+      .mockImplementationOnce(async () => {
+        setClientIdentity({ status: 'anonymous' });
+        throw new TypeError('Load failed');
+      });
+
+    await expect(initializeStores()).rejects.toBeInstanceOf(IdentityUnavailableError);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('Loading previous conversation summaries for an expired session', () => {
@@ -159,6 +172,20 @@ describe('Loading previous conversation summaries for an expired session', () =>
     await useConversationFlowStore.getState().loadFromServer();
 
     expect(logger.warn).toHaveBeenCalled();
+  });
+
+  it('preserves the error type when the same account exhausts network retries', async () => {
+    global.fetch = vi.fn().mockRejectedValue(new TypeError('Load failed'));
+    const { logger } = await import('@/lib/logger');
+    const { useConversationFlowStore } = await import('../conversation-flow-store');
+
+    await useConversationFlowStore.getState().loadFromServer();
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Failed to load conversation summaries',
+      expect.objectContaining({ errorName: 'TypeError' }),
+    );
   });
 
   it('still fails loudly when the conversations API is broken', async () => {

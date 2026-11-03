@@ -3,11 +3,11 @@
 // Orchestrator-based execution path for tools
 // ============================================================================
 
-import { logger } from "@/lib/logger";
-import type { ToolExecutionResult, ToolContext } from "@/types/tools";
-import { ToolOrchestrator } from "@/lib/tools/plugin/orchestrator";
-import { getToolTypeFromFunctionName } from "./tool-executor-mapping";
-import { saveToolOutput } from "@/lib/tools/tool-output-storage";
+import { logger } from '@/lib/logger';
+import type { ToolExecutionResult, ToolContext } from '@/types/tools';
+import { ToolOrchestrator } from '@/lib/tools/plugin/orchestrator';
+import { getToolTypeFromFunctionName } from './tool-executor-mapping';
+import { saveToolOutput } from '@/lib/tools/tool-output-storage';
 
 /**
  * Execute a tool via the orchestrator path
@@ -30,11 +30,19 @@ export async function executeViaOrchestrator(
   try {
     // Build orchestrator context
     if (!context.userId || !context.sessionId) {
-      logger.warn("Tool orchestrator missing session context", {
+      const details = {
         functionName,
         hasUserId: Boolean(context.userId),
         hasSessionId: Boolean(context.sessionId),
-      });
+      };
+      // The chat request's conversationId is optional (it becomes the
+      // sessionId), so an authenticated call without it is a normal fall back
+      // to the compatibility handler. A missing user stays a warning.
+      if (context.userId) {
+        logger.debug('Tool orchestrator skipped: no session id', details);
+      } else {
+        logger.warn('Tool orchestrator missing session context', details);
+      }
       return null;
     }
 
@@ -49,11 +57,7 @@ export async function executeViaOrchestrator(
     };
 
     // Execute through orchestrator
-    const result = await orchestrator.execute(
-      functionName,
-      args,
-      orchestratorContext,
-    );
+    const result = await orchestrator.execute(functionName, args, orchestratorContext);
 
     // Convert orchestrator result to ToolExecutionResult
     if (result.success) {
@@ -74,7 +78,7 @@ export async function executeViaOrchestrator(
             { userId: context.userId, enableRAG: true },
           );
         } catch (error) {
-          logger.warn("Failed to save tool output to database:", {
+          logger.warn('Failed to save tool output to database:', {
             error: String(error),
           });
         }
@@ -91,7 +95,7 @@ export async function executeViaOrchestrator(
         success: false,
         toolId,
         toolType,
-        error: result.error || "Unknown error",
+        error: result.error || 'Unknown error',
       };
     }
   } catch (error) {

@@ -15,7 +15,7 @@ import {
   whenIdentitySettled,
 } from '@/lib/auth/client-auth';
 import { logger } from '@/lib/logger';
-import { retryNetworkRead } from '@/lib/resilience/network-read';
+import { isTransientNetworkError, retryNetworkRead } from '@/lib/resilience/network-read';
 
 /**
  * Initialize all stores by loading data from server
@@ -36,6 +36,11 @@ export async function initializeStores() {
       throw new IdentityUnavailableError('IDENTITY_CHANGED');
     }
     return fetch('/api/user');
+  }).catch(async (error: unknown) => {
+    if (isTransientNetworkError(error) && !isSameAccount(identity, await whenIdentitySettled())) {
+      throw new IdentityUnavailableError('IDENTITY_CHANGED');
+    }
+    throw error;
   });
 
   // The session died between asking who the user is and asking for their data.

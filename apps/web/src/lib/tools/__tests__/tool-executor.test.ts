@@ -6,6 +6,9 @@ import {
   clearHandlers,
 } from '../tool-executor';
 import { ToolRegistry } from '../plugin/registry';
+import { ToolOrchestrator } from '../plugin/orchestrator';
+import { executeViaOrchestrator } from '../tool-executor-orchestration';
+import { logger } from '@/lib/logger';
 import type { ToolExecutionResult, ToolContext } from '@/types/tools';
 
 // Mock nanoid with a function that generates unique IDs
@@ -28,6 +31,7 @@ describe('tool-executor', () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     clearHandlers();
     ToolRegistry.getInstance().clear();
   });
@@ -89,26 +93,15 @@ describe('tool-executor', () => {
         maestroId: 'archimede',
       };
 
-      const result = await executeToolCall(
-        'create_mindmap',
-        validArgs,
-        context
-      );
+      const result = await executeToolCall('create_mindmap', validArgs, context);
 
-      expect(mockHandler).toHaveBeenCalledWith(
-        validArgs,
-        context
-      );
+      expect(mockHandler).toHaveBeenCalledWith(validArgs, context);
       expect(result.success).toBe(true);
       expect(result.toolType).toBe('mindmap');
     });
 
     it('should return error for unknown tool', async () => {
-      const result = await executeToolCall(
-        'unknown_tool',
-        {},
-        { sessionId: 'test' }
-      );
+      const result = await executeToolCall('unknown_tool', {}, { sessionId: 'test' });
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('Unknown tool');
@@ -118,11 +111,7 @@ describe('tool-executor', () => {
       const mockHandler = vi.fn().mockRejectedValue(new Error('Handler error'));
       registerToolHandler('failing_tool', mockHandler);
 
-      const result = await executeToolCall(
-        'failing_tool',
-        {},
-        { sessionId: 'test' }
-      );
+      const result = await executeToolCall('failing_tool', {}, { sessionId: 'test' });
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('Handler error');
@@ -138,14 +127,20 @@ describe('tool-executor', () => {
       registerToolHandler('create_quiz', mockHandler);
 
       // Pass all required fields per Zod schema
-      const result = await executeToolCall('create_quiz', {
-        topic: 'Test Quiz',
-        questions: [{
-          question: 'Test question?',
-          options: ['A', 'B', 'C'],
-          correctIndex: 0,
-        }],
-      }, { sessionId: 'test' });
+      const result = await executeToolCall(
+        'create_quiz',
+        {
+          topic: 'Test Quiz',
+          questions: [
+            {
+              question: 'Test question?',
+              options: ['A', 'B', 'C'],
+              correctIndex: 0,
+            },
+          ],
+        },
+        { sessionId: 'test' },
+      );
 
       // Executor should fill in a toolId when handler returns empty
       expect(result.toolId).toBeTruthy();
@@ -163,14 +158,20 @@ describe('tool-executor', () => {
       registerToolHandler('create_quiz', mockHandler);
 
       // Pass all required fields per Zod schema
-      const result = await executeToolCall('create_quiz', {
-        topic: 'Test Quiz',
-        questions: [{
-          question: 'Test question?',
-          options: ['A', 'B', 'C'],
-          correctIndex: 0,
-        }],
-      }, { sessionId: 'test' });
+      const result = await executeToolCall(
+        'create_quiz',
+        {
+          topic: 'Test Quiz',
+          questions: [
+            {
+              question: 'Test question?',
+              options: ['A', 'B', 'C'],
+              correctIndex: 0,
+            },
+          ],
+        },
+        { sessionId: 'test' },
+      );
 
       // Handler's toolId should be preserved
       expect(result.toolId).toBe('handler-provided-id');
@@ -191,16 +192,40 @@ describe('tool-executor', () => {
       registerToolHandler('create_demo', mockHandler);
 
       // Pass all required fields per Zod schema
-      const result = await executeToolCall('create_demo', {
-        title: 'Test Demo',
-        concept: 'Test concept',
-        visualization: 'Test visualization',
-        interaction: 'Test interaction',
-      }, { sessionId: 'test', maestroId: 'galileo' });
+      const result = await executeToolCall(
+        'create_demo',
+        {
+          title: 'Test Demo',
+          concept: 'Test concept',
+          visualization: 'Test visualization',
+          interaction: 'Test interaction',
+        },
+        { sessionId: 'test', maestroId: 'galileo' },
+      );
 
       // Verify execution succeeded - broadcasting is verified through ToolOrchestrator tests
       expect(result.success).toBe(true);
       expect(result.toolType).toBe('demo');
+    });
+  });
+  describe('orchestrator session context', () => {
+    const orchestrator = new ToolOrchestrator(ToolRegistry.getInstance());
+    const run = (context: ToolContext) =>
+      executeViaOrchestrator('create_quiz', {}, context, orchestrator, 'id', true);
+
+    it('falls back without a warning for an authenticated call lacking sessionId', async () => {
+      const warn = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+      expect(await run({ userId: 'user-1' })).toBeNull();
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('still warns when the user is missing', async () => {
+      const warn = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+      expect(await run({ sessionId: 's-1' })).toBeNull();
+      expect(warn).toHaveBeenCalledWith(
+        'Tool orchestrator missing session context',
+        expect.objectContaining({ hasUserId: false, hasSessionId: true }),
+      );
     });
   });
 });
