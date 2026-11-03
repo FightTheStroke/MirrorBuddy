@@ -89,11 +89,21 @@ export const GET = pipe(
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error('Sentry API error response', {
-        component: 'sentry-issues',
-        status: response.status,
-        errorText,
-      });
+      // A Sentry outage or rate limit is not a MirrorBuddy fault: the panel
+      // already shows the metric as unavailable. Auth/config faults stay errors.
+      const transient = response.status === 429 || response.status >= 500;
+      if (transient) {
+        logger.warn('Sentry API temporarily unavailable', {
+          component: 'sentry-issues',
+          status: response.status,
+        });
+      } else {
+        logger.error('Sentry API error response', {
+          component: 'sentry-issues',
+          status: response.status,
+          errorText,
+        });
+      }
       return NextResponse.json(
         {
           error: 'Failed to fetch Sentry issues',
