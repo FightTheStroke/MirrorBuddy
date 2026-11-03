@@ -37,11 +37,36 @@ describe('Sentry recent-activity evidence', () => {
       sentryIssueToAlert(issue),
       'test-only',
     );
-    expect(evidence).toBe(
+    expect(evidence).toContain(
       'category=unclassified | errorTypes=NetworkError,TypeError | httpStatuses=503',
     );
     expect(evidence).not.toContain('private');
     expect(evidence).not.toContain('Private Person');
+  });
+
+  it('reports vector-query counts and optional tool context without disclosing SQL or parameters', async () => {
+    const fetchImpl: typeof fetch = async () =>
+      Response.json({
+        extra: { hasUserId: true, hasSessionId: false },
+        spans: [1, 2].map((id) => ({
+          span_id: String(id),
+          op: 'db',
+          description: 'SELECT * FROM search_similar_embeddings($1)',
+          start_timestamp: id,
+          timestamp: id + 0.1,
+          data: { 'db.params': ['private user text', id] },
+        })),
+      });
+    const evidence = await sentryInventoryEvidence(
+      fetchImpl,
+      sentryIssueToAlert(issue),
+      'test-only',
+    );
+    expect(evidence).toContain('toolContext=user:true,session:false');
+    expect(evidence).toContain('vectorSpans=2');
+    expect(evidence).toContain('uniqueSqlText=1');
+    expect(evidence).toContain('distinctParameterSets=2');
+    expect(evidence).not.toMatch(/SELECT|private|span_id/);
   });
   it.each(['preview', 'production', 'development'])(
     'preserves and truthfully labels the latest event environment %s',
