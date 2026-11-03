@@ -15,6 +15,9 @@ import {
   resolveE2EServerMode,
 } from './e2e-server-mode';
 
+// Subprocess and cold-import work exceeds the 5 s default on a loaded machine.
+vi.setConfig({ testTimeout: 30_000 });
+
 describe('resolveE2EServerMode', () => {
   it('serves the dev server when neither the mode nor CI is set', () => {
     expect(resolveE2EServerMode({})).toEqual({

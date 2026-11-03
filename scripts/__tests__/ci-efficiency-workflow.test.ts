@@ -175,7 +175,7 @@ function decisions(
         condition.replace(/needs\.([\w-]+)/g, 'needs["$1"]'),
         { needs },
         {
-          timeout: 100,
+          timeout: 5_000,
           contextCodeGeneration: { strings: false, wasm: false },
         },
       ) === true

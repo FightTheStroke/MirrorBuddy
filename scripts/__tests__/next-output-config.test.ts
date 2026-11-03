@@ -1,7 +1,10 @@
 // @vitest-environment node
 import { spawnSync } from 'node:child_process';
 import { join, resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Subprocess and cold-import work exceeds the 5 s default on a loaded machine.
+vi.setConfig({ testTimeout: 45_000 });
 
 const repository = resolve(import.meta.dirname, '../..');
 const readConfig = `

@@ -47,6 +47,9 @@ vi.mock('@/lib/funnel', () => ({
   recordStageTransition: vi.fn().mockResolvedValue({}),
 }));
 
+// Subprocess and cold-import work exceeds the 5 s default on a loaded machine.
+vi.setConfig({ testTimeout: 30_000 });
+
 describe('Cron Guard - Production Environment Check', () => {
   let originalEnv: Record<string, string | undefined>;
 

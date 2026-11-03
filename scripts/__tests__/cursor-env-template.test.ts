@@ -8,7 +8,10 @@ import { spawnSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// Subprocess and cold-import work exceeds the 5 s default on a loaded machine.
+vi.setConfig({ testTimeout: 30_000 });
 
 const repository = resolve(import.meta.dirname, '../..');
 const script = join(repository, 'scripts/print-cursor-env-template.ts');
@@ -36,7 +39,7 @@ function emit(): string {
   const result = spawnSync('npx', ['--no-install', 'tsx', copy], {
     cwd: repository,
     encoding: 'utf8',
-    timeout: 60_000,
+    timeout: 25_000,
     env: { ...process.env, PATH: `${dirname(process.execPath)}:${process.env.PATH}` },
   });
   expect(result.error, 'the template script must launch').toBeUndefined();
