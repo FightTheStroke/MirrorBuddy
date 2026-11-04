@@ -1,9 +1,8 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- Only canonical source paths and private fixed-name artifacts are accessed. */
-import { chmodSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { pathToFileURL } from 'node:url';
 import {
   browserInventory,
   canonicalScope,
@@ -18,18 +17,14 @@ import {
   unitInventory,
 } from './release-evidence-scope-policy.mjs';
 
-const commands = {
-  unit: ['node_modules/vitest/vitest.mjs', 'list', '--root', 'apps/web', '--allowOnly=false'],
-  e2e: [
-    'node_modules/@playwright/test/cli.js',
-    'test',
-    '--config=apps/web/playwright.config.ts',
-    '--list',
-    '--reporter=json',
-    '--forbid-only',
-  ],
-};
-const browserEnvironment = { E2E_TESTS: '1' };
+import {
+  commands,
+  browserEnvironment,
+  discover,
+  declarations,
+  ScopeCaptureError,
+} from './release-evidence-scope-runner.mjs';
+
 const profile = (kind) => ({
   policy: 'mirrorbuddy-declared-release-scope-v1',
   command: ['node', ...commands[kind], ...(kind === 'unit' ? ['--json=<private-output>'] : [])],
@@ -55,42 +50,6 @@ const profile = (kind) => ({
       }),
 });
 
-function discover(kind, directory, root, filesOnly = false) {
-  const name = filesOnly ? 'files.json' : 'inventory.json';
-  const output = privateArtifact(directory, name, true);
-  const args = [...commands[kind]];
-  if (kind === 'unit') args.push(...(filesOnly ? ['--filesOnly'] : []), `--json=${output}`);
-  const result = spawnSync(process.execPath, args, {
-    cwd: root,
-    env: {
-      ...process.env,
-      ...(kind === 'e2e' ? { ...browserEnvironment, PLAYWRIGHT_JSON_OUTPUT_FILE: output } : {}),
-    },
-    stdio: 'ignore',
-    timeout: 300_000,
-  });
-  requireScope(result?.status === 0 && !result.error && !result.signal);
-  // Native reporters inherit the caller's umask; discovery remains inside a 0700 directory.
-  chmodSync(privateArtifact(directory, name), 0o600);
-  return readArtifact(directory, name);
-}
-
-function declarations(directory, root) {
-  const output = privateArtifact(directory, 'declarations.json', true);
-  const result = spawnSync(
-    process.execPath,
-    [fileURLToPath(import.meta.url), '--collect-declarations', output],
-    {
-      cwd: root,
-      env: process.env,
-      stdio: 'ignore',
-      timeout: 300_000,
-    },
-  );
-  requireScope(result?.status === 0 && !result.error && !result.signal);
-  return readArtifact(directory, 'declarations.json');
-}
-
 /**
  * Synchronously capture the full native declaration inventory immediately before a real run.
  * Returns the scope written to <kind>.scope.json (0600); the caller must hash that artifact.
@@ -98,35 +57,44 @@ function declarations(directory, root) {
  */
 export function captureExpectedScope(kind, directory, sourceRoot) {
   let temporary;
+  let stage = 0;
   try {
     const { root, dir } = context(kind, directory, sourceRoot);
     const output = privateArtifact(dir, `${kind}.scope.json`, true);
     temporary = mkdtempSync(join(dir, `.${kind}-scope-`));
+    stage = 1;
     const inventory = discover(kind, temporary, root);
     let declared;
     if (kind === 'unit') {
+      stage = 2;
       const canonical = canonicalScope(root);
-      const eligible = unitInventory(
-        root,
-        inventory,
-        discover(kind, temporary, root, true),
-        canonical.files,
-      );
+      stage = 3;
+      const discovered = discover(kind, temporary, root, true);
+      stage = 4;
+      const eligible = unitInventory(root, inventory, discovered, canonical.files);
+      stage = 5;
+      const collected = declarations(temporary, root);
+      stage = 6;
       declared = {
-        files: declaredUnitInventory(root, declarations(temporary, root), eligible),
+        files: declaredUnitInventory(root, collected, eligible),
         coverage: canonical.coverage,
       };
-    } else declared = browserInventory(root, inventory);
+    } else {
+      stage = 7;
+      declared = browserInventory(root, inventory);
+    }
+    stage = 8;
     const scope = { version: 1, kind, sourceRoot: root, profile: profile(kind), ...declared };
     writeFileSync(output, `${JSON.stringify(scope)}\n`, { mode: 0o600 });
     return scope;
-  } catch {
-    throw new Error('Release scope capture failed');
+  } catch (error) {
+    if (error instanceof ScopeCaptureError) throw error;
+    throw new ScopeCaptureError(kind, stage, [1, 3, 5].includes(stage) ? 5 : 6);
   } finally {
     try {
       if (temporary) rmSync(temporary, { recursive: true, force: true });
     } catch {
-      throw new Error('Release scope cleanup failed');
+      throw new ScopeCaptureError(kind, 9);
     }
   }
 }
