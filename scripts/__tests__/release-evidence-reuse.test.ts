@@ -68,7 +68,7 @@ describe('release execution reuse policy', () => {
 
 describe('private-safe scope subprocess diagnostics', () => {
   it.each([1, 3, 5])(
-    'identifies timeout at unit discovery stage %s without extending the limit',
+    'rejects timeout at unit discovery stage %s using its bounded collection budget',
     (stage) => {
       vi.mocked(spawnSync).mockReturnValueOnce({
         ...failure,
@@ -84,7 +84,7 @@ describe('private-safe scope subprocess diagnostics', () => {
       expect(spawnSync).toHaveBeenLastCalledWith(process.execPath, ['PRIVATE_ARGUMENT'], {
         cwd: '/private',
         stdio: 'ignore',
-        timeout: 300_000,
+        timeout: stage === 3 ? 300_000 : 900_000,
       });
     },
   );

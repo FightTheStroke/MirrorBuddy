@@ -36,7 +36,9 @@ export function runScopeSubprocess(kind, stage, args, options, diagnostics) {
   }
   try {
     const stdio = capture ? ['ignore', ...capture.descriptors] : 'ignore';
-    result = spawnSync(process.execPath, args, { ...options, stdio, timeout: 300_000 });
+    // Both full unit collectors import every test file; file/browser listings remain bounded separately.
+    const timeout = kind === 'unit' && [1, 5].includes(stage) ? 900_000 : 300_000;
+    result = spawnSync(process.execPath, args, { ...options, stdio, timeout });
   } catch (error) {
     result = { error, status: null };
   } finally {
