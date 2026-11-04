@@ -54,3 +54,10 @@ jobs:
       - name: Test file count only (suite failed before finishing)
         if: always() && steps.suite.outputs.wall == ''
         run: node scripts/test-rules/budget-check.mjs
+
+      - name: Requested project health verification
+        if: github.event_name == 'workflow_dispatch'
+        run: ./scripts/health-check.sh
+        env:
+          NEXT_PUBLIC_SITE_URL: https://www.mirrorbuddy.org
+          OLLAMA_URL: http://localhost:11434
