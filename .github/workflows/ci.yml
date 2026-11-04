@@ -3003,3 +3003,10 @@ jobs:
           npm run release:gate -- --evidence-dir "$RUNNER_TEMP/attachment-release-evidence"
       - name: Verify project health
         run: ./scripts/health-check.sh
+      - name: Preserve public-safe release summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-release-summary-${{ github.sha }}
+          path: ${{ runner.temp }}/attachment-release-evidence/evidence-pack-*.md
+          if-no-files-found: error
+          retention-days: 30
