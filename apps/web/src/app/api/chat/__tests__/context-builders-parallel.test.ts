@@ -4,9 +4,14 @@ const mocks = vi.hoisted(() => ({
   findSimilarMaterials: vi.fn(),
   findRelatedConcepts: vi.fn(),
   retrieveMaestroKnowledge: vi.fn(),
+  loadBatchedChatRetrieval: vi.fn(),
+  resolveQueryEmbedding: vi.fn(),
 }));
 
 vi.mock('@/lib/rag/server', () => mocks);
+vi.mock('../rag-context', () => ({
+  loadBatchedChatRetrieval: mocks.loadBatchedChatRetrieval,
+}));
 vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
@@ -23,7 +28,9 @@ vi.mock('@/data/maestri', () => ({ getMaestroById: vi.fn() }));
 vi.mock('@/lib/education', () => ({ buildAdaptiveInstruction: vi.fn(() => '') }));
 vi.mock('@/lib/education/server', () => ({ getAdaptiveContextForUser: vi.fn() }));
 vi.mock('@/lib/i18n/language-instructions', () => ({ getLanguageInstruction: () => 'LANG' }));
-vi.mock('../query-embedding', () => ({ resolveQueryEmbedding: vi.fn(async () => [0.1]) }));
+vi.mock('../query-embedding', () => ({
+  resolveQueryEmbedding: mocks.resolveQueryEmbedding,
+}));
 
 import { buildAllContexts, injectRAGContext } from '../context-builders';
 
@@ -36,7 +43,38 @@ function deferred<T>() {
 }
 
 describe('chat vector retrievals run concurrently', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.resolveQueryEmbedding.mockResolvedValue(undefined);
+  });
+
+  it('uses one batch for a shared embedding and preserves prompt and transparency order', async () => {
+    mocks.resolveQueryEmbedding.mockResolvedValue([0.1]);
+    mocks.loadBatchedChatRetrieval.mockResolvedValue({
+      maestroKnowledge: '## KB',
+      rag: {
+        materials: [{ content: 'mat', similarity: 0.9 }],
+        studyKits: [{ content: 'kit', similarity: 0.7 }],
+      },
+    });
+
+    const result = await buildAllContexts({
+      systemPrompt: 'BASE',
+      userId: 'u1',
+      maestroId: 'euclide',
+      lastUserMessage: 'question',
+    });
+
+    expect(mocks.loadBatchedChatRetrieval).toHaveBeenCalledExactlyOnceWith('u1', 'euclide', [0.1]);
+    expect(mocks.retrieveMaestroKnowledge).not.toHaveBeenCalled();
+    expect(mocks.findSimilarMaterials).not.toHaveBeenCalled();
+    expect(mocks.findRelatedConcepts).not.toHaveBeenCalled();
+    expect(result.hasRAG).toBe(true);
+    expect(result.ragResultsForTransparency.map((hit) => hit.content)).toEqual(['mat', 'kit']);
+    expect(result.enhancedPrompt.indexOf('## KB')).toBeLessThan(
+      result.enhancedPrompt.indexOf('- mat'),
+    );
+  });
 
   it('starts maestro KB, materials and study kits before any of them finishes', async () => {
     const kb = deferred<string>();
