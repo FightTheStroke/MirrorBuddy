@@ -59,7 +59,8 @@
       "emptyState": {
         "backpackEmpty": "La mochila está vacía",
         "goToToolcase": "Go To Toolcase",
-        "startCreating": "Empieza a crear"
+        "goToHome": "Elige qué hacer",
+        "startCreating": "Elige una actividad y una materia desde Inicio. Los materiales que crees con tu profesor aparecerán aquí."
       },
       "errorTitle": "Se produjo un error",
       "favorites": "Favorites",
@@ -466,6 +467,7 @@
       "continueWith": "Continue with",
       "error": "Errore",
       "goToStudyKit": "Go to study kit",
+      "goToHome": "Elige qué estudiar",
       "inProgressLegend": "In progress legend",
       "keyConcepts": "Key concepts",
       "learningPaths": "Learning paths",

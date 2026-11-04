@@ -4,10 +4,13 @@
  */
 
 import type { KnowledgeCategory } from './knowledge-base-types';
+import homeMessages from '../../messages/it/home.json';
+
+const { navigation, intent } = homeMessages.home;
 
 export const KNOWLEDGE_CONTENT: Record<KnowledgeCategory, string> = {
-  maestri: `**16 Maestri Storici**
-Tutori AI basati su figure storiche. Dalla home, scegli un Maestro per iniziare.
+  maestri: `**${navigation.professors}**
+Tutori AI basati su figure storiche. Scegli un'attivita' dalla ${navigation.home} o apri ${navigation.professors} dal menu.
 - Euclide (Matematica), Marie Curie (Chimica), Feynman (Fisica)
 - Galileo (Astronomia), Darwin (Scienze), Manzoni (Italiano)
 - Shakespeare (Inglese), Erodoto (Storia), Humboldt (Geografia)
@@ -79,27 +82,27 @@ Ogni stagione ha 100 livelli da sbloccare. Alla fine del trimestre il livello si
 **Achievement/Badge**
 Sblocca badge speciali per traguardi come streak, livelli, esplorazione di materie.
 
-Vai alla Dashboard (/dashboard) per vedere tutti i tuoi progressi!`,
+Apri ${navigation.myRewards} dal menu principale per vedere i tuoi progressi!`,
 
-  navigation: `**Navigazione Zaino/Astuccio**
+  navigation: `**Navigazione MirrorBuddy**
 
-**Zaino** (/zaino)
-Il tuo archivio di materiali di studio! Qui trovi tutto cio' che hai creato:
+**${navigation.home}** (/)
+Scegli ${intent.homework.title}, ${intent.study.title} o ${intent.quizMe.title}, poi la materia.
+Il professore adatto ti accompagna nella conversazione.
+Per usare le pagine di un libro, allega il PDF o un'immagine direttamente nella chat.
+
+**${navigation.myWork}** (/supporti)
+Il tuo archivio di materiali di studio. Qui trovi cio' che hai creato:
 - Mappe mentali, quiz, flashcard, demo, riassunti
 - Naviga per Materia, Data o Tipo
 - Ricerca vocale: "Trova le mappe di matematica"
 
-**Astuccio** (/astuccio)
-I tuoi strumenti creativi! Scegli uno strumento per creare nuovi materiali:
-- Mappa Mentale: visualizza concetti
-- Quiz: verifica comprensione
-- Demo: simulazioni interattive
-- Flashcard: memorizzazione spaziata
-- Riassunto: sintesi strutturate
-- Study Kit: carica PDF e genera materiali
+**${navigation.professors}**
+Apri una conversazione per materia e usa gli strumenti nella chat:
+mappe mentali, quiz, demo, flashcard e riassunti.
 
-**Dashboard** (/dashboard)
-Statistiche complete: tempo studio, livelli, trend, costi Azure (se configurato).`,
+**${navigation.myRewards}**
+Consulta progressi, livelli e badge dal menu principale.`,
 
   pomodoro: `**Timer Pomodoro**
 25 min studio + 5 min pausa. Ogni 4 pomodori: pausa 15 min.
