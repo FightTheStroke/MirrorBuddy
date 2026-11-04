@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.43.23] - 2026-11-04
+
+### Fixed
+
+- Retrieve chat reference material in one database round trip while preserving
+  separate student and maestro access boundaries.
+- Wait for identity refresh during consent and onboarding, without accepting
+  stale responses after an account change.
+- Cancel mindmap streams cleanly without reporting intentional cancellation as
+  an application error; continue reporting genuine failures.
+
 ## [0.43.22] - 2026-11-03
 
 - No user-facing changes recorded.
