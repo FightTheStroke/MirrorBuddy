@@ -4,10 +4,26 @@ import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { parse } from 'yaml';
+import { z } from 'zod';
+import { policyTestDatabaseEnabled } from '../../apps/web/src/test/policy-test-environment';
 
 const script = (name: string) => readFileSync(new URL(`../${name}`, import.meta.url), 'utf8');
 
 describe('release audit checks the build that can actually ship', () => {
+  it('lets native discovery collect the real database suites using one isolated target', () => {
+    const workflow = parse(
+      readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8'),
+    );
+    const environment = z
+      .object({
+        DATABASE_URL: z.string(),
+        TEST_DATABASE_URL: z.string(),
+        DEV_DATABASE_URL: z.string(),
+      })
+      .parse(workflow?.jobs?.['release-validation']?.env);
+    expect(policyTestDatabaseEnabled(environment)).toBe(true);
+  });
   it('checks pre-release runtime absence after building and preparing standalone', () => {
     const source = script('pre-release-check.sh');
     expect(source.indexOf('node scripts/release-audit.mjs')).toBeGreaterThan(
