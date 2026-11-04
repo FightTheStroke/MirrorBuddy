@@ -57,6 +57,10 @@ vi.mock('@/lib/funnel/batch-funnel', () => ({
   processBatchFunnelEvents: vi.fn().mockResolvedValue({ processed: 0 } as any),
 }));
 
+vi.mock('../scheduled-metrics', () => ({
+  collectDatabaseBackedSamples: vi.fn().mockResolvedValue([]),
+}));
+
 // Mock fetch for Grafana push
 const mockFetch = vi.fn().mockResolvedValue({
   ok: true,
@@ -100,6 +104,7 @@ describe('metrics-push - waitlist KPIs', () => {
   });
 
   afterEach(() => {
+    vi.unstubAllEnvs();
     Object.entries(originalEnv).forEach(([key, value]) => {
       if (value === undefined) {
         delete process.env[key];
@@ -123,25 +128,33 @@ describe('metrics-push - waitlist KPIs', () => {
     expect(prisma.waitlistEntry.count).toHaveBeenCalledTimes(5);
   });
 
-  it('should push waitlist_signups_total metric to Grafana', async () => {
-    const { POST } = await import('../route');
+  it.each([false, true])(
+    'should push waitlist metrics with service configuration=%s',
+    async (configured) => {
+      if (configured) {
+        vi.stubEnv('VERCEL_TOKEN', 'fixture-token');
+        vi.stubEnv('VERCEL_PROJECT_ID', 'fixture-project');
+      }
+      const { POST } = await import('../route');
 
-    const request = new NextRequest(new URL('http://localhost:3000/api/cron/metrics-push'), {
-      method: 'POST',
-      headers: { authorization: 'Bearer test-secret' },
-    });
+      const request = new NextRequest(new URL('http://localhost:3000/api/cron/metrics-push'), {
+        method: 'POST',
+        headers: { authorization: 'Bearer test-secret' },
+      });
 
-    await POST(request);
+      await POST(request);
 
-    const fetchCall = mockFetch.mock.calls[0];
-    const body = fetchCall[1].body as string;
+      expect(mockFetch).toHaveBeenCalledOnce();
+      const fetchCall = mockFetch.mock.calls[0];
+      const body = fetchCall[1].body as string;
 
-    expect(body).toContain('waitlist_signups_total');
-    expect(body).toContain('waitlist_verified_total');
-    expect(body).toContain('waitlist_unsubscribed_total');
-    expect(body).toContain('waitlist_promo_redeemed_total');
-    expect(body).toContain('waitlist_conversion_rate');
-  });
+      expect(body).toContain('waitlist_signups_total');
+      expect(body).toContain('waitlist_verified_total');
+      expect(body).toContain('waitlist_unsubscribed_total');
+      expect(body).toContain('waitlist_promo_redeemed_total');
+      expect(body).toContain('waitlist_conversion_rate');
+    },
+  );
 
   it('should compute conversion_rate as converted/total', async () => {
     const { POST } = await import('../route');
