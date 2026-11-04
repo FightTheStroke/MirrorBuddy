@@ -92,27 +92,17 @@ function boundedText(path) {
   }
 }
 
-function trackedTests(root) {
+function trackedTests(
+  root,
+  paths = ['apps/web/src', 'scripts/__tests__', 'apps/web/scripts/__tests__'],
+) {
   try {
-    return execFileSync(
-      'git',
-      [
-        '-C',
-        root,
-        'ls-files',
-        '-z',
-        '--',
-        'apps/web/src',
-        'scripts/__tests__',
-        'apps/web/scripts/__tests__',
-      ],
-      {
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'pipe'],
-        timeout: 5000,
-        maxBuffer: 8 * 1024 * 1024,
-      },
-    ).split('\0');
+    return execFileSync('git', ['-C', root, 'ls-files', '-z', '--', ...paths], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 5000,
+      maxBuffer: 8 * 1024 * 1024,
+    }).split('\0');
   } catch {
     /* No trustworthy public index: report zero, never a path. */
     return [];
@@ -170,4 +160,48 @@ export function summarizeUnitFailure(directory, root) {
   }
   const { category, file, related } = classifyScopeFailure(text, root, tracked);
   return `class=${category} file=${file} related=${related.join(',') || 0} assertions=${assertions.join(';') || 0}`;
+}
+
+export function summarizeBrowserFailure(directory, root) {
+  const files = [...new Set(trackedTests(root, ['apps/web/e2e']))]
+    .filter((file) => /^apps\/web\/e2e\/.*\.spec\.tsx?$/.test(file))
+    .sort();
+  const failures = [];
+  let text = '';
+  try {
+    const report = JSON.parse(
+      readFileSync(join(root, 'apps/web/test-results/pw-results.json'), 'utf8'),
+    );
+    const visit = (suite, depth = 0) => {
+      if (!suite || depth > 32 || failures.length >= 8) return;
+      for (const spec of Array.isArray(suite.specs) ? suite.specs : []) {
+        for (const test of Array.isArray(spec?.tests) ? spec.tests : []) {
+          if (test?.status !== 'unexpected' || failures.length >= 8) continue;
+          const results = Array.isArray(test.results) ? test.results : [];
+          const last = results.at(-1);
+          const status = ['failed', 'timedOut', 'interrupted'].indexOf(last?.status) + 1;
+          const path = resolve(root, 'apps/web/e2e', String(spec.file ?? ''));
+          const file = files.findIndex((tracked) => resolve(root, tracked) === path) + 1;
+          const line = Number.isSafeInteger(spec.line) && spec.line > 0 ? spec.line : 0;
+          failures.push(`${file}:${line}:${status}`);
+          text += `\n${last?.error?.message ?? ''}`;
+        }
+      }
+      for (const child of Array.isArray(suite.suites) ? suite.suites : []) visit(child, depth + 1);
+    };
+    for (const suite of Array.isArray(report?.suites) ? report.suites : []) visit(suite);
+    for (const error of Array.isArray(report?.errors) ? report.errors : [])
+      text += `\n${error?.message ?? ''}`;
+  } catch {
+    /* A cancelled browser run may not have written its JSON report. */
+  }
+  if (!text) {
+    try {
+      text = boundedText(join(directory, 'e2e.log'));
+    } catch {
+      /* Missing diagnostics still leave the browser execution rejected. */
+    }
+  }
+  const { category } = classifyScopeFailure(text, root);
+  return `class=${category} failures=${failures.join(';') || 0}`;
 }

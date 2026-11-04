@@ -24,8 +24,8 @@ echo "Release evidence directory: $EVIDENCE_DIR"
 # Remote policy and vulnerability advisories are always checked afresh.
 node scripts/release-native-evidence.mjs run policy "$EVIDENCE_DIR"
 node scripts/release-native-evidence.mjs reuse-or-run pre-release "$EVIDENCE_DIR"
-node scripts/release-native-evidence.mjs run unit "$EVIDENCE_DIR"
 node scripts/release-native-evidence.mjs run e2e "$EVIDENCE_DIR"
+node scripts/release-native-evidence.mjs run unit "$EVIDENCE_DIR"
 # Long test runs must not leave stale operational/advisory evidence at signoff.
 node scripts/release-native-evidence.mjs run policy "$EVIDENCE_DIR"
 node scripts/release-native-evidence.mjs run audit "$EVIDENCE_DIR"
