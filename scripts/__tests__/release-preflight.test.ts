@@ -148,3 +148,54 @@ describe('pre-release required inspection callers', () => {
     expect(result.prepared).toBe(false);
   });
 });
+
+function policyDiagnostic(body: string) {
+  const root = mkdtempSync(join(tmpdir(), 'mb-policy-diagnostic-'));
+  roots.push(root);
+  mkdirSync(join(root, 'scripts/lib'), { recursive: true });
+  writeFileSync(join(root, 'scripts/lib/checks.sh'), '');
+  const source = readFileSync(join(repository, 'scripts/release-policy-check.sh'), 'utf8');
+  const firstCheck = 'pnpm exec tsx scripts/ci/check-version-consistency.ts';
+  expect(source).toContain(firstCheck);
+  writeFileSync(
+    join(root, 'scripts/release-policy-check.sh'),
+    source.replace(firstCheck, `${body}\nexit 0`),
+  );
+  return spawnSync('bash', [join(root, 'scripts/release-policy-check.sh')], {
+    cwd: root,
+    encoding: 'utf8',
+    timeout: 5000,
+    env: { ...process.env, PRIVATE_POLICY_SENTINEL: 'must-not-be-emitted' },
+  });
+}
+
+describe('privacy-safe policy failure diagnostics', () => {
+  it.each([
+    ['direct command', 'bash -c "exit 23"', 23],
+    ['pipeline', 'bash -c "exit 17" | cat', 17],
+    ['function', 'fail_policy() { bash -c "exit 15"; }\nfail_policy', 15],
+    ['command substitution', 'value=$(bash -c "exit 19")', 19],
+    ['subshell', '(bash -c "exit 21")', 21],
+    ['explicit exit', 'exit 7', 7],
+  ])('reports only numeric metadata for %s and preserves its status', (_name, body, status) => {
+    const result = policyDiagnostic(String(body));
+    expect(result.error).toBeUndefined();
+    expect(result.status).toBe(status);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toMatch(
+      new RegExp(`^(?:__POLICY_FAILURE__ line=[1-9]\\d* exit=${status}\n)+$`),
+    );
+    expect(result.stderr).not.toContain('must-not-be-emitted');
+    expect(result.stderr).not.toContain(String(body));
+  });
+  it('keeps successful and intentionally handled commands silent', () => {
+    const result = policyDiagnostic('if false; then exit 9; fi\nfalse || :\ntrue');
+    expect(result.status).toBe(0);
+    expect(result.stderr).toBe('');
+  });
+  it('does not enable errexit inside a continuing command substitution', () => {
+    const result = policyDiagnostic('value=$(false; printf resumed)\n[[ "$value" = resumed ]]');
+    expect(result.status).toBe(0);
+    expect(result.stdout).toBe('');
+  });
+});

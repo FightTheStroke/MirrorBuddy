@@ -162,7 +162,7 @@ test('never exposes CLI failure payload or malformed JSON', () => {
 
 test('tagged workflow only collects metadata with read permissions and strict artifact upload', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8');
-  const evidence = workflow.split('\n  release-evidence-pack:')[1];
+  const evidence = workflow.split('\n  release-evidence-pack:')[1]?.split(/\n {2}[\w-]+:/)[0];
   assert.ok(evidence);
   assert.match(evidence, /needs: \[deployment-gate\]/);
   assert.match(evidence, /if: startsWith\(github.ref, 'refs\/tags\/v'\)/);

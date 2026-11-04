@@ -58,6 +58,14 @@ test.describe('Conversation document attachments', () => {
       const upload = await owner.post(path, { headers: ownerHeaders, data });
       expect(upload.status()).toBe(201);
       const { attachment } = (await upload.json()) as { attachment: AttachmentDocument };
+      expect(
+        (
+          await owner.post(path, {
+            headers: ownerHeaders,
+            data: { ...data, mimeType: 'image/png' },
+          })
+        ).status(),
+      ).toBe(403);
       expect((await other.get(path)).status()).toBe(404);
       expect((await other.post(path, { headers: otherHeaders, data })).status()).toBe(404);
       expect(
@@ -159,7 +167,17 @@ test.describe('Conversation document attachments', () => {
     expect(await response.json()).toEqual({ attachments: [] });
   });
 
-  test('requires consent before sending a scanned image for OCR', async ({ page }) => {
+  test('requires consent before sending an allowed scanned image for OCR', async ({
+    page,
+    baseURL,
+  }) => {
+    const prisma = getPrismaClient();
+    const { testUserId } = await createE2ETestUser(prisma);
+    trackTestRecord('userIds', testUserId);
+    const tier = await prisma.tierDefinition.findUniqueOrThrow({ where: { code: 'pro' } });
+    await prisma.userSubscription.create({ data: { userId: testUserId, tierId: tier.id } });
+    const issued = await issueTestSession(prisma, testUserId);
+    await page.context().addCookies(testSessionCookies(issued, baseURL));
     const labels = en.chat.attachments;
     let analyzed = false;
     await page.route('**/api/chat/attachments/analyze', async (route) => {
@@ -203,6 +221,7 @@ test.describe('Conversation document attachments', () => {
       const labels = translations[locale].chat.attachments;
       await page.goto(`/${locale}/maestri/manzoni`);
       await expect(page.locator('textarea')).toBeVisible();
+      await expect(page.locator('textarea')).toBeFocused();
       const button = page.getByRole('button', { name: labels.attach, exact: true });
       await button.focus();
       await expect(button).toBeFocused();

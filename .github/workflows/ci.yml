@@ -2996,11 +2996,26 @@ jobs:
           pnpm exec prisma generate
           pnpm exec prisma migrate deploy
           pnpm exec prisma db seed
-          pnpm exec playwright install --with-deps chromium
+      - name: Install release verification browser
+        timeout-minutes: 10
+        run: pnpm exec playwright install chromium
+      - name: Install release browser OS dependencies
+        timeout-minutes: 5
+        continue-on-error: true
+        run: pnpm exec playwright install-deps chromium
       - name: Run native release gate
         run: |
           umask 077
           npm run release:gate -- --evidence-dir "$RUNNER_TEMP/attachment-release-evidence"
+      - name: Report bounded native failure diagnostics
+        if: failure()
+        run: |
+          log="$RUNNER_TEMP/attachment-release-evidence/policy.log"
+          if [ -f "$log" ]; then
+            if ! grep -E '^__POLICY_FAILURE__ line=[1-9][0-9]* exit=[1-9][0-9]*$' "$log"; then
+              echo "No safe policy diagnostic marker; raw logs remain private."
+            fi
+          fi
       - name: Verify project health
         run: ./scripts/health-check.sh
       - name: Preserve public-safe release summary

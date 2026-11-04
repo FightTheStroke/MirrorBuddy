@@ -44,13 +44,13 @@ describe('ordinary page navigation links', () => {
     expect(window.location.assign).not.toHaveBeenCalled();
   });
 
-  it('offers a locale-aware study kit link when learning paths are empty', async () => {
+  it('offers a locale-aware home link when learning paths are empty', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ paths: [] })));
     render(<LearningPathsList />);
     const link = await screen.findByRole('link', {
-      name: getTranslation('education.learningPath.goToStudyKit'),
+      name: getTranslation('education.learningPath.goToHome'),
     });
-    expect(link).toHaveAttribute('href', '/fr/study-kit');
+    expect(link).toHaveAttribute('href', '/fr/');
     expect(link.querySelector('button')).toBeNull();
     expect(window.location.assign).not.toHaveBeenCalled();
   });
