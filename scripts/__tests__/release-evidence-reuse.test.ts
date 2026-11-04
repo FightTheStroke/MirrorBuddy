@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, realpathSync, writeFileSync, readFileSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -8,6 +8,7 @@ import { run } from '../release-native-evidence.mjs';
 import { readReceipt, root } from '../lib/release-evidence-store.mjs';
 import { captureExpectedScope } from '../lib/release-evidence-scope.mjs';
 import { runScopeSubprocess } from '../lib/release-evidence-scope-runner.mjs';
+import { classifyScopeFailure } from '../lib/release-evidence-scope-diagnostics.mjs';
 
 vi.mock('node:child_process', () => ({ spawnSync: vi.fn() }));
 vi.mock('../lib/release-evidence-inputs.mjs', async (original) => ({
@@ -111,5 +112,67 @@ describe('private-safe scope subprocess diagnostics', () => {
     expect(() => run('unit', directory, false)).toThrow(message);
     expect(spawnSync).not.toHaveBeenCalled();
     expect(readReceipt).not.toHaveBeenCalled();
+  });
+});
+
+it('classifies a failed list from private child stderr without exposing its payload', () => {
+  const directory = realpathSync(mkdtempSync(join(tmpdir(), 'mb-scope-stderr-')));
+  directories.push(directory);
+  vi.mocked(spawnSync).mockImplementationOnce((_command, _args, options) => {
+    const stdio = options?.stdio;
+    if (Array.isArray(stdio) && typeof stdio[2] === 'number') {
+      writeFileSync(
+        stdio[2],
+        'PRIVATE_VALUE: FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory',
+      );
+    }
+    return { ...failure, status: 1 };
+  });
+  expect(() =>
+    runScopeSubprocess('unit', 1, [], { cwd: directory }, { directory, root: directory }),
+  ).toThrow('exit=1 class=1 file=0 errno=0');
+  const path = join(directory, 'scope-1-1.stderr.log');
+  expect(readFileSync(path, 'utf8')).toContain('PRIVATE_VALUE');
+  expect(statSync(path).mode & 0o077).toBe(0);
+});
+it('preserves numeric native spawn errno without exposing its message', () => {
+  vi.mocked(spawnSync).mockReturnValueOnce({
+    ...failure,
+    status: null,
+    error: Object.assign(new Error('PRIVATE_VALUE'), { code: 'ENOMEM', errno: -12 }),
+  });
+  expect(() => runScopeSubprocess('unit', 1, [], {})).toThrow('exit=0 class=0 file=0 errno=-12');
+});
+
+it.each([
+  ['ERR_WORKER_OUT_OF_MEMORY', 1],
+  ['Worker exited unexpectedly', 2],
+  ['Cannot find module', 3],
+  ['failed to load config', 4],
+  ['Transform failed', 5],
+  ['No test suite found', 6],
+  ['EACCES', 7],
+  ['Missing required environment variable', 8],
+  ['PRIVATE_VALUE', 0],
+])('returns only a numeric category for %s', (message, category) => {
+  expect(classifyScopeFailure(message, '/public')).toEqual({ category, file: 0, related: [] });
+});
+
+it('indexes only one exact tracked test path and rejects ambiguous or partial matches', () => {
+  const files = ['scripts/__tests__/b.test.ts', 'apps/web/src/a.test.ts'];
+  expect(
+    classifyScopeFailure(
+      'Cannot find module at /public/apps/web/src/a.test.ts:2',
+      '/public',
+      files,
+    ),
+  ).toEqual({ category: 3, file: 1, related: [1] });
+  expect(
+    classifyScopeFailure('apps/web/src/a.test.ts scripts/__tests__/b.test.ts', '/public', files),
+  ).toEqual({ category: 0, file: 0, related: [1, 2] });
+  expect(classifyScopeFailure('xapps/web/src/a.test.ts', '/public', files)).toEqual({
+    category: 0,
+    file: 0,
+    related: [],
   });
 });
