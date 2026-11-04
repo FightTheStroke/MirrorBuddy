@@ -10,7 +10,7 @@
 import { logger } from '@/lib/logger';
 import { isEmbeddingConfigured } from './embedding-service';
 import { generatePrivacyAwareEmbedding } from './privacy-aware-embedding';
-import { searchSimilar } from './vector-store';
+import { searchSimilar, type SearchOptions, type VectorSearchResult } from './vector-store';
 
 const SYSTEM_USER_ID = 'SYSTEM_MAESTRO_KB';
 const DEFAULT_LIMIT = 3;
@@ -42,6 +42,37 @@ export interface MaestroKnowledgeResult {
   chunkIndex: number;
 }
 
+export function maestroKnowledgeSearchOptions(
+  maestroId: string,
+  vector: number[],
+  limit = DEFAULT_LIMIT,
+): SearchOptions {
+  return {
+    userId: SYSTEM_USER_ID,
+    vector,
+    limit,
+    minSimilarity: MIN_SIMILARITY,
+    sourceType: 'maestro_knowledge',
+    sourceId: maestroId,
+    subject: undefined,
+  };
+}
+
+export function formatMaestroKnowledge(maestroId: string, results: VectorSearchResult[]): string {
+  // Keep the persona boundary even when an older database uses the JS fallback.
+  const filtered = results.filter((result) => result.sourceId === maestroId);
+  if (filtered.length === 0) {
+    logger.debug('[MaestroKB] No relevant knowledge found', { maestroId });
+    return '';
+  }
+  logger.debug('[MaestroKB] Knowledge retrieved', {
+    maestroId,
+    resultCount: filtered.length,
+    topSimilarity: filtered[0]?.similarity,
+  });
+  return `## Conoscenze Didattiche Rilevanti\n${filtered.map((result) => result.content).join('\n\n')}`;
+}
+
 /**
  * Retrieve relevant didactic knowledge for a maestro based on the user's query.
  * Falls back to empty string if pgvector is unavailable (graceful degradation).
@@ -69,36 +100,8 @@ export async function retrieveMaestroKnowledge(
   try {
     const vector = embedding ?? (await generatePrivacyAwareEmbedding(query)).vector;
 
-    const results = await searchSimilar({
-      userId: SYSTEM_USER_ID,
-      vector,
-      limit,
-      minSimilarity: MIN_SIMILARITY,
-      sourceType: 'maestro_knowledge',
-      sourceId: maestroId,
-      subject: undefined,
-    });
-
-    // The store filters by maestro now, so nothing foreign should arrive here.
-    // Kept as a belt: a database still on the six-argument search function
-    // falls back to the JS path, and this guarantees the persona boundary holds
-    // whichever path served the query.
-    const filtered = results.filter((r) => r.sourceId === maestroId);
-
-    if (filtered.length === 0) {
-      logger.debug('[MaestroKB] No relevant knowledge found', { maestroId });
-      return '';
-    }
-
-    const formatted = filtered.map((r) => r.content).join('\n\n');
-
-    logger.debug('[MaestroKB] Knowledge retrieved', {
-      maestroId,
-      resultCount: filtered.length,
-      topSimilarity: filtered[0]?.similarity,
-    });
-
-    return `## Conoscenze Didattiche Rilevanti\n${formatted}`;
+    const results = await searchSimilar(maestroKnowledgeSearchOptions(maestroId, vector, limit));
+    return formatMaestroKnowledge(maestroId, results);
   } catch (error) {
     logger.warn('[MaestroKB] Retrieval failed, graceful fallback', {
       maestroId,

@@ -10,7 +10,17 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useOnboardingStore } from '../onboarding-store';
 import { setClientIdentity } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
+function signIn(userId = 'onboarding-account') {
+  setClientIdentity({
+    status: 'authenticated',
+    userId,
+    role: 'USER',
+    legacyOrigin: false,
+    needsLegacyUpgrade: false,
+  });
+}
 function mockOnboardingResponse(body: unknown) {
   vi.stubGlobal(
     'fetch',
@@ -24,21 +34,80 @@ function mockOnboardingResponse(body: unknown) {
 
 describe('onboarding-store hydrateFromApi — completion resolution', () => {
   beforeEach(() => {
-    setClientIdentity({
-      status: 'authenticated',
-      userId: 'onboarding-account',
-      role: 'USER',
-      legacyOrigin: false,
-      needsLegacyUpgrade: false,
-    });
+    signIn();
     // Reset the hydration guard so each test re-runs hydrateFromApi.
-    useOnboardingStore.setState({ isHydrated: false, hasCompletedOnboarding: false });
+    useOnboardingStore.setState({
+      isHydrated: false,
+      hydratedUserId: undefined,
+      hasCompletedOnboarding: false,
+      data: { name: '' },
+    });
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
+
+  it('waits for same-account verification during a successful profile read', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        setClientIdentity({ status: 'pending' });
+        return Response.json({ onboardingState: null, data: { name: 'Returning student' } });
+      }),
+    );
+    const loading = useOnboardingStore.getState().hydrateFromApi();
+    const outcome = loading.then(
+      () => null,
+      (error: unknown) => error,
+    );
+    await vi.advanceTimersByTimeAsync(0);
+    expect(useOnboardingStore.getState().isHydrated).toBe(false);
+    signIn();
+
+    await expect(outcome).resolves.toBeNull();
+    expect(useOnboardingStore.getState()).toMatchObject({
+      isHydrated: true,
+      hydratedUserId: 'onboarding-account',
+      hasCompletedOnboarding: true,
+      data: { name: 'Returning student' },
+    });
+  });
+
+  it.each(['other-account', 'anonymous'])(
+    'discards a successful old profile without reporting a failure after switching to %s',
+    async (next) => {
+      vi.useFakeTimers();
+      const warn = vi.spyOn(logger, 'warn');
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => {
+          setClientIdentity({ status: 'pending' });
+          return Response.json({ onboardingState: null, data: { name: 'Old account' } });
+        }),
+      );
+      const outcome = useOnboardingStore
+        .getState()
+        .hydrateFromApi()
+        .then(
+          () => null,
+          (error: unknown) => error,
+        );
+      await vi.advanceTimersByTimeAsync(0);
+      if (next === 'anonymous') setClientIdentity({ status: 'anonymous' });
+      else signIn(next);
+
+      await expect(outcome).resolves.toBeNull();
+      expect(useOnboardingStore.getState()).toMatchObject({
+        isHydrated: false,
+        data: { name: '' },
+      });
+      expect(warn).not.toHaveBeenCalled();
+    },
+  );
 
   it('returning user with a profile name + stale hasCompletedOnboarding=false → completed (no /welcome bounce)', async () => {
     mockOnboardingResponse({
@@ -110,6 +179,35 @@ describe('onboarding-store hydrateFromApi — completion resolution', () => {
       'SESSION_NOT_ACTIVATED',
     );
     expect(fetch).not.toHaveBeenCalled();
+    expect(useOnboardingStore.getState().isHydrated).toBe(false);
+  });
+
+  it('still rejects when identity verification during the read genuinely fails', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        setClientIdentity({ status: 'pending' });
+        return Response.json({ onboardingState: null, data: { name: 'Old profile' } });
+      }),
+    );
+    const outcome = useOnboardingStore
+      .getState()
+      .hydrateFromApi()
+      .catch((error: unknown) => error);
+    await vi.advanceTimersByTimeAsync(0);
+    setClientIdentity({ status: 'unavailable', reason: 'SESSION_UNAVAILABLE' });
+
+    await expect(outcome).resolves.toMatchObject({ reason: 'SESSION_UNAVAILABLE' });
+    expect(useOnboardingStore.getState().isHydrated).toBe(false);
+    expect(useOnboardingStore.getState().data.name).toBe('');
+  });
+
+  it('rejects a null response without marking onboarding as hydrated', async () => {
+    mockOnboardingResponse(null);
+    await expect(useOnboardingStore.getState().hydrateFromApi()).rejects.toThrow(
+      'Invalid onboarding response',
+    );
     expect(useOnboardingStore.getState().isHydrated).toBe(false);
   });
 

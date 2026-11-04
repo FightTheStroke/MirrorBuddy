@@ -1,19 +1,14 @@
-/**
- * Onboarding Store
- *
- * Manages the onboarding flow state:
- * - Track if user has completed onboarding
- * - Current step in the flow
- * - Collected data during onboarding
- */
+/** Manages onboarding progress, profile data and voice session state. */
 
 import { create } from 'zustand';
 import { csrfFetch } from '@/lib/auth';
 import { AUTH_COOKIE_NAME } from '@/lib/auth';
 import {
   getUserIdFromCookie,
+  getClientIdentity,
   requireClientUserId,
   setClientIdentity,
+  whenIdentitySettled,
 } from '@/lib/auth/client-auth';
 import { logger } from '@/lib/logger';
 import {
@@ -199,6 +194,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
 
   hydrateFromApi: async () => {
     try {
+      if (getClientIdentity().status === 'pending') await whenIdentitySettled();
       const userId = getUserIdFromCookie();
       if (get().isHydrated && get().hydratedUserId === userId) return;
       if (userId === null) {
@@ -211,17 +207,14 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
       }
 
       const data = await response.json();
-      if (getUserIdFromCookie() !== userId) throw new Error('Onboarding identity changed');
+      if (getClientIdentity().status === 'pending') await whenIdentitySettled();
+      if (getUserIdFromCookie() !== userId) {
+        logger.debug('Onboarding hydration superseded by identity change');
+        return;
+      }
+      if (!data || typeof data !== 'object') throw new Error('Invalid onboarding response');
 
-      // Decide whether onboarding is complete.
-      // A returning user who already has a real profile (a name) must go
-      // straight to the app — NOT be re-forced through onboarding by a stale
-      // OnboardingState row with hasCompletedOnboarding=false (e.g. an account
-      // created/seeded without the flag ever being set). The previous `??`
-      // logic let an explicit `false` win over the "has existing data" signal,
-      // which trapped real logged-in users in a /welcome bounce.
-      // Replay mode still intentionally forces onboarding (resetOnboarding /
-      // startReplay set hasCompletedOnboarding=false to redo the flow).
+      // An existing profile overrides a stale incomplete flag, except in replay mode.
       const state = data.onboardingState;
       const hasProfileName = Boolean(data.data?.name);
       const isCompleted = state?.isReplayMode

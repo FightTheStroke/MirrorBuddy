@@ -17,6 +17,7 @@ import { buildAdaptiveInstruction } from '@/lib/education';
 import { getAdaptiveContextForUser } from '@/lib/education/server';
 import { getLanguageInstruction } from '@/lib/i18n/language-instructions';
 import { resolveQueryEmbedding } from './query-embedding';
+import { loadBatchedChatRetrieval, type RAGLoad } from './rag-context';
 import type { SupportedLanguage } from './types';
 
 export interface ContextResult {
@@ -107,10 +108,6 @@ export async function injectToolContextData(
 }
 
 type RAGHit = { content: string; similarity: number; sourceType?: string };
-type RAGLoad = {
-  materials: Awaited<ReturnType<typeof findSimilarMaterials>>;
-  studyKits: Awaited<ReturnType<typeof findRelatedConcepts>>;
-} | null;
 
 /**
  * Start the two student-corpus vector searches together. They are independent,
@@ -303,15 +300,19 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
     ? await resolveQueryEmbedding(options.lastUserMessage)
     : undefined;
 
-  // The three vector searches (maestro KB, materials, study kits) are
-  // independent: start them together, apply them below in the original order.
-  const maestroKnowledgePending =
-    options.maestroId && options.lastUserMessage
-      ? loadMaestroKnowledge(options.maestroId, options.lastUserMessage, queryEmbedding)
+  // Batch the three corpora in one database call, then apply them in prompt order.
+  const batchPending = queryEmbedding
+    ? loadBatchedChatRetrieval(options.userId, options.maestroId, queryEmbedding)
+    : undefined;
+  const maestroKnowledgePending = batchPending
+    ? batchPending.then((loaded) => loaded.maestroKnowledge)
+    : options.maestroId && options.lastUserMessage
+      ? loadMaestroKnowledge(options.maestroId, options.lastUserMessage)
       : undefined;
-  const ragPending =
-    options.userId && options.lastUserMessage
-      ? loadRAGResults(options.userId, options.lastUserMessage, queryEmbedding)
+  const ragPending = batchPending
+    ? batchPending.then((loaded) => loaded.rag)
+    : options.userId && options.lastUserMessage
+      ? loadRAGResults(options.userId, options.lastUserMessage)
       : undefined;
 
   // Memory context
