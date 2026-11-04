@@ -12,6 +12,7 @@ import { isTransientNetworkError, retryNetworkRead } from '@/lib/resilience/netw
 import {
   getClientIdentity,
   subscribeClientIdentity,
+  whenIdentitySettled,
   type ClientIdentity,
 } from '@/lib/auth/client-auth';
 import {
@@ -54,15 +55,18 @@ export function consentFromServer(
   }).consent;
 }
 export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | null> {
+  const current = generation;
+  if (getClientIdentity().status === 'pending') await whenIdentitySettled();
+  if (generation !== current || consentClearing()) throw new ConsentSyncError('superseded');
   const identity = getConsentIdentity();
   if (identity.account === null) return null;
   confirmAnalyticsPermission(identity, false);
   updateConsentState({});
-  const current = generation;
   const observed = { terms: currentRevision('terms'), analytics: currentRevision('analytics') };
   const get = async (url: string): Promise<unknown> => {
     try {
       return await retryNetworkRead(async () => {
+        if (getClientIdentity().status === 'pending') await whenIdentitySettled();
         if (generation !== current || identity !== getConsentIdentity())
           throw new ConsentSyncError('superseded');
         const response = await fetch(url, { method: 'GET', credentials: 'include' });
@@ -79,9 +83,13 @@ export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | n
     }
   };
   const terms = await get('/api/tos');
+  // Verification may start while a successful read is in flight. Wait, then
+  // still reject a real account/generation change before using that response.
+  if (getClientIdentity().status === 'pending') await whenIdentitySettled();
   if (generation !== current || identity !== getConsentIdentity())
     throw new ConsentSyncError('superseded');
   const cookies = await get('/api/user/consent');
+  if (getClientIdentity().status === 'pending') await whenIdentitySettled();
   if (generation !== current || identity !== getConsentIdentity())
     throw new ConsentSyncError('superseded');
   const consent = consentFromServer(terms, cookies, observed);
@@ -96,6 +104,10 @@ export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | n
 }
 export async function initializeConsent(): Promise<boolean> {
   if (consentClearing()) return false;
+  if (getClientIdentity().status === 'pending') {
+    await whenIdentitySettled();
+    if (consentClearing()) return false;
+  }
   let identity: ConsentIdentity;
   try {
     identity = getConsentIdentity();
@@ -116,6 +128,7 @@ export async function initializeConsent(): Promise<boolean> {
     });
     try {
       await (isConsentLoaded() ? readConsent() : loadUnifiedConsentFromDB());
+      if (getClientIdentity().status === 'pending') await whenIdentitySettled();
       const consent = readConsent();
       if (generation !== current || identity !== getConsentIdentity())
         throw new ConsentSyncError('superseded');
