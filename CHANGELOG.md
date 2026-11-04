@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.44.0] - 2026-11-04
+
+### Added
+
+- Attach PDFs and supported images directly to a professor's text conversation,
+  with explicit consent before scanned pages are analyzed.
+- Keep follow-up questions grounded in selected documents with page references;
+  restore signed-in conversation attachments without exposing another student's files.
+- Provide keyboard-accessible attachment controls and consent in all five languages.
+
+### Fixed
+
+- Align study navigation and tutor references with the current intention-based experience.
+- Preserve strict release checks while distinguishing stylesheet imports from eager
+  JavaScript loading and reporting bounded, private-safe failure diagnostics.
+
 ## [0.43.23] - 2026-11-04
 
 ### Fixed
