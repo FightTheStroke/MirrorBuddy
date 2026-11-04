@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { clientLogger } from '@/lib/logger/client';
 import { identitySchema, snapshotSchema, type MindmapSnapshot } from './protocol';
 import { createSseParser } from './sse-parser';
+import { cancelMindmapReader } from './cancel-reader';
 
 export const MINDMAP_RETRY_DELAYS = [1000, 2000, 4000, 8000, 8000] as const;
 export const MINDMAP_RECOVERY_MS = 30_000;
@@ -55,11 +56,9 @@ export function subscribeMindmap(
     deadline = retryTimer = watchdog = undefined;
   };
   const cancelRead = () => {
+    // Close the reader before aborting fetch; browsers otherwise error its stream.
+    if (reader) void cancelMindmapReader(reader, true, 'Mindmap reader cancellation failed');
     controller?.abort();
-    if (reader)
-      void reader.cancel().catch((error: unknown) => {
-        clientLogger.warn('Mindmap reader cancellation failed', { error: String(error) });
-      });
   };
   const end = (status: 'exhausted' | 'denied', error: string, httpStatus?: number) => {
     terminal = true;
@@ -183,16 +182,16 @@ export function subscribeMindmap(
     } finally {
       clearTimeout(watchdog);
       watchdog = undefined;
+      const cleanup = currentReader
+        ? cancelMindmapReader(
+            currentReader,
+            abortController.signal.aborted,
+            'Mindmap reader cleanup failed',
+          )
+        : undefined;
       abortController.abort();
-      if (currentReader) {
-        try {
-          await currentReader.cancel();
-        } catch (error) {
-          clientLogger.warn('Mindmap reader cleanup failed', { error: String(error) });
-        } finally {
-          currentReader.releaseLock();
-        }
-      }
+      await cleanup;
+      currentReader?.releaseLock();
       if (controller === abortController) {
         controller = undefined;
         reader = undefined;
