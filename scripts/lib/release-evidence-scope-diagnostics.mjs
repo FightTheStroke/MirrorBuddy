@@ -1,5 +1,13 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- Fixed files in a validated private directory; contents never published. */
-import { closeSync, fstatSync, lstatSync, openSync, readSync, realpathSync } from 'node:fs';
+import {
+  closeSync,
+  fstatSync,
+  lstatSync,
+  openSync,
+  readFileSync,
+  readSync,
+  realpathSync,
+} from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, resolve } from 'node:path';
 
@@ -84,35 +92,82 @@ function boundedText(path) {
   }
 }
 
+function trackedTests(root) {
+  try {
+    return execFileSync(
+      'git',
+      [
+        '-C',
+        root,
+        'ls-files',
+        '-z',
+        '--',
+        'apps/web/src',
+        'scripts/__tests__',
+        'apps/web/scripts/__tests__',
+      ],
+      {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+        timeout: 5000,
+        maxBuffer: 8 * 1024 * 1024,
+      },
+    ).split('\0');
+  } catch {
+    /* No trustworthy public index: report zero, never a path. */
+    return [];
+  }
+}
+
 export function summarizeScopeCapture(capture, root) {
   try {
-    const text = capture.paths.map(boundedText).join('\n');
-    let tracked = [];
-    try {
-      tracked = execFileSync(
-        'git',
-        [
-          '-C',
-          root,
-          'ls-files',
-          '-z',
-          '--',
-          'apps/web/src',
-          'scripts/__tests__',
-          'apps/web/scripts/__tests__',
-        ],
-        {
-          encoding: 'utf8',
-          stdio: ['ignore', 'pipe', 'pipe'],
-          timeout: 5000,
-          maxBuffer: 8 * 1024 * 1024,
-        },
-      ).split('\0');
-    } catch {
-      /* No trustworthy public index: report zero, never a path. */
-    }
-    return classifyScopeFailure(text, root, tracked);
+    return classifyScopeFailure(
+      capture.paths.map(boundedText).join('\n'),
+      root,
+      trackedTests(root),
+    );
   } catch {
     return { category: 0, file: 0, related: [] };
   }
+}
+
+export function summarizeUnitFailure(directory, root) {
+  const tracked = trackedTests(root);
+  let text = '';
+  let assertions = [];
+  try {
+    const report = JSON.parse(readFileSync(join(directory, 'unit.json'), 'utf8'));
+    const failed = Array.isArray(report?.testResults)
+      ? report.testResults.filter((suite) => suite?.status === 'failed').slice(0, 8)
+      : [];
+    text = failed
+      .map((suite) =>
+        [
+          suite.name,
+          suite.message,
+          ...(Array.isArray(suite.assertionResults) ? suite.assertionResults : [])
+            .filter((test) => test?.status === 'failed')
+            .flatMap((test) => test.failureMessages ?? []),
+        ].join('\n'),
+      )
+      .join('\n');
+    assertions = failed.map((suite) => {
+      const { file } = classifyScopeFailure(String(suite.name ?? ''), root, tracked);
+      const indices = (Array.isArray(suite.assertionResults) ? suite.assertionResults : [])
+        .flatMap((test, index) => (test?.status === 'failed' ? [index + 1] : []))
+        .slice(0, 8);
+      return `${file}:${indices.join(',') || 0}`;
+    });
+  } catch {
+    /* A crashed runner may not have written its JSON report. */
+  }
+  if (!text) {
+    try {
+      text = boundedText(join(directory, 'unit.log'));
+    } catch {
+      /* Missing diagnostics never turn a failed execution into a receipt. */
+    }
+  }
+  const { category, file, related } = classifyScopeFailure(text, root, tracked);
+  return `class=${category} file=${file} related=${related.join(',') || 0} assertions=${assertions.join(';') || 0}`;
 }

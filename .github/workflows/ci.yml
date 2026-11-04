@@ -3001,7 +3001,7 @@ jobs:
         timeout-minutes: 10
         run: pnpm exec playwright install chromium
       - name: Install release browser OS dependencies
-        timeout-minutes: 5
+        timeout-minutes: 10
         continue-on-error: true
         run: pnpm exec playwright install-deps chromium
       - name: Run native release gate

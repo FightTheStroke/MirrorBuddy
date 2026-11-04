@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, realpathSync, writeFileSync, readFileSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -8,9 +8,12 @@ import { run } from '../release-native-evidence.mjs';
 import { readReceipt, root } from '../lib/release-evidence-store.mjs';
 import { captureExpectedScope } from '../lib/release-evidence-scope.mjs';
 import { runScopeSubprocess } from '../lib/release-evidence-scope-runner.mjs';
-import { classifyScopeFailure } from '../lib/release-evidence-scope-diagnostics.mjs';
+import {
+  classifyScopeFailure,
+  summarizeUnitFailure,
+} from '../lib/release-evidence-scope-diagnostics.mjs';
 
-vi.mock('node:child_process', () => ({ spawnSync: vi.fn() }));
+vi.mock('node:child_process', () => ({ spawnSync: vi.fn(), execFileSync: vi.fn(() => '') }));
 vi.mock('../lib/release-evidence-inputs.mjs', async (original) => ({
   ...(await original<typeof import('../lib/release-evidence-inputs.mjs')>()),
   inputIdentity: vi.fn(() => ({ source: 'fixture' })),
@@ -44,6 +47,61 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 describe('release execution reuse policy', () => {
+  it.each(['absent', 'malformed'])(
+    'keeps %s unit reports fail-closed with private log diagnostics',
+    (mode) => {
+      const directory = mkdtempSync(join(tmpdir(), 'mb-native-report-'));
+      directories.push(directory);
+      if (mode === 'malformed') writeFileSync(join(directory, 'unit.json'), 'PRIVATE_INVALID_JSON');
+      writeFileSync(join(directory, 'unit.log'), 'PRIVATE: ERR_WORKER_OUT_OF_MEMORY');
+      expect(summarizeUnitFailure(directory, root)).toBe('class=1 file=0 related=0 assertions=0');
+      expect(readReceipt).not.toHaveBeenCalled();
+    },
+  );
+  it('identifies failed unit assertions numerically without publishing private report content', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'mb-native-failure-'));
+    directories.push(directory);
+    vi.mocked(execFileSync).mockReturnValueOnce('apps/web/src/fixture.test.ts\0');
+    vi.mocked(spawnSync).mockImplementationOnce((_command, _args, options) => {
+      const stdio = options?.stdio;
+      if (Array.isArray(stdio) && typeof stdio[2] === 'number')
+        writeFileSync(stdio[2], 'PRIVATE_LOG_VALUE');
+      writeFileSync(
+        join(directory, 'unit.json'),
+        JSON.stringify({
+          testResults: [
+            {
+              name: join(root, 'apps/web/src/fixture.test.ts'),
+              status: 'failed',
+              assertionResults: [
+                { status: 'passed' },
+                {
+                  status: 'failed',
+                  fullName: 'PRIVATE_TEST_NAME',
+                  failureMessages: ['EACCES PRIVATE'],
+                },
+              ],
+            },
+          ],
+        }),
+      );
+      return failure;
+    });
+    let message = '';
+    try {
+      run('unit', directory, false);
+    } catch (error) {
+      message = error instanceof Error ? error.message : '';
+    }
+    expect(message).toContain(
+      '__NATIVE_FAILURE__ kind=1 exit=42 class=7 file=1 related=1 assertions=1:2',
+    );
+    expect(message).not.toContain('PRIVATE');
+    expect(message).not.toContain('fixture.test.ts');
+    expect(readReceipt).not.toHaveBeenCalled();
+    expect(readFileSync(join(directory, 'unit.log'), 'utf8')).toContain('PRIVATE_LOG_VALUE');
+    expect(statSync(join(directory, 'unit.log')).mode & 0o077).toBe(0);
+  });
   it.each(['unit', 'e2e', 'policy', 'audit'])(
     'executes %s even when a reusable green receipt is offered',
     (kind) => {

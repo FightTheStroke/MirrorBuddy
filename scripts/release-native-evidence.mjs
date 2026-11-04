@@ -15,6 +15,7 @@ import { buildIdentity, digest, inputIdentity } from './lib/release-evidence-inp
 import { validateNativeEvidence } from './lib/release-evidence-native.mjs';
 import { auditMessage } from './lib/release-audit-exception.mjs';
 import { captureExpectedScope, validateExpectedScope } from './lib/release-evidence-scope.mjs';
+import { summarizeUnitFailure } from './lib/release-evidence-scope-diagnostics.mjs';
 import {
   artifact,
   evidenceDirectory,
@@ -60,7 +61,11 @@ export function run(kind, directory, reuse) {
     closeSync(logFd);
   }
   if (result.error || result.signal || result.status !== 0) {
-    throw new Error(`${kind} failed; execution log: ${log}`);
+    const diagnostic =
+      kind === 'unit'
+        ? `__NATIVE_FAILURE__ kind=1 exit=${Number.isInteger(result.status) && result.status >= 0 ? result.status : 0} ${summarizeUnitFailure(directory, root)}; `
+        : '';
+    throw new Error(`${kind} failed; ${diagnostic}execution log: ${log}`);
   }
   if (!same(identity, inputIdentity(root)))
     throw new Error('Source or environment changed during verification');
