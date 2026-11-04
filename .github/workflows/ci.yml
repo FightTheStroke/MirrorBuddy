@@ -2935,3 +2935,71 @@ jobs:
           path: ${{ steps.evidence.outputs.report_path }}
           if-no-files-found: error
           retention-days: 365
+
+  release-validation:
+    name: Native Release Validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mirrorbuddy_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      CI: 'true'
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+      TEST_DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+      SESSION_SECRET: e2e-test-session-secret-32-characters-min
+      NEXT_PUBLIC_SITE_URL: https://www.mirrorbuddy.org
+      OLLAMA_URL: http://localhost:11434
+      NEXT_TELEMETRY_DISABLED: '1'
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require integration comparison base
+        run: git rev-parse --verify origin/main
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install verification dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ripgrep
+          pnpm install --frozen-lockfile
+          npm install -g "vercel@${VERCEL_CLI_VERSION}"
+      - name: Prepare isolated test database and browser
+        run: |
+          test_key=$(openssl rand -hex 32)
+          echo "::add-mask::$test_key"
+          echo "PII_ENCRYPTION_KEY=$test_key" >> "$GITHUB_ENV"
+          pnpm exec prisma generate
+          pnpm exec prisma migrate deploy
+          pnpm exec prisma db seed
+          pnpm exec playwright install --with-deps chromium
+      - name: Run native release gate
+        run: |
+          umask 077
+          npm run release:gate -- --evidence-dir "$RUNNER_TEMP/attachment-release-evidence"
+      - name: Verify project health
+        run: ./scripts/health-check.sh
