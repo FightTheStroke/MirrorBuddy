@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# =============================================================================
 # PRE-RELEASE CHECK SCRIPT - PARALLELIZED FOR M3 MAX
 # Runs all automated quality gates before release.
 # Optimized for Apple Silicon with parallel execution.
@@ -8,8 +7,13 @@
 # manual exit code checks. set -e would break the wait+check pattern.
 #
 # Usage: npm run pre-release
-# =============================================================================
 set -uo pipefail
+
+# Stable numeric criteria: docs=1, hygiene=2, i18n=3, lint=4, types=5,
+# build=6, standalone=7, audit=8, performance=9, file-size=10.
+report_pre_release_failure() {
+    printf "__PRE_RELEASE_FAILURE__ criterion=%s exit=%s\n" "$1" "$2" >&2
+}
 
 SCRIPT_DIR_PR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/build-lock.sh
@@ -37,9 +41,7 @@ echo ""
 
 START_TIME=$(date +%s)
 
-# =============================================================================
 # PHASE 1: INSTANT CHECKS (< 1 second)
-# =============================================================================
 echo -e "${BLUE}[PHASE 1] Instant checks...${NC}"
 
 # Documentation check (instant)
@@ -48,6 +50,7 @@ for doc in "README.md" "CHANGELOG.md" "CONTRIBUTING.md" "CLAUDE.md"; do
     [ ! -f "$doc" ] && MISSING_DOCS="$MISSING_DOCS $doc"
 done
 if [ -n "$MISSING_DOCS" ]; then
+    report_pre_release_failure 1 1
     echo -e "${RED}✗ Missing docs:$MISSING_DOCS${NC}"
     exit 1
 fi
@@ -57,6 +60,7 @@ exec_hygiene
 cat "$_OUTPUT"
 rm -f "$_OUTPUT"
 if [ "$_EXIT" -ne 0 ]; then
+    report_pre_release_failure 2 "$_EXIT"
     echo -e "${RED}✗ Code hygiene inspection failed${NC}"
     exit 1
 fi
@@ -66,12 +70,11 @@ PHASE1_TIME=$(date +%s)
 echo -e "${BLUE}   Phase 1: $((PHASE1_TIME - START_TIME))s${NC}"
 echo ""
 
-# =============================================================================
 # PHASE 1.5: i18n VALIDATION
-# =============================================================================
 echo -e "${BLUE}[PHASE 1.5] i18n completeness check...${NC}"
 
-if ! npx tsx scripts/i18n-check.ts > "$TEMP_DIR/i18n.log" 2>&1; then
+if npx tsx scripts/i18n-check.ts > "$TEMP_DIR/i18n.log" 2>&1; then :; else
+    report_pre_release_failure 3 "$?"
     echo -e "${RED}✗ i18n check failed${NC}"
     cat "$TEMP_DIR/i18n.log"
     exit 1
@@ -83,9 +86,7 @@ PHASE1_5_TIME=$(date +%s)
 echo -e "${BLUE}   Phase 1.5: $((PHASE1_5_TIME - PHASE1_TIME))s${NC}"
 echo ""
 
-# =============================================================================
 # PHASE 2: PARALLEL STATIC ANALYSIS
-# =============================================================================
 echo -e "${BLUE}[PHASE 2] Parallel static analysis (lint + typecheck)...${NC}"
 
 # Run both in parallel
@@ -116,6 +117,7 @@ TYPE_EXIT=$(cat "$TEMP_DIR/typecheck.exit" 2>/dev/null || echo 1)
 FAILED=0
 
 if [ "$LINT_EXIT" -ne 0 ]; then
+    report_pre_release_failure 4 "$LINT_EXIT"
     echo -e "${RED}✗ ESLint failed${NC}"
     cat "$TEMP_DIR/lint.log"
     FAILED=1
@@ -124,6 +126,7 @@ else
 fi
 
 if [ "$TYPE_EXIT" -ne 0 ]; then
+    report_pre_release_failure 5 "$TYPE_EXIT"
     echo -e "${RED}✗ TypeScript failed${NC}"
     cat "$TEMP_DIR/typecheck.log"
     FAILED=1
@@ -137,20 +140,20 @@ PHASE2_TIME=$(date +%s)
 echo -e "${BLUE}   Phase 2: $((PHASE2_TIME - PHASE1_TIME))s${NC}"
 echo ""
 
-# =============================================================================
 # PHASE 3: PRODUCTION BUILD (uses all cores via Next.js)
-# =============================================================================
 echo -e "${BLUE}[PHASE 3] Production build...${NC}"
 
 # Next.js automatically uses available cores
 acquire_build_lock
-if ! npm run build > "$TEMP_DIR/build.log" 2>&1; then
+if npm run build > "$TEMP_DIR/build.log" 2>&1; then :; else
+    report_pre_release_failure 6 "$?"
     release_build_lock
     echo -e "${RED}✗ Build failed${NC}"
     cat "$TEMP_DIR/build.log"
     exit 1
 fi
-if ! node "$SCRIPT_DIR_PR/prepare-standalone.mjs" > "$TEMP_DIR/standalone.log" 2>&1; then
+if node "$SCRIPT_DIR_PR/prepare-standalone.mjs" > "$TEMP_DIR/standalone.log" 2>&1; then :; else
+    report_pre_release_failure 7 "$?"
     release_build_lock
     echo -e "${RED}✗ Standalone preparation failed${NC}"
     cat "$TEMP_DIR/standalone.log"
@@ -159,7 +162,8 @@ fi
 release_build_lock
 echo -e "${GREEN}✓ Build successful; standalone assets prepared${NC}"
 
-if ! node scripts/release-audit.mjs > "$TEMP_DIR/audit.log" 2>&1; then
+if node scripts/release-audit.mjs > "$TEMP_DIR/audit.log" 2>&1; then :; else
+    report_pre_release_failure 8 "$?"
     echo -e "${RED}✗ Security audit failed${NC}"
     cat "$TEMP_DIR/audit.log"
     exit 1
@@ -170,17 +174,17 @@ PHASE3_TIME=$(date +%s)
 echo -e "${BLUE}   Phase 3: $((PHASE3_TIME - PHASE2_TIME))s${NC}"
 echo ""
 
-# =============================================================================
 # PHASE 4: PERFORMANCE VALIDATION
-# =============================================================================
 echo -e "${BLUE}[PHASE 4] Performance validation...${NC}"
 
 if [ -f "./scripts/perf-check.sh" ]; then
-    if ! ./scripts/perf-check.sh; then
+    if ./scripts/perf-check.sh; then :; else
+        report_pre_release_failure 9 "$?"
         echo -e "${RED}✗ Performance checks failed${NC}"
         exit 1
     fi
 else
+    report_pre_release_failure 9 127
     echo -e "${RED}✗ Required perf-check.sh not found${NC}"
     exit 1
 fi
@@ -189,17 +193,17 @@ PHASE4_TIME=$(date +%s)
 echo -e "${BLUE}   Phase 4: $((PHASE4_TIME - PHASE3_TIME))s${NC}"
 echo ""
 
-# =============================================================================
 # PHASE 5: FILE SIZE VALIDATION (warning only)
-# =============================================================================
 echo -e "${BLUE}[PHASE 5] File size validation...${NC}"
 
 if [ -f "./scripts/check-file-size.sh" ]; then
-    if ! ./scripts/check-file-size.sh; then
+    if ./scripts/check-file-size.sh; then :; else
+        report_pre_release_failure 10 "$?"
         echo -e "${RED}✗ File-size inventory failed${NC}"
         exit 1
     fi
 else
+    report_pre_release_failure 10 127
     echo -e "${RED}✗ Required check-file-size.sh not found${NC}"
     exit 1
 fi
@@ -208,9 +212,7 @@ PHASE5_TIME=$(date +%s)
 echo -e "${BLUE}   Phase 5: $((PHASE5_TIME - PHASE4_TIME))s${NC}"
 echo ""
 
-# =============================================================================
 # SUMMARY
-# =============================================================================
 END_TIME=$(date +%s)
 TOTAL=$((END_TIME - START_TIME))
 

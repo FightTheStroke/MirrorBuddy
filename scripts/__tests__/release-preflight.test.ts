@@ -26,6 +26,9 @@ function preflight(
   preparationStatus = 0,
   buildStatus = 0,
   validAudit = true,
+  failures: Partial<
+    Record<'lint' | 'typecheck' | 'i18n' | 'hygiene' | 'performance' | 'docs', number>
+  > = {},
 ) {
   const root = mkdtempSync(join(tmpdir(), 'mb-release-preflight-'));
   roots.push(root);
@@ -41,7 +44,7 @@ function preflight(
   );
   writeFileSync(
     join(root, 'scripts/lib/checks.sh'),
-    'exec_hygiene() { _OUTPUT="$TEMP_DIR/hygiene.log"; : > "$_OUTPUT"; _EXIT=0; }\n',
+    `exec_hygiene() { _OUTPUT="$TEMP_DIR/hygiene.log"; : > "$_OUTPUT"; _EXIT=${failures.hygiene ?? 0}; }\n`,
   );
   writeFileSync(
     join(root, 'scripts/prepare-standalone.mjs'),
@@ -72,12 +75,19 @@ printf '%s\\n' '${JSON.stringify(audit)}'
       join(root, 'bin', tool),
       `#!/bin/sh
 if [ "$1" = run ] && [ "$2" = build ]; then exit ${buildStatus}; fi
+if [ "$1" = run ] && [ "$2" = lint ]; then exit ${failures.lint ?? 0}; fi
+if [ "$1" = run ] && [ "$2" = typecheck ]; then exit ${failures.typecheck ?? 0}; fi
+if [ "$1" = tsx ]; then exit ${failures.i18n ?? 0}; fi
 exit 0\n`,
       { mode: 0o755 },
     );
   }
   if (performance) {
-    writeFileSync(join(root, 'scripts/perf-check.sh'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+    writeFileSync(
+      join(root, 'scripts/perf-check.sh'),
+      `#!/bin/sh\nexit ${failures.performance ?? 0}\n`,
+      { mode: 0o755 },
+    );
   }
   if (sizeStatus !== undefined) {
     writeFileSync(
@@ -86,6 +96,7 @@ exit 0\n`,
       { mode: 0o755 },
     );
   }
+  if (failures.docs) rmSync(join(root, 'README.md'));
   const result = spawnSync('bash', [join(root, 'scripts/pre-release-check.sh')], {
     cwd: root,
     encoding: 'utf8',
@@ -109,19 +120,46 @@ afterEach(() => {
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 describe('pre-release required inspection callers', () => {
+  it.each([
+    [1, 1, { docs: 1 }],
+    [2, 13, { hygiene: 13 }],
+    [3, 14, { i18n: 14 }],
+    [4, 15, { lint: 15 }],
+    [5, 16, { typecheck: 16 }],
+    [9, 17, { performance: 17 }],
+  ] as const)('reports only numeric criterion %s and raw exit %s', (criterion, code, failures) => {
+    const result = preflight(true, 0, 0, 0, true, failures);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toBe(`__PRE_RELEASE_FAILURE__ criterion=${criterion} exit=${code}\n`);
+  });
+  it('reports both parallel failures without changing the overall exit', () => {
+    const result = preflight(true, 0, 0, 0, true, { lint: 18, typecheck: 19 });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toBe(
+      '__PRE_RELEASE_FAILURE__ criterion=4 exit=18\n__PRE_RELEASE_FAILURE__ criterion=5 exit=19\n',
+    );
+  });
+
   it('rejects a missing performance checker', () => {
-    expect(preflight(false, 0).status).toBe(1);
+    const result = preflight(false, 0);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toBe('__PRE_RELEASE_FAILURE__ criterion=9 exit=127\n');
   });
   it('rejects a missing file-size checker', () => {
-    expect(preflight(true).status).toBe(1);
+    const result = preflight(true);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toBe('__PRE_RELEASE_FAILURE__ criterion=10 exit=127\n');
   });
   it('propagates file-size inventory failures rather than swallowing them as warnings', () => {
-    expect(preflight(true, 1).status).toBe(1);
+    const result = preflight(true, 22);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toBe('__PRE_RELEASE_FAILURE__ criterion=10 exit=22\n');
   });
   it('preserves successful warning-only size checks without suggesting duplicate browser runs', () => {
     const result = preflight(true, 0);
     expect(result.status).toBe(0);
     expect(result.prepared).toBe(true);
+    expect(result.stderr).toBe('');
     expect(result.stdout).toContain('File-size inspection result');
     expect(result.stdout).not.toContain('Run E2E tests: npm run test');
     expect(result.audit).toEqual(nativeEvidenceFixture().audit);
@@ -133,6 +171,7 @@ describe('pre-release required inspection callers', () => {
     const result = preflight(true, 0, 0, 0, false);
     expect(result.status).toBe(1);
     expect(result.prepared).toBe(true);
+    expect(result.stderr).toBe('__PRE_RELEASE_FAILURE__ criterion=8 exit=1\n');
     expect(result.stdout).toContain('Dependency audit rejected');
     expect(result.stdout).not.toContain('File-size inspection result');
   });
@@ -140,11 +179,13 @@ describe('pre-release required inspection callers', () => {
     const result = preflight(true, 0, 1);
     expect(result.status).toBe(1);
     expect(result.prepared).toBe(true);
+    expect(result.stderr).toBe('__PRE_RELEASE_FAILURE__ criterion=7 exit=1\n');
     expect(result.stdout).toContain('Standalone preparation failed');
   });
   it('does not prepare standalone output after a failed build', () => {
     const result = preflight(true, 0, 0, 1);
     expect(result.status).toBe(1);
+    expect(result.stderr).toBe('__PRE_RELEASE_FAILURE__ criterion=6 exit=1\n');
     expect(result.prepared).toBe(false);
   });
 });

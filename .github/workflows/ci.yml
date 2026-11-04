@@ -3010,12 +3010,18 @@ jobs:
       - name: Report bounded native failure diagnostics
         if: failure()
         run: |
-          log="$RUNNER_TEMP/attachment-release-evidence/policy.log"
-          if [ -f "$log" ]; then
-            if ! grep -E '^__POLICY_FAILURE__ line=[1-9][0-9]* exit=[1-9][0-9]*$' "$log"; then
-              echo "No safe policy diagnostic marker; raw logs remain private."
+          for kind in policy pre-release; do
+            log="$RUNNER_TEMP/attachment-release-evidence/$kind.log"
+            [ -f "$log" ] || continue
+            if [ "$kind" = policy ]; then
+              pattern='^__POLICY_FAILURE__ line=[1-9][0-9]* exit=[1-9][0-9]*$'
+            else
+              pattern='^__PRE_RELEASE_FAILURE__ criterion=([1-9]|10) exit=[1-9][0-9]{0,2}$'
             fi
-          fi
+            if ! grep -E "$pattern" "$log" | head -n 12; then
+              echo "No safe native diagnostic marker; raw logs remain private."
+            fi
+          done
       - name: Verify project health
         run: ./scripts/health-check.sh
       - name: Preserve public-safe release summary
