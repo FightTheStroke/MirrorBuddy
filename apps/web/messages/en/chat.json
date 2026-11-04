@@ -57,6 +57,14 @@
       "webcam": {
         "label": "Photo",
         "tooltip": "Take photo"
+      },
+      "diagram": {
+        "label": "Diagram",
+        "tooltip": "Create a diagram"
+      },
+      "timeline": {
+        "label": "Timeline",
+        "tooltip": "Create a timeline"
       }
     },
     "history": {
@@ -555,6 +563,57 @@
       "general": "Hi! I'm {coach}, your study coach. Before we start, tell me: which subject do you want to work on, what do you want to do, and how much time do you have? Then I'll introduce the right Maestro. 😊",
       "withSubject": "Hi! I'm {coach}, your study coach. Today we're working on {subject} — let me introduce the right Maestro! 😊"
     },
-    "fraseDelMaestro": "Line from the maestro"
+    "fraseDelMaestro": "Line from the maestro",
+    "attachments": {
+      "attach": "Attach a file",
+      "hint": "Attach PDF, JPEG, PNG or WebP (max 10 MB; PDFs up to {pages} pages). Files are used in the text chat.",
+      "listLabel": "Attached files",
+      "cancel": "Cancel",
+      "cancelLabel": "Cancel reading {name}",
+      "retry": "Retry",
+      "retryLabel": "Retry {name}",
+      "removeLabel": "Remove {name}",
+      "status": {
+        "reading": "Reading…",
+        "progress": "Page {done} of {total}",
+        "saving": "Preparing the file for the chat…",
+        "ready": "Ready to use in the chat",
+        "partial": "Ready, but {count, plural, one {# page without readable text will not be used} other {# pages without readable text will not be used}}",
+        "removing": "Removing…"
+      },
+      "errors": {
+        "unsupported": "Unsupported format. Use PDF, JPEG, PNG or WebP.",
+        "encrypted": "This PDF is password-protected, so I cannot read it.",
+        "unreadable": "I cannot read this file.",
+        "tooLarge": "The file is larger than 10 MB.",
+        "tooManyPages": "This PDF has too many pages. Choose a shorter one.",
+        "noText": "I found no readable text in the file.",
+        "ocrFailed": "I could not read the scanned pages. Try again.",
+        "removeFailed": "I could not remove the file. Try again.",
+        "generic": "Something went wrong. Try again.",
+        "contextTooLarge": "The file is too long for this conversation. Remove it or attach a shorter one, then try again.",
+        "conversationFailed": "This conversation is unavailable. Start a new one and attach the file again.",
+        "restoreFailed": "I could not load the files of this conversation. Try again.",
+        "notFound": "This file is no longer available. Remove it from the chat and attach it again if needed.",
+        "notAllowed": "Your access does not include this file type. Remove it to continue chatting.",
+        "unsafe": "I cannot use the instructions in this file. Remove it and attach only the pages to study.",
+        "invalid": "I cannot use this file. Remove it and attach it again.",
+        "sessionExpired": "Your session has expired. Sign in again before using attachments."
+      },
+      "announce": {
+        "reading": "Started reading {name}",
+        "ready": "{name} is ready to use in the chat",
+        "removed": "{name} removed",
+        "cancelled": "Reading {name} cancelled"
+      },
+      "consent": {
+        "title": "Use this file in the chat?",
+        "body": "The text of the file and images of scanned pages or photos are sent to the AI for analysis.",
+        "storage": "With an account the extracted text is saved with the chat; without an account it stays only while the session is open. The original file is not uploaded.",
+        "confirm": "Use in chat",
+        "decline": "Cancel"
+      },
+      "voiceUnavailable": "To discuss attached files, use text chat. Remove them to start a voice call."
+    }
   }
 }

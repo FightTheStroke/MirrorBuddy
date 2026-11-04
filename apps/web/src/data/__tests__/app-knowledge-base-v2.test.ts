@@ -93,6 +93,20 @@ describe('app-knowledge-base-v2', () => {
   });
 
   describe('generateCompactIndexPrompt', () => {
+    it('guides students through the current intentions rather than retired navigation', () => {
+      const compact = generateCompactIndexPrompt();
+      const navigation = getKnowledgeForCategories(['navigation']);
+
+      for (const prompt of [compact, navigation]) {
+        expect(prompt).not.toMatch(/\/(?:astuccio|zaino|dashboard)\b/);
+        expect(prompt).not.toContain('17 Maestri');
+        expect(prompt).toContain('Fare i compiti');
+        expect(prompt).toContain('I miei lavori');
+        expect(prompt).toContain('I miei premi');
+        expect(prompt).toContain('I Professori');
+      }
+    });
+
     it('returns non-empty compact index', () => {
       const result = generateCompactIndexPrompt();
       expect(result.length).toBeGreaterThan(0);

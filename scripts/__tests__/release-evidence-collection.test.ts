@@ -8,6 +8,7 @@ import { collect } from '../release-native-evidence.mjs';
 import { buildIdentity, digest } from '../lib/release-evidence-inputs.mjs';
 import { evidenceDirectory, kinds, recipe, reports } from '../lib/release-evidence-store.mjs';
 import { buildFixture, fixtureScopes, nativeEvidenceFixture } from './release-native-fixture';
+import { summarizeBrowserFailure } from '../lib/release-evidence-scope-diagnostics.mjs';
 
 vi.mock('node:child_process', () => ({ execFileSync: vi.fn(), spawnSync: vi.fn() }));
 const roots: string[] = [];
@@ -74,6 +75,54 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 describe('complete native evidence collection', () => {
+  it('identifies failed browser source positions without exposing report content', () => {
+    const state = fixture();
+    vi.mocked(execFileSync).mockReturnValueOnce('apps/web/e2e/a.spec.ts\0');
+    const resultDirectory = join(state.root, 'apps/web/test-results');
+    mkdirSync(resultDirectory, { recursive: true });
+    writeFileSync(
+      join(resultDirectory, 'pw-results.json'),
+      JSON.stringify({
+        suites: [
+          {
+            suites: [
+              {
+                specs: [
+                  {
+                    file: 'a.spec.ts',
+                    line: 7,
+                    title: 'PRIVATE_TEST_NAME',
+                    tests: [
+                      {
+                        status: 'unexpected',
+                        results: [{ status: 'timedOut', error: { message: 'PRIVATE_USER_DATA' } }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      }),
+    );
+    expect(summarizeBrowserFailure(state.directory, state.root)).toBe('class=0 failures=1:7:2');
+  });
+  it.each(['absent', 'malformed'])(
+    'keeps %s browser reports fail-closed with private diagnostics',
+    (mode) => {
+      const state = fixture();
+      if (mode === 'malformed') {
+        mkdirSync(join(state.root, 'apps/web/test-results'), { recursive: true });
+        writeFileSync(
+          join(state.root, 'apps/web/test-results/pw-results.json'),
+          'PRIVATE_INVALID_JSON',
+        );
+      }
+      writeFileSync(join(state.directory, 'e2e.log'), 'PRIVATE: EACCES');
+      expect(summarizeBrowserFailure(state.directory, state.root)).toBe('class=7 failures=0');
+    },
+  );
   it.each(['policy', 'audit'])('rejects expired %s evidence', (kind) => {
     const state = fixture(kind);
     expect(() => collect(state.directory, state.identity)).toThrow(/expired/);

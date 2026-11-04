@@ -75,9 +75,9 @@ export function LearningPathsList({ onSelect, className }: LearningPathsListProp
           {t('noPathsDescription')}
         </p>
         <Button asChild className="gap-2">
-          <Link href="/study-kit">
+          <Link href="/">
             <BookOpen className="w-4 h-4" />
-            {t('goToStudyKit')}
+            {t('goToHome')}
           </Link>
         </Button>
       </div>

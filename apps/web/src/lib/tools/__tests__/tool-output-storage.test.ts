@@ -195,7 +195,7 @@ describe('tool-output-storage', () => {
       expect(results[0].data).toEqual({ nodes: [] });
       expect(results[1].data).toEqual({ questions: [] });
       expect(prisma.toolOutput.findMany).toHaveBeenCalledWith({
-        where: { conversationId },
+        where: { conversationId, toolType: { not: 'conversation_attachment' } },
         orderBy: { createdAt: 'desc' },
         take: 500,
       });
@@ -248,7 +248,7 @@ describe('tool-output-storage', () => {
 
       expect(count).toBe(5);
       expect(prisma.toolOutput.count).toHaveBeenCalledWith({
-        where: { conversationId },
+        where: { conversationId, toolType: { not: 'conversation_attachment' } },
       });
     });
 
@@ -276,6 +276,11 @@ describe('tool-output-storage', () => {
 
       const stats = await getToolOutputStats(conversationId);
 
+      expect(prisma.toolOutput.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { conversationId, toolType: { not: 'conversation_attachment' } },
+        }),
+      );
       expect(stats).toEqual({
         mindmap: 2,
         quiz: 1,

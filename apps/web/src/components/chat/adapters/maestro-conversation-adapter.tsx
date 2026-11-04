@@ -67,6 +67,7 @@ export function MaestroConversationAdapter({
           onRequestTool={session.requestTool}
           onRequestPhoto={session.handleRequestPhoto}
           onEndSession={session.handleEndSession}
+          attachments={session.attachments}
         />
       }
     >

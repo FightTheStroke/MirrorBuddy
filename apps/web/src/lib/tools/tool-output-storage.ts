@@ -9,6 +9,7 @@ import { prisma } from '@/lib/db';
 import type { ToolOutput as PrismaToolOutput } from '@prisma/client';
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
+import { CONVERSATION_ATTACHMENT_TOOL_TYPE } from '@/lib/conversation/attachments/types';
 import { indexToolOutput } from './tool-rag-indexer';
 import type { SaveToolOutputOptions, StoredToolOutput } from './tool-output-types';
 
@@ -105,7 +106,7 @@ export async function saveToolOutput(
 export async function getToolOutputs(conversationId: string): Promise<StoredToolOutput[]> {
   try {
     const outputs = await prisma.toolOutput.findMany({
-      where: { conversationId },
+      where: { conversationId, toolType: { not: CONVERSATION_ATTACHMENT_TOOL_TYPE } },
       orderBy: { createdAt: 'desc' },
       take: 500,
     });
@@ -169,7 +170,7 @@ export async function getToolOutputsByType(
 export async function getToolOutputCount(conversationId: string): Promise<number> {
   try {
     return await prisma.toolOutput.count({
-      where: { conversationId },
+      where: { conversationId, toolType: { not: CONVERSATION_ATTACHMENT_TOOL_TYPE } },
     });
   } catch (error) {
     logger.error('Failed to get tool output count', { conversationId }, error);
@@ -187,7 +188,7 @@ export async function getToolOutputCount(conversationId: string): Promise<number
 export async function getToolOutputStats(conversationId: string): Promise<Record<string, number>> {
   try {
     const outputs = await prisma.toolOutput.findMany({
-      where: { conversationId },
+      where: { conversationId, toolType: { not: CONVERSATION_ATTACHMENT_TOOL_TYPE } },
       take: 1000,
       select: { toolType: true },
     });

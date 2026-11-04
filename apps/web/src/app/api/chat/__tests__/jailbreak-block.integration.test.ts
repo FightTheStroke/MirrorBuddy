@@ -85,6 +85,15 @@ vi.mock('@/lib/tier/server', () => ({
   },
 }));
 
+vi.mock('@/lib/conversation/attachments/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/conversation/attachments/server')>();
+  return {
+    ...actual,
+    canUseAttachmentTool: vi.fn().mockResolvedValue(true),
+    listConversationAttachments: vi.fn().mockResolvedValue([]),
+  };
+});
+
 vi.mock('@/lib/api/middlewares', () => ({
   pipe:
     (
@@ -135,6 +144,8 @@ import { POST } from '../route';
 import { chatCompletion } from '@/lib/ai/server';
 import { detectJailbreak, detectBias, type JailbreakDetection } from '@/lib/safety';
 import { recordContentFiltered } from '@/lib/safety/server';
+import { listConversationAttachments } from '@/lib/conversation/attachments/server';
+import { buildAllContexts } from '../context-builders';
 
 const SAFE_OUTPUT_BIAS = {
   hasBias: false,
@@ -252,5 +263,70 @@ describe('POST /api/chat jailbreak input gate (T1.5)', () => {
     expect(data.blocked).toBeUndefined();
     expect(data.content).toBe('Le frazioni rappresentano parti di un intero.');
     expect(vi.mocked(chatCompletion)).toHaveBeenCalled();
+  });
+
+  it('passes only owned selected document pages and citation instructions to the model', async () => {
+    vi.mocked(listConversationAttachments).mockResolvedValueOnce([
+      {
+        id: 'selected-file',
+        name: 'Observatory.pdf',
+        mimeType: 'application/pdf',
+        size: 1024,
+        pages: [{ pageNumber: 2, text: 'The fictional observatory opened in 1847.' }],
+      },
+      {
+        id: 'unselected-file',
+        name: 'Other.pdf',
+        mimeType: 'application/pdf',
+        size: 1024,
+        pages: [{ pageNumber: 1, text: 'UNSELECTED_PRIVATE_CONTENT' }],
+      },
+    ]);
+
+    const response = await POST(makeRequest({ ...BENIGN_BODY, attachmentIds: ['selected-file'] }));
+
+    expect(response.status).toBe(200);
+    expect(listConversationAttachments).toHaveBeenCalledWith('user-123', 'conv-1', [
+      'selected-file',
+    ]);
+    expect(buildAllContexts).toHaveBeenCalledWith(
+      expect.objectContaining({ hasAttachments: true }),
+    );
+    const prompt = vi.mocked(chatCompletion).mock.calls[0][1];
+    expect(prompt).toContain('The fictional observatory opened in 1847.');
+    expect(prompt).toContain('"pageNumber":2');
+    expect(prompt).toContain('Always cite the document name and actual page number');
+    expect(prompt).not.toContain('UNSELECTED_PRIVATE_CONTENT');
+  });
+
+  it('fails closed before model invocation when a file is not in the owned conversation', async () => {
+    vi.mocked(listConversationAttachments).mockResolvedValueOnce([]);
+
+    const response = await POST(makeRequest({ ...BENIGN_BODY, attachmentIds: ['foreign-file'] }));
+
+    expect(response.status).toBe(404);
+    expect(await response.json()).toMatchObject({ code: 'attachment_not_found' });
+    expect(chatCompletion).not.toHaveBeenCalled();
+  });
+
+  it('rejects document context beyond the tier budget without silently dropping pages', async () => {
+    vi.mocked(listConversationAttachments).mockResolvedValueOnce([
+      {
+        id: 'large-file',
+        name: 'Large.pdf',
+        mimeType: 'application/pdf',
+        size: 200_000,
+        pages: Array.from({ length: 5 }, (_, i) => ({
+          pageNumber: i + 1,
+          text: 'Source text. '.repeat(4000),
+        })),
+      },
+    ]);
+
+    const response = await POST(makeRequest({ ...BENIGN_BODY, attachmentIds: ['large-file'] }));
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toMatchObject({ code: 'ATTACHMENT_CONTEXT_TOO_LARGE' });
+    expect(chatCompletion).not.toHaveBeenCalled();
   });
 });

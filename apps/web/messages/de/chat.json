@@ -57,6 +57,14 @@
       "webcam": {
         "label": "Foto",
         "tooltip": "Foto aufnehmen"
+      },
+      "diagram": {
+        "label": "Diagramm",
+        "tooltip": "Diagramm erstellen"
+      },
+      "timeline": {
+        "label": "Zeitleiste",
+        "tooltip": "Zeitleiste erstellen"
       }
     },
     "history": {
@@ -555,6 +563,57 @@
       "general": "Hallo! Ich bin {coach}, dein Lerncoach. Bevor wir starten, sag mir: An welchem Fach möchtest du arbeiten, was möchtest du tun und wie viel Zeit hast du? Dann stelle ich dir den richtigen Maestro vor. 😊",
       "withSubject": "Hallo! Ich bin {coach}, dein Lerncoach. Heute arbeiten wir an {subject} – ich stelle dir gleich den richtigen Maestro vor! 😊"
     },
-    "fraseDelMaestro": "Satz des Meisters"
+    "fraseDelMaestro": "Satz des Meisters",
+    "attachments": {
+      "attach": "Datei anhängen",
+      "hint": "PDF, JPEG, PNG oder WebP anhängen (max. 10 MB; PDF bis {pages} Seiten). Dateien werden im Text-Chat verwendet.",
+      "listLabel": "Angehängte Dateien",
+      "cancel": "Abbrechen",
+      "cancelLabel": "Lesen von {name} abbrechen",
+      "retry": "Erneut versuchen",
+      "retryLabel": "{name} erneut versuchen",
+      "removeLabel": "{name} entfernen",
+      "status": {
+        "reading": "Wird gelesen…",
+        "progress": "Seite {done} von {total}",
+        "saving": "Datei wird für den Chat vorbereitet…",
+        "ready": "Bereit für den Chat",
+        "partial": "Bereit, aber {count, plural, one {# Seite ohne lesbaren Text wird nicht verwendet} other {# Seiten ohne lesbaren Text werden nicht verwendet}}",
+        "removing": "Wird entfernt…"
+      },
+      "errors": {
+        "unsupported": "Format nicht unterstützt. Verwende PDF, JPEG, PNG oder WebP.",
+        "encrypted": "Dieses PDF ist passwortgeschützt, ich kann es nicht lesen.",
+        "unreadable": "Ich kann diese Datei nicht lesen.",
+        "tooLarge": "Die Datei ist größer als 10 MB.",
+        "tooManyPages": "Dieses PDF hat zu viele Seiten. Wähle ein kürzeres.",
+        "noText": "Ich habe keinen lesbaren Text in der Datei gefunden.",
+        "ocrFailed": "Ich konnte die gescannten Seiten nicht lesen. Versuche es erneut.",
+        "removeFailed": "Ich konnte die Datei nicht entfernen. Versuche es erneut.",
+        "generic": "Etwas ist schiefgelaufen. Versuche es erneut.",
+        "contextTooLarge": "Die Datei ist für dieses Gespräch zu lang. Entferne sie oder hänge eine kürzere an und versuche es erneut.",
+        "conversationFailed": "Dieses Gespräch ist nicht verfügbar. Starte ein neues und hänge die Datei erneut an.",
+        "restoreFailed": "Ich konnte die Dateien dieses Gesprächs nicht laden. Versuche es erneut.",
+        "notFound": "Diese Datei ist nicht mehr verfügbar. Entferne sie aus dem Chat und hänge sie bei Bedarf erneut an.",
+        "notAllowed": "Dein Zugang umfasst diesen Dateityp nicht. Entferne die Datei, um weiterzuchatten.",
+        "unsafe": "Ich kann die Anweisungen in dieser Datei nicht verwenden. Entferne sie und hänge nur die Lernseiten an.",
+        "invalid": "Ich kann diese Datei nicht verwenden. Entferne sie und hänge sie erneut an.",
+        "sessionExpired": "Deine Sitzung ist abgelaufen. Melde dich erneut an, bevor du Anhänge verwendest."
+      },
+      "announce": {
+        "reading": "Lesen von {name} gestartet",
+        "ready": "{name} ist bereit für den Chat",
+        "removed": "{name} entfernt",
+        "cancelled": "Lesen von {name} abgebrochen"
+      },
+      "consent": {
+        "title": "Diese Datei im Chat verwenden?",
+        "body": "Der Text der Datei und Bilder von gescannten Seiten oder Fotos werden zur Analyse an die KI gesendet.",
+        "storage": "Mit Konto wird der gelesene Text mit dem Chat gespeichert; ohne Konto bleibt er nur, solange die Sitzung offen ist. Die Originaldatei wird nicht hochgeladen.",
+        "confirm": "Im Chat verwenden",
+        "decline": "Abbrechen"
+      },
+      "voiceUnavailable": "Um über angehängte Dateien zu sprechen, nutze den Text-Chat. Entferne sie, um einen Sprachanruf zu starten."
+    }
   }
 }

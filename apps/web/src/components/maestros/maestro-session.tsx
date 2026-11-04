@@ -136,6 +136,7 @@ export function MaestroSession({
     requestTool,
     handleRequestPhoto,
     loadConversation,
+    attachments,
   } = useMaestroSessionLogic({
     maestro,
     initialMode,
@@ -269,6 +270,7 @@ export function MaestroSession({
             onRequestTool={requestTool}
             onRequestPhoto={handleRequestPhoto}
             onEndSession={handleEndSession}
+            attachments={attachments}
           />
         }
         rightPanel={

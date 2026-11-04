@@ -57,6 +57,14 @@
       "webcam": {
         "label": "Foto",
         "tooltip": "Scatta foto"
+      },
+      "diagram": {
+        "label": "Diagramma",
+        "tooltip": "Crea diagramma"
+      },
+      "timeline": {
+        "label": "Timeline",
+        "tooltip": "Crea linea temporale"
       }
     },
     "history": {
@@ -555,6 +563,57 @@
       "general": "Ciao! Sono {coach}, il tuo coach di studio. Prima di iniziare dimmi: di quale materia ti vuoi occupare, cosa vuoi fare e quanto tempo hai? Poi ti presento il Maestro giusto. 😊",
       "withSubject": "Ciao! Sono {coach}, il tuo coach di studio. Oggi lavoriamo su {subject}: ti presento subito il Maestro giusto! 😊"
     },
-    "fraseDelMaestro": "Frase del maestro"
+    "fraseDelMaestro": "Frase del maestro",
+    "attachments": {
+      "attach": "Allega un file",
+      "hint": "Allega PDF, JPEG, PNG o WebP (max 10 MB; PDF fino a {pages} pagine). I file si usano nella chat di testo.",
+      "listLabel": "File allegati",
+      "cancel": "Annulla",
+      "cancelLabel": "Annulla la lettura di {name}",
+      "retry": "Riprova",
+      "retryLabel": "Riprova con {name}",
+      "removeLabel": "Rimuovi {name}",
+      "status": {
+        "reading": "Lettura in corso…",
+        "progress": "Pagina {done} di {total}",
+        "saving": "Preparo il file per la chat…",
+        "ready": "Pronto da usare in chat",
+        "partial": "Pronto, ma {count, plural, one {# pagina senza testo leggibile non sarà usata} other {# pagine senza testo leggibile non saranno usate}}",
+        "removing": "Rimozione in corso…"
+      },
+      "errors": {
+        "unsupported": "Formato non supportato. Usa PDF, JPEG, PNG o WebP.",
+        "encrypted": "Il PDF è protetto da password: non posso leggerlo.",
+        "unreadable": "Non riesco a leggere questo file.",
+        "tooLarge": "Il file supera i 10 MB.",
+        "tooManyPages": "Il PDF ha troppe pagine. Scegline uno più breve.",
+        "noText": "Non ho trovato testo leggibile nel file.",
+        "ocrFailed": "Non sono riuscito a leggere le pagine scansionate. Riprova.",
+        "removeFailed": "Non sono riuscito a rimuovere il file. Riprova.",
+        "generic": "Qualcosa è andato storto. Riprova.",
+        "contextTooLarge": "Il file è troppo lungo per questa conversazione. Rimuovilo o allegane uno più breve, poi riprova.",
+        "conversationFailed": "Questa conversazione non è disponibile. Avviane una nuova e allega di nuovo il file.",
+        "restoreFailed": "Non sono riuscito a recuperare i file di questa conversazione. Riprova.",
+        "notFound": "Questo file non è più disponibile. Rimuovilo dalla chat e, se serve, allegalo di nuovo.",
+        "notAllowed": "Questo tipo di file non è disponibile con il tuo accesso. Rimuovilo per continuare la chat.",
+        "unsafe": "Non posso usare le istruzioni contenute in questo file. Rimuovilo e allega solo le pagine da studiare.",
+        "invalid": "Non riesco a usare questo file. Rimuovilo e allegalo di nuovo.",
+        "sessionExpired": "La sessione è scaduta. Accedi di nuovo prima di usare gli allegati."
+      },
+      "announce": {
+        "reading": "Lettura di {name} iniziata",
+        "ready": "{name} è pronto da usare in chat",
+        "removed": "{name} rimosso",
+        "cancelled": "Lettura di {name} annullata"
+      },
+      "consent": {
+        "title": "Usare questo file nella chat?",
+        "body": "Il testo del file e le immagini delle pagine scansionate o delle foto vengono inviati all'intelligenza artificiale per essere analizzati.",
+        "storage": "Con un account il testo ricavato viene salvato insieme alla chat; senza account resta solo finché la sessione è aperta. Il file originale non viene caricato.",
+        "confirm": "Usa in chat",
+        "decline": "Annulla"
+      },
+      "voiceUnavailable": "Per parlare dei file allegati usa la chat di testo. Rimuovili per avviare una chiamata vocale."
+    }
   }
 }

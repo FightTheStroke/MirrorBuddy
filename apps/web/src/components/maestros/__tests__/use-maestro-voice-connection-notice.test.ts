@@ -106,4 +106,21 @@ describe('useMaestroVoiceConnection content-filter notice', () => {
       `voice.${VOICE_ERROR_I18N_KEYS.VOICE_CONNECTION_FAILED}`,
     );
   });
+
+  it('explains that attached documents are supported in text chat instead of starting blind voice', () => {
+    const { result } = renderHook(() =>
+      useMaestroVoiceConnection({
+        maestro,
+        initialMode: 'chat',
+        onTranscript: vi.fn(),
+        onQuestionAsked: vi.fn(),
+        attachmentsActive: true,
+      }),
+    );
+
+    act(() => result.current.handleVoiceCall());
+
+    expect(result.current.isVoiceActive).toBe(false);
+    expect(result.current.configError).toContain('attachments.voiceUnavailable');
+  });
 });

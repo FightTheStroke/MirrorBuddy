@@ -3,11 +3,11 @@
  * @brief Empty state tips component
  */
 
-import { motion } from "framer-motion";
-import { useRouter } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
-import { Backpack } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { motion } from 'framer-motion';
+import { useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { Backpack } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface EmptyStateTipsProps {
   show: boolean;
@@ -15,7 +15,7 @@ interface EmptyStateTipsProps {
 
 export function EmptyStateTips({ show }: EmptyStateTipsProps) {
   const router = useRouter();
-  const t = useTranslations("education.supporti");
+  const t = useTranslations('education.supporti');
 
   if (!show) return null;
 
@@ -28,16 +28,16 @@ export function EmptyStateTips({ show }: EmptyStateTipsProps) {
     >
       <h3 className="font-semibold text-emerald-900 dark:text-emerald-100 mb-3 flex items-center gap-2">
         <Backpack className="w-5 h-5" aria-hidden="true" />
-        {t("emptyState.backpackEmpty")}
+        {t('emptyState.backpackEmpty')}
       </h3>
       <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-4">
-        {t("emptyState.startCreating")}
+        {t('emptyState.startCreating')}
       </p>
       <Button
-        onClick={() => router.push("/astuccio")}
+        onClick={() => router.push('/')}
         className="bg-emerald-700 hover:bg-emerald-800 text-white"
       >
-        {t("emptyState.goToToolcase")}
+        {t('emptyState.goToHome')}
       </Button>
     </motion.div>
   );

@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 # Fresh release policy checks; never replaced by cached browser/unit evidence.
-set -euo pipefail
+set -Eeuo pipefail
+
+# Never print commands or environment values: callers publish only this numeric marker.
+# errtrace covers functions/subshells; do not enable inherit_errexit (different semantics).
+policy_failure_reported=0
+report_policy_failure() {
+  printf "__POLICY_FAILURE__ line=%s exit=%s\n" "$1" "$2" >&2
+  policy_failure_reported=1
+}
+trap 'report_policy_failure "$LINENO" "$?"' ERR
+# Explicit exit paths do not raise ERR; avoid duplicating a marker already emitted here.
+trap 'status=$?; if [[ "$status" -ne 0 && "$policy_failure_reported" -eq 0 ]]; then report_policy_failure "$LINENO" "$status"; fi' EXIT
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 source "$ROOT_DIR/scripts/lib/checks.sh"

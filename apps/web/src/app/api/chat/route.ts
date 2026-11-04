@@ -79,6 +79,13 @@ import {
   type ConversationMessage,
 } from '@/lib/conversation/conversation-window';
 import { getTierMemoryLimits } from '@/lib/conversation/tier-memory-config';
+import { resolveChatAttachments } from './attachment-context';
+import { AttachmentError } from '@/lib/conversation/attachments/server';
+import {
+  AttachmentContextBudgetError,
+  assertAttachmentContextBudget,
+  buildAttachmentContext,
+} from '@/lib/conversation/attachments/context';
 
 /**
  * Look up a character's allowed tools array by maestroId.
@@ -270,6 +277,7 @@ export const POST = pipe(
 
     // Get last user message for safety filtering and RAG
     const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
+    const attachments = await resolveChatAttachments(body, userId);
 
     // Build all contexts (memory, tool, RAG, adaptive, language)
     const contexts = await buildAllContexts({
@@ -278,12 +286,16 @@ export const POST = pipe(
       maestroId,
       conversationId,
       enableMemory,
+      hasAttachments: attachments.length > 0,
       lastUserMessage: lastUserMessage?.content,
       adaptiveDifficultyMode: userSettings?.adaptiveDifficultyMode,
       requestedTool,
       language,
     });
     enhancedSystemPrompt = contexts.enhancedPrompt;
+    if (attachments.length) {
+      enhancedSystemPrompt += `\n\n${buildAttachmentContext(attachments)}`;
+    }
 
     // T1.10 (D-10): adapt language/topic guidance to the student's age when
     // a real profile age is on record (no-op for anonymous Trial users or
@@ -524,8 +536,16 @@ export const POST = pipe(
             .catch(() => 'base')
         : 'trial';
       const tierLimits = getTierMemoryLimits(userTier as 'trial' | 'base' | 'pro');
+      if (attachments.length) {
+        assertAttachmentContextBudget(
+          `${enhancedSystemPrompt}\n${lastUserMessage?.content ?? ''}`,
+          tierLimits.conversationWindowTokens,
+        );
+      }
       const compressedMessages = compressConversationHistory(messages as ConversationMessage[], {
-        maxTokens: tierLimits.conversationWindowTokens,
+        maxTokens: attachments.length
+          ? tierLimits.conversationWindowTokens - Math.ceil(enhancedSystemPrompt.length / 4)
+          : tierLimits.conversationWindowTokens,
       });
 
       const result = await chatCompletion(compressedMessages, enhancedSystemPrompt, {
@@ -732,6 +752,7 @@ export const POST = pipe(
       response.headers.set('X-Request-ID', getRequestId(request));
       return response;
     } catch (providerError) {
+      if (providerError instanceof AttachmentContextBudgetError) throw providerError;
       const errorMessage =
         providerError instanceof Error ? providerError.message : 'Unknown provider error';
 
@@ -767,6 +788,14 @@ export const POST = pipe(
       return response;
     }
   } catch (error) {
+    if (error instanceof AttachmentError || error instanceof AttachmentContextBudgetError) {
+      const response = NextResponse.json(
+        { error: error.code, code: error.code },
+        { status: error.status },
+      );
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
+    }
     // Explicit Sentry capture: withSentry middleware only sees thrown errors,
     // but this catch returns a Response, so the middleware never intercepts.
     Sentry.captureException(error, {

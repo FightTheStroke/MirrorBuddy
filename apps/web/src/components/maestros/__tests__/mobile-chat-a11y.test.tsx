@@ -77,6 +77,21 @@ const inputProps = {
   onRequestTool: vi.fn(),
   onRequestPhoto: vi.fn(),
   onEndSession: vi.fn(),
+  attachments: {
+    items: [],
+    readyDocs: [],
+    busy: false,
+    announcement: null,
+    consentOpen: false,
+    pickFiles: vi.fn(),
+    confirmConsent: vi.fn(),
+    declineConsent: vi.fn(),
+    cancel: vi.fn(),
+    retry: vi.fn(),
+    remove: vi.fn(),
+    restore: vi.fn(),
+    reset: vi.fn(),
+  },
 };
 
 function userMessage(): ChatMessage {

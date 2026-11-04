@@ -1,8 +1,14 @@
-import { useCallback } from 'react';
-import { useLocale } from 'next-intl';
+import { useCallback, useEffect, useRef } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/auth';
 import type { Maestro, ChatMessage, ToolCall } from '@/types';
+import type { AttachmentDocument } from '@/lib/conversation/attachments/types';
+import {
+  attachmentErrorKey,
+  buildAttachmentFields,
+  chatTurnError,
+} from './attachments/chat-attachment-fields';
 
 interface TurnMetrics {
   latencyMs: number;
@@ -21,6 +27,13 @@ interface UseMaestroChatHandlersProps {
   setToolCalls: React.Dispatch<React.SetStateAction<ToolCall[]>>;
   onQuestionAsked: () => void;
   onTurnComplete?: (metrics: TurnMetrics) => void;
+  readyDocs?: AttachmentDocument[];
+  ensureConversation?: () => Promise<string | null>;
+  persistMessage?: (
+    conversationId: string,
+    role: 'user' | 'assistant',
+    content: string,
+  ) => Promise<void>;
 }
 
 export function useMaestroChatHandlers({
@@ -34,8 +47,53 @@ export function useMaestroChatHandlers({
   setToolCalls,
   onQuestionAsked,
   onTurnComplete,
+  readyDocs = [],
+  ensureConversation,
+  persistMessage,
 }: UseMaestroChatHandlersProps) {
   const locale = useLocale();
+  const t = useTranslations('chat');
+
+  // Every request/persist step belongs to a generation; reset, account switch,
+  // Maestro change and unmount invalidate it so late responses are dropped.
+  const generationRef = useRef(0);
+  const controllerRef = useRef<AbortController | null>(null);
+  const invalidate = useCallback(() => {
+    generationRef.current += 1;
+    controllerRef.current?.abort();
+    controllerRef.current = null;
+  }, []);
+  const beginTurn = useCallback(() => {
+    generationRef.current += 1;
+    controllerRef.current?.abort();
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    return { generation: generationRef.current, signal: controller.signal };
+  }, []);
+  const isStale = useCallback((generation: number) => generation !== generationRef.current, []);
+
+  useEffect(() => invalidate, [maestro.id, invalidate]);
+
+  const persistTurn = useCallback(
+    async (
+      generation: number,
+      conversationId: string | null,
+      userContent: string,
+      assistantContent: string,
+    ) => {
+      if (!conversationId || !persistMessage || isStale(generation)) return;
+      await persistMessage(conversationId, 'user', userContent);
+      if (isStale(generation)) return;
+      await persistMessage(conversationId, 'assistant', assistantContent);
+    },
+    [persistMessage, isStale],
+  );
+
+  // Created on the first real interaction only; the same docs ride on every turn.
+  const attachmentFields = useCallback(async () => {
+    const conversationId = (await ensureConversation?.()) ?? null;
+    return { conversationId, fields: buildAttachmentFields(readyDocs, conversationId) };
+  }, [ensureConversation, readyDocs]);
 
   const handleSubmit = useCallback(
     async (e?: React.FormEvent, contentOverride?: string) => {
@@ -49,12 +107,15 @@ export function useMaestroChatHandlers({
         timestamp: new Date(),
       };
 
+      const { generation, signal } = beginTurn();
       setMessages((prev) => [...prev, userMessage]);
       setInput('');
       setIsLoading(true);
       if (userContent.includes('?')) onQuestionAsked();
 
       try {
+        const { conversationId, fields } = await attachmentFields();
+        if (isStale(generation)) return;
         const startTime = Date.now();
         const response = await csrfFetch('/api/chat', {
           method: 'POST',
@@ -66,12 +127,15 @@ export function useMaestroChatHandlers({
             systemPrompt: maestro.systemPrompt,
             maestroId: maestro.id,
             language: locale,
+            ...fields,
           }),
+          signal,
         });
         const latencyMs = Date.now() - startTime;
 
-        if (!response.ok) throw new Error('Failed to get response');
+        if (!response.ok) throw await chatTurnError(response);
         const data = await response.json();
+        if (isStale(generation)) return;
 
         if (onTurnComplete && data.usage) {
           onTurnComplete({
@@ -88,23 +152,28 @@ export function useMaestroChatHandlers({
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, assistantMessage]);
+        void persistTurn(generation, conversationId, userContent, assistantMessage.content);
 
         if (data.toolCalls?.length > 0) {
           setToolCalls((prev) => [...prev, ...data.toolCalls]);
         }
       } catch (error) {
+        if (isStale(generation)) return;
+        const errorKey = attachmentErrorKey(error);
         logger.error('Chat request failed', { error: String(error) });
         setMessages((prev) => [
           ...prev,
           {
             id: `error-${Date.now()}`,
             role: 'assistant',
-            content: 'Mi dispiace, ho avuto un problema. Puoi riprovare?',
+            content: errorKey
+              ? t(`attachments.errors.${errorKey}`)
+              : 'Mi dispiace, ho avuto un problema. Puoi riprovare?',
             timestamp: new Date(),
           },
         ]);
       } finally {
-        setIsLoading(false);
+        if (!isStale(generation)) setIsLoading(false);
       }
     },
     [
@@ -114,6 +183,11 @@ export function useMaestroChatHandlers({
       maestro.systemPrompt,
       maestro.id,
       locale,
+      t,
+      attachmentFields,
+      persistTurn,
+      beginTurn,
+      isStale,
       setInput,
       setIsLoading,
       setMessages,
@@ -124,9 +198,11 @@ export function useMaestroChatHandlers({
   );
 
   const clearChat = useCallback(() => {
+    invalidate();
+    setIsLoading(false);
     setMessages([]);
     setToolCalls([]);
-  }, [setMessages, setToolCalls]);
+  }, [invalidate, setIsLoading, setMessages, setToolCalls]);
 
   const handleWebcamCapture = useCallback(
     async (imageData: string) => {
@@ -136,6 +212,7 @@ export function useMaestroChatHandlers({
         content: '[Foto catturata]',
         timestamp: new Date(),
       };
+      const { generation, signal } = beginTurn();
       setMessages((prev) => [...prev, userMessage]);
       setIsLoading(true);
 
@@ -144,6 +221,7 @@ export function useMaestroChatHandlers({
         const analyzeRes = await csrfFetch('/api/image/analyze', {
           method: 'POST',
           body: JSON.stringify({ imageBase64: imageData }),
+          signal,
         });
 
         if (!analyzeRes.ok) {
@@ -151,6 +229,7 @@ export function useMaestroChatHandlers({
         }
 
         const { text, description } = await analyzeRes.json();
+        if (isStale(generation)) return;
 
         // Build context from analysis results
         const analysisContext = text
@@ -158,6 +237,8 @@ export function useMaestroChatHandlers({
           : `[Analisi foto] ${description}`;
 
         // Step 2: Send analysis to chat API for maestro response
+        const { conversationId, fields } = await attachmentFields();
+        if (isStale(generation)) return;
         const startTime = Date.now();
         const chatRes = await csrfFetch('/api/chat', {
           method: 'POST',
@@ -169,12 +250,15 @@ export function useMaestroChatHandlers({
             systemPrompt: maestro.systemPrompt,
             maestroId: maestro.id,
             language: locale,
+            ...fields,
           }),
+          signal,
         });
         const latencyMs = Date.now() - startTime;
 
-        if (!chatRes.ok) throw new Error('Failed to get response');
+        if (!chatRes.ok) throw await chatTurnError(chatRes);
         const data = await chatRes.json();
+        if (isStale(generation)) return;
 
         if (onTurnComplete && data.usage) {
           onTurnComplete({
@@ -184,33 +268,38 @@ export function useMaestroChatHandlers({
           });
         }
 
+        const photoReply: string = data.content || data.message || '';
         setMessages((prev) => [
           ...prev,
           {
             id: `assistant-${Date.now()}`,
             role: 'assistant' as const,
-            content: data.content || data.message || '',
+            content: photoReply,
             timestamp: new Date(),
           },
         ]);
+        void persistTurn(generation, conversationId, userMessage.content, photoReply);
 
         if (data.toolCalls?.length > 0) {
           setToolCalls((prev) => [...prev, ...data.toolCalls]);
         }
       } catch (error) {
+        if (isStale(generation)) return;
+        const errorKey = attachmentErrorKey(error);
         logger.error('Webcam analysis failed', { error: String(error) });
         setMessages((prev) => [
           ...prev,
           {
             id: `error-${Date.now()}`,
             role: 'assistant' as const,
-            content:
-              'Mi dispiace, non sono riuscito ad analizzare la foto. Puoi descrivermi cosa vedi?',
+            content: errorKey
+              ? t(`attachments.errors.${errorKey}`)
+              : 'Mi dispiace, non sono riuscito ad analizzare la foto. Puoi descrivermi cosa vedi?',
             timestamp: new Date(),
           },
         ]);
       } finally {
-        setIsLoading(false);
+        if (!isStale(generation)) setIsLoading(false);
       }
     },
     [
@@ -218,6 +307,11 @@ export function useMaestroChatHandlers({
       maestro.systemPrompt,
       maestro.id,
       locale,
+      t,
+      attachmentFields,
+      persistTurn,
+      beginTurn,
+      isStale,
       setMessages,
       setIsLoading,
       setToolCalls,
@@ -253,6 +347,7 @@ export function useMaestroChatHandlers({
   );
 
   return {
+    invalidate,
     handleSubmit,
     clearChat,
     handleWebcamCapture,

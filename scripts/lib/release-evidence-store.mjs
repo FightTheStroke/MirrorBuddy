@@ -45,7 +45,7 @@ export function recipe(kind, directory) {
         `--outputFile=${join(directory, 'unit.json')}`,
       ];
     case 'e2e':
-      return ['npm', 'run', 'test', '--', '--forbid-only'];
+      return ['npm', 'run', 'test', '--', '--forbid-only', '--max-failures=1'];
     default:
       throw new Error('Unknown release check');
   }

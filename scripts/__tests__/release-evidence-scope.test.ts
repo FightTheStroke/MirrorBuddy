@@ -178,7 +178,7 @@ describe('independent release scope', () => {
       throw new Error('SECRET_PAYLOAD');
     });
     expect(() => captureExpectedScope('unit', directory, root)).toThrow(
-      'Release scope capture failed',
+      'Release scope capture failed: __SCOPE_FAILURE__ kind=1 stage=1 reason=2 exit=0',
     );
     inventory[0].name = '';
     expect(() => captureExpectedScope('unit', directory, root)).toThrow();
