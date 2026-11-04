@@ -22,9 +22,13 @@ async function failure(response: Response): Promise<AttachmentApiError> {
   return new AttachmentApiError(response.status, code);
 }
 
-export async function listAttachments(conversationId: string): Promise<AttachmentDocument[]> {
+export async function listAttachments(
+  conversationId: string,
+  signal?: AbortSignal,
+): Promise<AttachmentDocument[]> {
   const response = await fetch(
     `/api/conversations/${encodeURIComponent(conversationId)}/attachments`,
+    { signal },
   );
   if (!response.ok) throw await failure(response);
   const body = (await response.json()) as { attachments?: AttachmentDocument[] };

@@ -5,6 +5,7 @@ import { FileText, Loader2, X, RotateCcw, AlertTriangle, Check } from 'lucide-re
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import type { AttachmentAnnouncement, AttachmentItem } from './use-conversation-attachments';
+import { attachmentCodeKey } from './chat-attachment-fields';
 
 interface AttachmentChipsProps {
   items: AttachmentItem[];
@@ -15,19 +16,6 @@ interface AttachmentChipsProps {
   /** Called with the removed chip's neighbour unavailable: focus must land somewhere safe. */
   onFocusFallback: () => void;
 }
-
-const ERROR_KEYS = new Set([
-  'unsupported',
-  'encrypted',
-  'unreadable',
-  'too_large',
-  'too_many_pages',
-  'no_text',
-  'ocr_failed',
-  'remove_failed',
-  'conversation_failed',
-  'restore_failed',
-]);
 
 export function AttachmentChips({
   items,
@@ -42,7 +30,7 @@ export function AttachmentChips({
 
   const announce = announcement
     ? announcement.type === 'error'
-      ? t(`attachments.errors.${ERROR_KEYS.has(announcement.code) ? announcement.code : 'generic'}`)
+      ? t(`attachments.errors.${attachmentCodeKey(announcement.code) ?? 'generic'}`)
       : t(`attachments.announce.${announcement.type}`, { name: announcement.name })
     : '';
 
@@ -64,8 +52,9 @@ export function AttachmentChips({
           {items.map((item, index) => {
             const working = item.status === 'reading' || item.status === 'saving';
             const failed = item.status === 'error';
-            const errorKey =
-              item.errorCode && ERROR_KEYS.has(item.errorCode) ? item.errorCode : 'generic';
+            const errorKey = item.errorCode
+              ? (attachmentCodeKey(item.errorCode) ?? 'generic')
+              : 'generic';
             const retryRemoval = item.errorCode === 'remove_failed';
             return (
               <li

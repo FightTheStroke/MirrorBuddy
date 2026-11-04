@@ -214,7 +214,7 @@ describe('chat handlers with attachments', () => {
     await act(async () => {
       await hook.result.current.handleSubmit();
     });
-    expect(lastContent(setMessages)).toBe('attachments.errors.context_too_large');
+    expect(lastContent(setMessages)).toBe('attachments.errors.contextTooLarge');
   });
 
   it('never falls back to transient files when the conversation cannot be created', async () => {
@@ -225,7 +225,7 @@ describe('chat handlers with attachments', () => {
       await hook.result.current.handleSubmit();
     });
     expect(mocks.csrfFetch).not.toHaveBeenCalled();
-    expect(lastContent(setMessages)).toBe('attachments.errors.conversation_failed');
+    expect(lastContent(setMessages)).toBe('attachments.errors.conversationFailed');
   });
 
   it('drops a late response from before a reset: no messages, no persistence', async () => {

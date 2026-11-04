@@ -48,11 +48,34 @@ export class ConversationUnavailableError extends Error {
   }
 }
 
-/** i18n key under chat.attachments.errors for failures the student must act on, else null. */
+const ATTACHMENT_ERROR_KEYS: Readonly<Record<string, string>> = {
+  unsupported: 'unsupported',
+  encrypted: 'encrypted',
+  unreadable: 'unreadable',
+  too_large: 'tooLarge',
+  too_many_pages: 'tooManyPages',
+  no_text: 'noText',
+  ocr_failed: 'ocrFailed',
+  remove_failed: 'removeFailed',
+  restore_failed: 'restoreFailed',
+  conversation_failed: 'conversationFailed',
+  ATTACHMENT_CONTEXT_TOO_LARGE: 'contextTooLarge',
+  attachment_not_found: 'notFound',
+  attachment_tool_not_allowed: 'notAllowed',
+  attachment_unsafe: 'unsafe',
+  attachment_invalid: 'invalid',
+  attachment_data_invalid: 'invalid',
+  conversation_not_found: 'conversationFailed',
+  attachment_auth_required: 'sessionExpired',
+};
+
+export function attachmentCodeKey(code: string): string | null {
+  return Object.hasOwn(ATTACHMENT_ERROR_KEYS, code) ? ATTACHMENT_ERROR_KEYS[code] : null;
+}
+
 export function attachmentErrorKey(error: unknown): string | null {
-  if (error instanceof ConversationUnavailableError) return 'conversation_failed';
-  if (error instanceof ChatTurnError && error.code === 'ATTACHMENT_CONTEXT_TOO_LARGE') {
-    return 'context_too_large';
+  if (error instanceof ConversationUnavailableError || error instanceof ChatTurnError) {
+    return attachmentCodeKey(error.code);
   }
   return null;
 }

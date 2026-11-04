@@ -407,7 +407,7 @@ export function useMaestroSessionLogic({
       {
         id: `restore-error-${Date.now()}`,
         role: 'assistant',
-        content: t('attachments.errors.restore_failed'),
+        content: t('attachments.errors.restoreFailed'),
         timestamp: new Date(),
       },
     ]);

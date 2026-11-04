@@ -41,6 +41,8 @@ export function useConversationAttachments({ ensureConversation, getConversation
   const counterRef = useRef(0);
   const filesRef = useRef(new Map<string, File>());
   const controllersRef = useRef(new Map<string, AbortController>());
+  // Only the latest restore may write state; reset or a newer restore invalidates it.
+  const restoreRef = useRef<AbortController | null>(null);
 
   const patch = useCallback((localId: string, changes: Partial<AttachmentItem>) => {
     setItems((prev) => prev.map((i) => (i.localId === localId ? { ...i, ...changes } : i)));
@@ -173,8 +175,13 @@ export function useConversationAttachments({ ensureConversation, getConversation
   );
 
   const restore = useCallback(async (conversationId: string) => {
+    restoreRef.current?.abort();
+    const controller = new AbortController();
+    restoreRef.current = controller;
+    const stale = () => restoreRef.current !== controller;
     try {
-      const docs = await listAttachments(conversationId);
+      const docs = await listAttachments(conversationId, controller.signal);
+      if (stale()) return;
       setItems(
         docs.map((doc) => ({
           localId: `srv-${doc.id}`,
@@ -188,12 +195,15 @@ export function useConversationAttachments({ ensureConversation, getConversation
         })),
       );
     } catch (error) {
+      if (stale()) return;
       logger.warn('Attachment restore failed', { error: String(error) });
       setAnnouncement({ type: 'error', name: '', code: 'restore_failed' });
     }
   }, []);
 
   const reset = useCallback(() => {
+    restoreRef.current?.abort();
+    restoreRef.current = null;
     controllersRef.current.forEach((c) => c.abort());
     controllersRef.current.clear();
     filesRef.current.clear();
@@ -204,7 +214,11 @@ export function useConversationAttachments({ ensureConversation, getConversation
 
   useEffect(() => {
     const controllers = controllersRef.current;
-    return () => controllers.forEach((c) => c.abort());
+    return () => {
+      controllers.forEach((c) => c.abort());
+      restoreRef.current?.abort();
+      restoreRef.current = null;
+    };
   }, []);
 
   const readyDocs = useMemo(

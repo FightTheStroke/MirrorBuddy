@@ -64,6 +64,7 @@ export function useMaestroChatHandlers({
     controllerRef.current = null;
   }, []);
   const beginTurn = useCallback(() => {
+    generationRef.current += 1;
     controllerRef.current?.abort();
     const controller = new AbortController();
     controllerRef.current = controller;

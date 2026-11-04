@@ -5,45 +5,42 @@
 // DELETE: Delete conversation
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
-
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAuth, withCSRF } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/conversations/[id]"),
+  withSentry('/api/conversations/[id]'),
   withAuth,
 )(async (ctx) => {
   const { id } = await ctx.params;
   const userId = ctx.userId!;
 
   const conversation = await prisma.conversation.findFirst({
-    where: { id, userId },
+    where: { id, userId, markedForDeletion: false },
     include: {
       messages: {
-        orderBy: { createdAt: "asc" },
-        take: 100, // Limit messages, use pagination for more
+        orderBy: { createdAt: 'desc' },
+        take: 100, // Newest 100, returned chronologically below
       },
     },
   });
 
   if (!conversation) {
-    return NextResponse.json(
-      { error: "Conversation not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
   }
 
   return NextResponse.json({
     ...conversation,
-    topics: JSON.parse(conversation.topics || "[]"),
+    messages: [...conversation.messages].reverse(),
+    topics: JSON.parse(conversation.topics || '[]'),
     keyFacts: conversation.keyFacts ? JSON.parse(conversation.keyFacts) : null,
   });
 });
 
 export const PUT = pipe(
-  withSentry("/api/conversations/[id]"),
+  withSentry('/api/conversations/[id]'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
@@ -56,10 +53,7 @@ export const PUT = pipe(
   });
 
   if (!existing) {
-    return NextResponse.json(
-      { error: "Conversation not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
   }
 
   const data = await ctx.req.json();
@@ -82,13 +76,13 @@ export const PUT = pipe(
 
   return NextResponse.json({
     ...conversation,
-    topics: JSON.parse(conversation.topics || "[]"),
+    topics: JSON.parse(conversation.topics || '[]'),
     keyFacts: conversation.keyFacts ? JSON.parse(conversation.keyFacts) : null,
   });
 });
 
 export const DELETE = pipe(
-  withSentry("/api/conversations/[id]"),
+  withSentry('/api/conversations/[id]'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
@@ -101,10 +95,7 @@ export const DELETE = pipe(
   });
 
   if (!existing) {
-    return NextResponse.json(
-      { error: "Conversation not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
   }
 
   await prisma.conversation.delete({
