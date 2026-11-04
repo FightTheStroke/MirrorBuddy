@@ -59,7 +59,12 @@ test.describe('PROD-SMOKE: Tools & Study Kit', () => {
     authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
     await openHomeworkSession(page);
 
-    const toolNames = ['Crea mappa mentale', 'Crea quiz', 'Crea flashcard', 'Crea riassunto'];
+    const toolNames = [
+      'Crea mappa mentale',
+      'Crea quiz',
+      'Crea flashcard',
+      'Scrivi un riassunto guidato',
+    ];
     for (const name of toolNames) {
       await expect(page.getByRole('button', { name })).toBeVisible({ timeout: 10000 });
     }

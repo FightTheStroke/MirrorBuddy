@@ -23,7 +23,12 @@ test.describe('PROD-SMOKE: Session UI', () => {
 
   test('Session tools are visible', async ({ page }) => {
     await openHomeworkSession(page);
-    for (const tool of ['Crea mappa mentale', 'Crea quiz', 'Crea flashcard', 'Crea riassunto']) {
+    for (const tool of [
+      'Crea mappa mentale',
+      'Crea quiz',
+      'Crea flashcard',
+      'Scrivi un riassunto guidato',
+    ]) {
       await expect(page.getByRole('button', { name: tool })).toBeVisible();
     }
   });
