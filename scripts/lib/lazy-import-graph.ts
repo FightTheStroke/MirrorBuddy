@@ -29,6 +29,8 @@ export function runtimeModule(source: ts.SourceFile, checker: ts.TypeChecker): R
       edge: { specifier, name },
     });
   const noteHeavy = (specifier: string) => {
+    // Stylesheets are not eager JavaScript runtime imports.
+    if (/\.(?:css|scss)$/.test(specifier)) return;
     if (specifier === 'recharts' || specifier.startsWith('recharts/')) result.heavy = true;
     if (specifier === 'katex' || specifier.startsWith('katex/')) result.katex = true;
   };

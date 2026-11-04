@@ -52,6 +52,9 @@ it('publishes only bounded allowlisted numeric native failure markers', () => {
         '__PRE_RELEASE_FAILURE__ criterion=11 exit=1',
         '__PRE_RELEASE_FAILURE__ criterion=6 exit=0',
         '__PRE_RELEASE_FAILURE__ criterion=6 exit=1 private-suffix',
+        '__PERF_FAILURE__ criterion=9 exit=1',
+        '__PERF_FAILURE__ criterion=6 exit=1 private-suffix',
+        '__PERF_FAILURE__ criterion=6 exit=1',
         ...Array.from({ length: 20 }, () => '__PRE_RELEASE_FAILURE__ criterion=6 exit=1'),
       ].join('\n'),
     );
@@ -71,7 +74,8 @@ it('publishes only bounded allowlisted numeric native failure markers', () => {
     expect(result.stderr).toBe('');
     expect(result.stdout).toBe(
       '__POLICY_FAILURE__ line=21 exit=1\n' +
-        '__PRE_RELEASE_FAILURE__ criterion=6 exit=1\n'.repeat(12),
+        '__PERF_FAILURE__ criterion=6 exit=1\n' +
+        '__PRE_RELEASE_FAILURE__ criterion=6 exit=1\n'.repeat(11),
     );
   } finally {
     rmSync(root, { recursive: true, force: true });

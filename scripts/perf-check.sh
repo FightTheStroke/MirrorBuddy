@@ -7,7 +7,19 @@
 # Usage: ./scripts/perf-check.sh
 # =============================================================================
 
-set -e
+set -Ee
+
+# Numeric-only diagnostics; keep checker output private in the native execution log.
+PERF_CRITERION=0
+trap 'printf "__PERF_FAILURE__ criterion=%s exit=%s\n" "$PERF_CRITERION" "$?" >&2' ERR
+run_perf_check() {
+    PERF_CRITERION="$1"
+    local before="$FAILED"
+    "$2"
+    if [[ "$FAILED" -gt "$before" ]]; then
+        printf "__PERF_FAILURE__ criterion=%s exit=1\n" "$PERF_CRITERION" >&2
+    fi
+}
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHECKS_DIR="$SCRIPT_DIR/perf-checks"
@@ -26,12 +38,12 @@ echo "=========================================="
 echo ""
 
 # Run all checks in order
-check_images           # [1/6] Avatar WebP
-check_eventsource      # [2/6] EventSource cleanup
-check_listeners        # [3/6] Event listener cleanup
-check_n1_patterns      # [4/6] N+1 database patterns
-check_bundle_size      # [5/6] Bundle size
-check_lazy_loading     # [6/6] Lazy loading
+run_perf_check 1 check_images           # [1/6] Avatar WebP
+run_perf_check 2 check_eventsource      # [2/6] EventSource cleanup
+run_perf_check 3 check_listeners        # [3/6] Event listener cleanup
+run_perf_check 4 check_n1_patterns      # [4/6] N+1 database patterns
+run_perf_check 5 check_bundle_size      # [5/6] Bundle size
+run_perf_check 6 check_lazy_loading     # [6/6] Lazy loading
 
 # Summary
 echo ""

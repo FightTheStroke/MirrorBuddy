@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, symlinkSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -37,10 +37,49 @@ function check(root: string, fn: string) {
     { cwd: root, encoding: 'utf8', timeout: 20_000 },
   );
 }
+function orchestrate(root: string, chunks = true) {
+  mkdirSync(join(root, 'scripts/perf-checks'), { recursive: true });
+  for (const name of ['common', 'bundle', 'memory', 'database']) {
+    const file = `scripts/perf-checks/${name}.sh`;
+    copyFileSync(join(repository, file), join(root, file));
+  }
+  copyFileSync(join(repository, 'scripts/perf-check.sh'), join(root, 'scripts/perf-check.sh'));
+  const lazyCheck = 'scripts/check-lazy-loading.ts';
+  symlinkSync(join(repository, lazyCheck), join(root, lazyCheck));
+  symlinkSync(join(repository, 'node_modules'), join(root, 'node_modules'), 'dir');
+  mkdirSync(join(root, 'apps/web/public/maestri'), { recursive: true });
+  writeFileSync(join(root, 'apps/web/public/maestri/avatar.webp'), 'fixture');
+  if (chunks) {
+    mkdirSync(join(root, 'apps/web/.next/static/chunks'), { recursive: true });
+    writeFileSync(join(root, 'apps/web/.next/static/chunks/test.js'), ';');
+  }
+  return spawnSync('bash', [join(root, 'scripts/perf-check.sh')], {
+    cwd: tmpdir(),
+    encoding: 'utf8',
+    timeout: 20000,
+  });
+}
 afterEach(() => {
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 describe('release performance checks use application paths', () => {
+  it.each([1, 2, 5, 6])(
+    'emits numeric performance subcriterion %s from the real orchestration',
+    (criterion) => {
+      const root = fixture();
+      if (criterion === 1) {
+        mkdirSync(join(root, 'apps/web/public/maestri'), { recursive: true });
+        writeFileSync(join(root, 'apps/web/public/maestri/avatar.png'), 'fixture');
+      }
+      if (criterion === 2)
+        writeFileSync(join(root, 'apps/web/src/index.ts'), 'new EventSource("/events");');
+      if (criterion === 6) writeFileSync(join(root, 'apps/web/src/index.ts'), 'import "katex";');
+      const result = orchestrate(root, criterion !== 5);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain(`__PERF_FAILURE__ criterion=${criterion} exit=1\n`);
+    },
+  );
+
   it('finds the actual app avatars', () => {
     const root = fixture();
     mkdirSync(join(root, 'apps/web/public/maestri'), { recursive: true });
@@ -95,6 +134,24 @@ describe('release performance checks use application paths', () => {
     writeFileSync(join(root, 'packages/static.ts'), 'import katex from "katex";');
     expect(check(root, 'check_lazy_loading').status).toBe(1);
   });
+  it('accepts KaTeX stylesheet with the JavaScript runtime dynamically loaded', () => {
+    const root = fixture();
+    writeFileSync(
+      join(root, 'apps/web/src/index.ts'),
+      'import "katex/dist/katex.min.css"; const load = () => import("katex");',
+    );
+    const result = orchestrate(root);
+    expect(result.status).toBe(0);
+    expect(result.stderr).not.toContain('Static KaTeX import');
+  });
+  it.each(['katex', 'katex/dist/katex.js'])(
+    'still rejects static KaTeX runtime %s',
+    (specifier) => {
+      const root = fixture();
+      writeFileSync(join(root, 'apps/web/src/index.ts'), `import "${specifier}";`);
+      expect(check(root, 'check_lazy_loading').status).toBe(1);
+    },
+  );
   it('accepts an inspected source tree without heavy imports', () => {
     expect(check(fixture(), 'check_lazy_loading').status).toBe(0);
   });
