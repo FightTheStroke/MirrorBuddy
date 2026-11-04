@@ -57,6 +57,14 @@
       "webcam": {
         "label": "Foto",
         "tooltip": "Tomar foto"
+      },
+      "diagram": {
+        "label": "Diagrama",
+        "tooltip": "Crear un diagrama"
+      },
+      "timeline": {
+        "label": "Línea de tiempo",
+        "tooltip": "Crear una línea de tiempo"
       }
     },
     "history": {
@@ -555,6 +563,52 @@
       "general": "¡Hola! Soy {coach}, tu coach de estudio. Antes de empezar, dime: ¿de qué asignatura quieres ocuparte, qué quieres hacer y cuánto tiempo tienes? Luego te presento al Maestro adecuado. 😊",
       "withSubject": "¡Hola! Soy {coach}, tu coach de estudio. Hoy trabajamos en {subject}: ¡te presento enseguida al Maestro adecuado! 😊"
     },
-    "fraseDelMaestro": "Frase del maestro"
+    "fraseDelMaestro": "Frase del maestro",
+    "attachments": {
+      "attach": "Adjuntar un archivo",
+      "hint": "Adjunta PDF, JPEG, PNG o WebP (máx. 10 MB; PDF de hasta {pages} páginas). Los archivos se usan en el chat de texto.",
+      "listLabel": "Archivos adjuntos",
+      "cancel": "Cancelar",
+      "cancelLabel": "Cancelar la lectura de {name}",
+      "retry": "Reintentar",
+      "retryLabel": "Reintentar con {name}",
+      "removeLabel": "Quitar {name}",
+      "status": {
+        "reading": "Leyendo…",
+        "progress": "Página {done} de {total}",
+        "saving": "Preparando el archivo para el chat…",
+        "ready": "Listo para usar en el chat",
+        "partial": "Listo, pero {count, plural, one {# página sin texto legible no se usará} other {# páginas sin texto legible no se usarán}}",
+        "removing": "Quitando…"
+      },
+      "errors": {
+        "unsupported": "Formato no admitido. Usa PDF, JPEG, PNG o WebP.",
+        "encrypted": "Este PDF tiene contraseña y no puedo leerlo.",
+        "unreadable": "No puedo leer este archivo.",
+        "too_large": "El archivo supera los 10 MB.",
+        "too_many_pages": "Este PDF tiene demasiadas páginas: el máximo es 5.",
+        "no_text": "No encontré texto legible en el archivo.",
+        "ocr_failed": "No pude leer las páginas escaneadas. Inténtalo de nuevo.",
+        "remove_failed": "No pude quitar el archivo. Inténtalo de nuevo.",
+        "generic": "Algo salió mal. Inténtalo de nuevo.",
+        "context_too_large": "El archivo es demasiado largo para esta conversación. Quítalo o adjunta uno más corto e inténtalo de nuevo.",
+        "conversation_failed": "No pude guardar la conversación, así que no se usó el archivo. Inténtalo de nuevo en un momento.",
+        "restore_failed": "No pude cargar los archivos de esta conversación. Inténtalo de nuevo."
+      },
+      "announce": {
+        "reading": "Lectura de {name} iniciada",
+        "ready": "{name} está listo para usar en el chat",
+        "removed": "{name} quitado",
+        "cancelled": "Lectura de {name} cancelada"
+      },
+      "consent": {
+        "title": "¿Usar este archivo en el chat?",
+        "body": "El texto del archivo y las imágenes de páginas escaneadas o fotos se envían a la IA para analizarlos.",
+        "storage": "Con una cuenta, el texto extraído se guarda con el chat; sin cuenta, solo permanece mientras la sesión está abierta. El archivo original no se sube.",
+        "confirm": "Usar en el chat",
+        "decline": "Cancelar"
+      },
+      "voiceUnavailable": "Para hablar de los archivos adjuntos, usa el chat de texto. Quítalos para iniciar una llamada de voz."
+    }
   }
 }

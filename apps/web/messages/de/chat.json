@@ -57,6 +57,14 @@
       "webcam": {
         "label": "Foto",
         "tooltip": "Foto aufnehmen"
+      },
+      "diagram": {
+        "label": "Diagramm",
+        "tooltip": "Diagramm erstellen"
+      },
+      "timeline": {
+        "label": "Zeitleiste",
+        "tooltip": "Zeitleiste erstellen"
       }
     },
     "history": {
@@ -555,6 +563,52 @@
       "general": "Hallo! Ich bin {coach}, dein Lerncoach. Bevor wir starten, sag mir: An welchem Fach möchtest du arbeiten, was möchtest du tun und wie viel Zeit hast du? Dann stelle ich dir den richtigen Maestro vor. 😊",
       "withSubject": "Hallo! Ich bin {coach}, dein Lerncoach. Heute arbeiten wir an {subject} – ich stelle dir gleich den richtigen Maestro vor! 😊"
     },
-    "fraseDelMaestro": "Satz des Meisters"
+    "fraseDelMaestro": "Satz des Meisters",
+    "attachments": {
+      "attach": "Datei anhängen",
+      "hint": "PDF, JPEG, PNG oder WebP anhängen (max. 10 MB; PDF bis {pages} Seiten). Dateien werden im Text-Chat verwendet.",
+      "listLabel": "Angehängte Dateien",
+      "cancel": "Abbrechen",
+      "cancelLabel": "Lesen von {name} abbrechen",
+      "retry": "Erneut versuchen",
+      "retryLabel": "{name} erneut versuchen",
+      "removeLabel": "{name} entfernen",
+      "status": {
+        "reading": "Wird gelesen…",
+        "progress": "Seite {done} von {total}",
+        "saving": "Datei wird für den Chat vorbereitet…",
+        "ready": "Bereit für den Chat",
+        "partial": "Bereit, aber {count, plural, one {# Seite ohne lesbaren Text wird nicht verwendet} other {# Seiten ohne lesbaren Text werden nicht verwendet}}",
+        "removing": "Wird entfernt…"
+      },
+      "errors": {
+        "unsupported": "Format nicht unterstützt. Verwende PDF, JPEG, PNG oder WebP.",
+        "encrypted": "Dieses PDF ist passwortgeschützt, ich kann es nicht lesen.",
+        "unreadable": "Ich kann diese Datei nicht lesen.",
+        "too_large": "Die Datei ist größer als 10 MB.",
+        "too_many_pages": "Dieses PDF hat zu viele Seiten: höchstens 5.",
+        "no_text": "Ich habe keinen lesbaren Text in der Datei gefunden.",
+        "ocr_failed": "Ich konnte die gescannten Seiten nicht lesen. Versuche es erneut.",
+        "remove_failed": "Ich konnte die Datei nicht entfernen. Versuche es erneut.",
+        "generic": "Etwas ist schiefgelaufen. Versuche es erneut.",
+        "context_too_large": "Die Datei ist für dieses Gespräch zu lang. Entferne sie oder hänge eine kürzere an und versuche es erneut.",
+        "conversation_failed": "Ich konnte das Gespräch nicht speichern, daher wurde die Datei nicht verwendet. Versuche es gleich erneut.",
+        "restore_failed": "Ich konnte die Dateien dieses Gesprächs nicht laden. Versuche es erneut."
+      },
+      "announce": {
+        "reading": "Lesen von {name} gestartet",
+        "ready": "{name} ist bereit für den Chat",
+        "removed": "{name} entfernt",
+        "cancelled": "Lesen von {name} abgebrochen"
+      },
+      "consent": {
+        "title": "Diese Datei im Chat verwenden?",
+        "body": "Der Text der Datei und Bilder von gescannten Seiten oder Fotos werden zur Analyse an die KI gesendet.",
+        "storage": "Mit Konto wird der gelesene Text mit dem Chat gespeichert; ohne Konto bleibt er nur, solange die Sitzung offen ist. Die Originaldatei wird nicht hochgeladen.",
+        "confirm": "Im Chat verwenden",
+        "decline": "Abbrechen"
+      },
+      "voiceUnavailable": "Um über angehängte Dateien zu sprechen, nutze den Text-Chat. Entferne sie, um einen Sprachanruf zu starten."
+    }
   }
 }

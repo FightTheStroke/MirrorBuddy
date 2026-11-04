@@ -10,6 +10,13 @@ import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/auth';
 import { usePendingToolRequestStore } from '@/lib/stores';
 import type { Maestro, ChatMessage, ToolCall, ToolType } from '@/types';
+import { useMaestroConversation } from './attachments/use-maestro-conversation';
+import { readConversationParam, writeConversationParam } from './attachments/conversation-url';
+import { useClientIdentity } from '@/lib/auth/identity-provider';
+import { useTranslations } from 'next-intl';
+import { useConversationLoader } from './attachments/use-conversation-loader';
+import { useIdentityReset } from './attachments/use-identity-reset';
+import { useConversationAttachments } from './attachments/use-conversation-attachments';
 
 interface UseMaestroSessionLogicProps {
   maestro: Maestro;
@@ -108,6 +115,26 @@ export function useMaestroSessionLogic({
 
   const sessionMetrics = useSessionMetrics(maestro.id);
 
+  const conversation = useMaestroConversation(maestro.id);
+  const {
+    ensureConversation,
+    getConversationId,
+    persistMessage,
+    adoptConversation,
+    resetConversation,
+  } = conversation;
+  const attachments = useConversationAttachments({ ensureConversation, getConversationId });
+  const { reset: resetAttachments, restore: restoreAttachments } = attachments;
+
+  // A different Maestro (or unmount) must never inherit the previous conversation or its files.
+  useEffect(
+    () => () => {
+      resetConversation();
+      resetAttachments();
+    },
+    [maestro.id, resetConversation, resetAttachments],
+  );
+
   const voiceConnection = useMaestroVoiceConnection({
     maestro,
     initialMode,
@@ -115,6 +142,7 @@ export function useMaestroSessionLogic({
     onQuestionAsked,
     currentMessages: messages,
     onWebcamRequest: onVoiceWebcamRequest,
+    attachmentsActive: attachments.readyDocs.length > 0 || attachments.busy,
   });
 
   const chatHandlers = useMaestroChatHandlers({
@@ -128,6 +156,9 @@ export function useMaestroSessionLogic({
     setToolCalls,
     onQuestionAsked,
     onTurnComplete: sessionMetrics.recordTurn,
+    readyDocs: attachments.readyDocs,
+    ensureConversation,
+    persistMessage,
   });
 
   const handleRequestPhoto = useCallback(() => {
@@ -297,11 +328,13 @@ export function useMaestroSessionLogic({
     );
     const evaluation = generateAutoEvaluation(questionCount.current, sessionDuration, xpEarned);
 
+    const realConversationId = getConversationId();
     try {
+      if (!realConversationId) throw new Error('No saved conversation');
       const response = await csrfFetch('/api/learnings/extract', {
         method: 'POST',
         body: JSON.stringify({
-          conversationId: `maestro-${maestro.id}-${Date.now()}`,
+          conversationId: realConversationId,
           maestroId: maestro.id,
           messages: messages.map((m) => ({ role: m.role, content: m.content })),
         }),
@@ -332,35 +365,104 @@ export function useMaestroSessionLogic({
       `${sessionDuration} minuti di studio, ${questionCount.current} domande fatte. Ottimo lavoro!`,
       { duration: 6000 },
     );
-  }, [voiceConnection, maestro.id, messages, addXP, endSession]);
+  }, [voiceConnection, maestro.id, messages, addXP, endSession, getConversationId]);
+
+  // Voice must never outlive the conversation or account it was started for.
+  const { isVoiceActive, disconnect: disconnectVoice, setIsVoiceActive } = voiceConnection;
+  const stopVoice = useCallback(() => {
+    if (!isVoiceActive) return;
+    disconnectVoice();
+    setIsVoiceActive(false);
+  }, [isVoiceActive, disconnectVoice, setIsVoiceActive]);
+  const stopVoiceRef = useRef(stopVoice);
+  useEffect(() => {
+    stopVoiceRef.current = stopVoice;
+  }, [stopVoice]);
+
+  // New chat or account change also drops any history response still in flight.
+  const cancelConversationLoadRef = useRef<() => void>(() => {});
 
   const clearChatWithReset = useCallback(() => {
+    cancelConversationLoadRef.current();
+    stopVoice();
     chatHandlers.clearChat();
+    resetConversation();
+    resetAttachments();
     questionCount.current = 0;
     setSessionEnded(false);
-  }, [chatHandlers]);
+  }, [chatHandlers, resetConversation, resetAttachments, stopVoice]);
 
-  // Load a specific conversation by ID from the server
-  const loadConversation = useCallback(async (conversationId: string) => {
-    try {
-      const res = await fetch(`/api/conversations/${conversationId}/messages`);
-      if (res.ok) {
-        const data = await res.json();
-        const loadedMessages: ChatMessage[] = data.map(
-          (m: { id: string; role: string; content: string; createdAt: string }) => ({
-            id: m.id,
-            role: m.role as 'user' | 'assistant',
-            content: m.content,
-            timestamp: new Date(m.createdAt),
-          }),
-        );
-        setMessages(loadedMessages);
-        setSessionEnded(false);
-      }
-    } catch (error) {
-      logger.error('Failed to load conversation', { conversationId }, error);
+  // Account switch or sign-out: abort pending work and drop messages, conversation and files.
+  useIdentityReset(() => clearChatWithReset());
+
+  const identity = useClientIdentity();
+  const accountId = identity.status === 'authenticated' ? identity.userId : null;
+  const t = useTranslations('chat');
+  const restoreStartedRef = useRef(false);
+  const restorePendingRef = useRef(false);
+
+  const showRestoreFailure = useCallback(() => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `restore-error-${Date.now()}`,
+        role: 'assistant',
+        content: t('attachments.errors.restore_failed'),
+        timestamp: new Date(),
+      },
+    ]);
+  }, [t]);
+
+  const { load: loadOwnedConversation, cancel: cancelConversationLoad } = useConversationLoader({
+    maestroId: maestro.id,
+    setMessages,
+    setSessionEnded,
+    stopVoice,
+    invalidateTurn: chatHandlers.invalidate,
+    resetAttachments,
+    adoptConversation,
+    restoreAttachments,
+    onFailure: showRestoreFailure,
+  });
+
+  useEffect(() => {
+    cancelConversationLoadRef.current = cancelConversationLoad;
+  }, [cancelConversationLoad]);
+
+  const loadConversation = useCallback(
+    (conversationId: string) => loadOwnedConversation(conversationId),
+    [loadOwnedConversation],
+  );
+
+  // Reload restores only a conversation this account owns, for this Maestro.
+  useEffect(() => {
+    if (identity.status !== 'authenticated' && identity.status !== 'anonymous') return;
+    if (restoreStartedRef.current) return;
+    restoreStartedRef.current = true;
+    const id = readConversationParam();
+    if (!id) return;
+    if (identity.status !== 'authenticated') {
+      writeConversationParam(null);
+      return;
     }
-  }, []);
+    restorePendingRef.current = true;
+    void loadOwnedConversation(id).then((ok) => {
+      restorePendingRef.current = false;
+      if (!ok) writeConversationParam(null);
+    });
+    return () => {
+      // Account switch while restoring: the URL id belonged to the previous account.
+      restorePendingRef.current = false;
+      cancelConversationLoad();
+      writeConversationParam(null);
+    };
+  }, [identity.status, accountId, loadOwnedConversation, cancelConversationLoad]);
+
+  // Mirror only real persisted ids in the URL; never wipe it while a restore is pending.
+  useEffect(() => {
+    if (conversation.conversationId) writeConversationParam(conversation.conversationId);
+    else if (!restorePendingRef.current) writeConversationParam(null);
+  }, [conversation.conversationId]);
 
   // Wrap webcam capture to also close the modal after processing.
   // When the capture was initiated by the assistant during a voice call, the
@@ -431,5 +533,6 @@ export function useMaestroSessionLogic({
     setShowWebcam,
     setWebcamRequest,
     loadConversation,
+    attachments,
   };
 }

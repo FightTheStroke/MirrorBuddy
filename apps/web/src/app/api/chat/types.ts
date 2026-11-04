@@ -1,6 +1,8 @@
 /**
  * Chat API types
  */
+import type { AttachmentDocument } from '@/lib/conversation/attachments/types';
+
 // Re-export SupportedLanguage from the shared types package to keep a
 // single source of truth for locale discrimination across the app and
 // shared packages. ChatMessage / ChatRequest stay here because the app
@@ -18,6 +20,8 @@ export interface ChatRequest {
   systemPrompt: string;
   maestroId: string;
   conversationId?: string; // Optional: for tool context injection
+  attachmentIds?: string[];
+  attachments?: AttachmentDocument[];
   enableTools?: boolean; // Optional: enable tool calling (default: true)
   enableMemory?: boolean; // Optional: enable conversation memory (default: true)
   requestedTool?:

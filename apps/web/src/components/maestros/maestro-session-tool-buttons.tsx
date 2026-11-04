@@ -11,10 +11,19 @@ import {
   GitBranch,
   Clock,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { useContainerWidth } from '@/components/conversation/hooks/use-container-width';
 
-type ToolType = 'mindmap' | 'quiz' | 'flashcards' | 'demo' | 'search' | 'summary' | 'diagram' | 'timeline';
+type ToolType =
+  | 'mindmap'
+  | 'quiz'
+  | 'flashcards'
+  | 'demo'
+  | 'search'
+  | 'summary'
+  | 'diagram'
+  | 'timeline';
 
 interface ToolButtonConfig {
   id: ToolType | 'photo';
@@ -37,68 +46,69 @@ export function MaestroSessionToolButtons({
   onRequestTool,
   onRequestPhoto,
 }: MaestroSessionToolButtonsProps) {
+  const t = useTranslations('chat');
   const toolButtons: ToolButtonConfig[] = [
     {
       id: 'photo',
       icon: Camera,
-      label: 'Foto',
-      title: 'Scatta foto',
+      label: t('tools.webcam.label'),
+      title: t('tools.webcam.tooltip'),
       onClick: onRequestPhoto,
     },
     {
       id: 'mindmap',
       icon: Brain,
-      label: 'Mappa',
-      title: 'Crea mappa mentale',
+      label: t('tools.mindmap.label'),
+      title: t('tools.mindmap.tooltip'),
       onClick: () => onRequestTool('mindmap'),
     },
     {
       id: 'quiz',
       icon: BookOpen,
-      label: 'Quiz',
-      title: 'Crea quiz',
+      label: t('tools.quiz.label'),
+      title: t('tools.quiz.tooltip'),
       onClick: () => onRequestTool('quiz'),
     },
     {
       id: 'demo',
       icon: Sparkles,
-      label: 'Demo',
-      title: 'Crea demo interattiva',
+      label: t('tools.demo.label'),
+      title: t('tools.demo.tooltip'),
       onClick: () => onRequestTool('demo'),
     },
     {
       id: 'flashcards',
       icon: Layers,
-      label: 'Flashcard',
-      title: 'Crea flashcard',
+      label: t('tools.flashcard.label'),
+      title: t('tools.flashcard.tooltip'),
       onClick: () => onRequestTool('flashcards'),
     },
     {
       id: 'search',
       icon: Search,
-      label: 'Cerca',
-      title: 'Cerca su web',
+      label: t('tools.search.label'),
+      title: t('tools.search.tooltip'),
       onClick: () => onRequestTool('search'),
     },
     {
       id: 'summary',
       icon: FileText,
-      label: 'Riassunto',
-      title: 'Crea riassunto',
+      label: t('tools.summary.label'),
+      title: t('tools.summary.tooltip'),
       onClick: () => onRequestTool('summary'),
     },
     {
       id: 'diagram',
       icon: GitBranch,
-      label: 'Diagramma',
-      title: 'Crea diagramma',
+      label: t('tools.diagram.label'),
+      title: t('tools.diagram.tooltip'),
       onClick: () => onRequestTool('diagram'),
     },
     {
       id: 'timeline',
       icon: Clock,
-      label: 'Timeline',
-      title: 'Crea linea temporale',
+      label: t('tools.timeline.label'),
+      title: t('tools.timeline.tooltip'),
       onClick: () => onRequestTool('timeline'),
     },
   ];
@@ -107,10 +117,7 @@ export function MaestroSessionToolButtons({
 
   return (
     <div className="w-full mb-2">
-      <div
-        ref={containerRef}
-        className="flex flex-wrap gap-1 justify-center items-center"
-      >
+      <div ref={containerRef} className="flex flex-wrap gap-1 justify-center items-center">
         {toolButtons.map((tool) => {
           const Icon = tool.icon;
           return (

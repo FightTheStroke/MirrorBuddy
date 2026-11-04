@@ -13,6 +13,7 @@ import { logger } from '@/lib/logger';
 import { ProcessedPage, ProcessedPDF, PDFProcessingError, PDFProcessOptions } from './pdf-types';
 import { isPDF, getPDFInfo, resizeImageToThumbnail } from './pdf-utils';
 import { PDF_WORKER_SRC } from './pdf-worker';
+import { MAX_PDF_PAGES } from './pdf-constants';
 
 export { isPDF, getPDFInfo };
 export { PDF_WORKER_SRC };
@@ -23,11 +24,7 @@ if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = PDF_WORKER_SRC;
 }
 
-/**
- * Maximum number of pages to process
- * Prevents overwhelming the Vision API with too many requests
- */
-export const MAX_PDF_PAGES = 5;
+export { MAX_PDF_PAGES };
 
 /**
  * Default rendering scale for high-quality output

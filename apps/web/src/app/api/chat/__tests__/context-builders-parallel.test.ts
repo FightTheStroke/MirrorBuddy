@@ -110,6 +110,36 @@ describe('chat vector retrievals run concurrently', () => {
     );
   });
 
+  it('does not mix account-wide student material into a document conversation', async () => {
+    mocks.resolveQueryEmbedding.mockResolvedValue([0.1]);
+    mocks.loadBatchedChatRetrieval.mockResolvedValue({
+      maestroKnowledge: '## Teacher knowledge',
+      rag: null,
+    });
+
+    const result = await buildAllContexts({
+      systemPrompt: 'BASE',
+      userId: 'u1',
+      maestroId: 'manzoni',
+      conversationId: 'conversation-1',
+      enableMemory: true,
+      hasAttachments: true,
+      lastUserMessage: 'Summarize these pages',
+    });
+
+    expect(mocks.loadBatchedChatRetrieval).toHaveBeenCalledExactlyOnceWith(
+      undefined,
+      'manzoni',
+      [0.1],
+    );
+    expect(mocks.findSimilarMaterials).not.toHaveBeenCalled();
+    expect(mocks.findRelatedConcepts).not.toHaveBeenCalled();
+    expect(result.hasMemory).toBe(false);
+    expect(result.hasToolContext).toBe(false);
+    expect(result.ragResultsForTransparency).toEqual([]);
+    expect(result.enhancedPrompt).toContain('Teacher knowledge');
+  });
+
   it('keeps the prompt unchanged when a retrieval fails', async () => {
     mocks.findSimilarMaterials.mockRejectedValue(new Error('db down'));
     mocks.findRelatedConcepts.mockResolvedValue([]);

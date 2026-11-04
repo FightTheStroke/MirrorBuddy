@@ -48,6 +48,21 @@ const createMockSession = (overrides = {}) => ({
   handleRequestPhoto: vi.fn(),
   setShowWebcam: vi.fn(),
   setWebcamRequest: vi.fn(),
+  attachments: {
+    items: [],
+    readyDocs: [],
+    busy: false,
+    announcement: null,
+    consentOpen: false,
+    pickFiles: vi.fn(),
+    confirmConsent: vi.fn(),
+    declineConsent: vi.fn(),
+    cancel: vi.fn(),
+    retry: vi.fn(),
+    remove: vi.fn(),
+    restore: vi.fn(),
+    reset: vi.fn(),
+  },
   loadConversation: vi.fn(),
   ...overrides,
 });
@@ -207,6 +222,15 @@ describe('Character Parity - TTS/Voice/Handoff', () => {
       // In a real implementation, TTS would be triggered on message arrival
       // This test verifies the TTS hook is available and configured
       expect(mockSpeak).toBeDefined();
+    });
+  });
+
+  describe('Attachments', () => {
+    it('exposes the file picker in the unified maestro conversation', () => {
+      render(
+        <MaestroConversationAdapter maestro={mockMaestro} config={baseConfig} onClose={vi.fn()} />,
+      );
+      expect(screen.getByTestId('attachment-file-input')).toBeInTheDocument();
     });
   });
 

@@ -57,6 +57,14 @@
       "webcam": {
         "label": "Photo",
         "tooltip": "Prendre une photo"
+      },
+      "diagram": {
+        "label": "Diagramme",
+        "tooltip": "Créer un diagramme"
+      },
+      "timeline": {
+        "label": "Frise",
+        "tooltip": "Créer une frise chronologique"
       }
     },
     "history": {
@@ -555,6 +563,52 @@
       "general": "Salut ! Je suis {coach}, ton coach d'étude. Avant de commencer, dis-moi : quelle matière veux-tu travailler, que veux-tu faire et combien de temps as-tu ? Ensuite je te présente le bon Maestro. 😊",
       "withSubject": "Salut ! Je suis {coach}, ton coach d'étude. Aujourd'hui on travaille sur {subject} : je te présente tout de suite le bon Maestro ! 😊"
     },
-    "fraseDelMaestro": "Phrase du maître"
+    "fraseDelMaestro": "Phrase du maître",
+    "attachments": {
+      "attach": "Joindre un fichier",
+      "hint": "Joignez un PDF, JPEG, PNG ou WebP (10 Mo max ; PDF jusqu'à {pages} pages). Les fichiers sont utilisés dans le chat texte.",
+      "listLabel": "Fichiers joints",
+      "cancel": "Annuler",
+      "cancelLabel": "Annuler la lecture de {name}",
+      "retry": "Réessayer",
+      "retryLabel": "Réessayer avec {name}",
+      "removeLabel": "Retirer {name}",
+      "status": {
+        "reading": "Lecture en cours…",
+        "progress": "Page {done} sur {total}",
+        "saving": "Préparation du fichier pour le chat…",
+        "ready": "Prêt à être utilisé dans le chat",
+        "partial": "Prêt, mais {count, plural, one {# page sans texte lisible ne sera pas utilisée} other {# pages sans texte lisible ne seront pas utilisées}}",
+        "removing": "Suppression en cours…"
+      },
+      "errors": {
+        "unsupported": "Format non pris en charge. Utilisez PDF, JPEG, PNG ou WebP.",
+        "encrypted": "Ce PDF est protégé par mot de passe : je ne peux pas le lire.",
+        "unreadable": "Je ne peux pas lire ce fichier.",
+        "too_large": "Le fichier dépasse 10 Mo.",
+        "too_many_pages": "Ce PDF a trop de pages : 5 au maximum.",
+        "no_text": "Je n'ai trouvé aucun texte lisible dans le fichier.",
+        "ocr_failed": "Je n'ai pas pu lire les pages numérisées. Réessayez.",
+        "remove_failed": "Je n'ai pas pu retirer le fichier. Réessayez.",
+        "generic": "Une erreur s'est produite. Réessayez.",
+        "context_too_large": "Le fichier est trop long pour cette conversation. Retirez-le ou joignez-en un plus court, puis réessayez.",
+        "conversation_failed": "Je n'ai pas pu enregistrer la conversation, le fichier n'a donc pas été utilisé. Réessayez bientôt.",
+        "restore_failed": "Je n'ai pas pu récupérer les fichiers de cette conversation. Réessayez."
+      },
+      "announce": {
+        "reading": "Lecture de {name} commencée",
+        "ready": "{name} est prêt à être utilisé dans le chat",
+        "removed": "{name} retiré",
+        "cancelled": "Lecture de {name} annulée"
+      },
+      "consent": {
+        "title": "Utiliser ce fichier dans le chat ?",
+        "body": "Le texte du fichier et les images des pages numérisées ou des photos sont envoyés à l'IA pour analyse.",
+        "storage": "Avec un compte, le texte extrait est enregistré avec le chat ; sans compte, il ne reste que tant que la session est ouverte. Le fichier d'origine n'est pas envoyé.",
+        "confirm": "Utiliser dans le chat",
+        "decline": "Annuler"
+      },
+      "voiceUnavailable": "Pour discuter des fichiers joints, utilisez le chat texte. Retirez-les pour démarrer un appel vocal."
+    }
   }
 }

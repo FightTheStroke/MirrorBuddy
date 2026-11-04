@@ -38,6 +38,7 @@ interface ContextOptions {
   maestroId?: string;
   conversationId?: string;
   enableMemory?: boolean;
+  hasAttachments?: boolean;
   lastUserMessage?: string;
   adaptiveDifficultyMode?: string | null;
   requestedTool?: string;
@@ -302,7 +303,11 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
 
   // Batch the three corpora in one database call, then apply them in prompt order.
   const batchPending = queryEmbedding
-    ? loadBatchedChatRetrieval(options.userId, options.maestroId, queryEmbedding)
+    ? loadBatchedChatRetrieval(
+        options.hasAttachments ? undefined : options.userId,
+        options.maestroId,
+        queryEmbedding,
+      )
     : undefined;
   const maestroKnowledgePending = batchPending
     ? batchPending.then((loaded) => loaded.maestroKnowledge)
@@ -311,12 +316,12 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
       : undefined;
   const ragPending = batchPending
     ? batchPending.then((loaded) => loaded.rag)
-    : options.userId && options.lastUserMessage
+    : !options.hasAttachments && options.userId && options.lastUserMessage
       ? loadRAGResults(options.userId, options.lastUserMessage)
       : undefined;
 
   // Memory context
-  if (options.enableMemory && options.userId && options.maestroId) {
+  if (!options.hasAttachments && options.enableMemory && options.userId && options.maestroId) {
     const memoryResult = await injectMemoryContext(
       enhancedPrompt,
       options.userId,
@@ -337,7 +342,7 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
   }
 
   // Tool context
-  if (options.userId && options.conversationId) {
+  if (!options.hasAttachments && options.userId && options.conversationId) {
     const toolResult = await injectToolContextData(
       enhancedPrompt,
       options.userId,
@@ -348,7 +353,7 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
   }
 
   // RAG context
-  if (options.userId && ragPending) {
+  if (!options.hasAttachments && options.userId && ragPending) {
     const ragResult = applyRAGResults(enhancedPrompt, options.userId, await ragPending);
     enhancedPrompt = ragResult.enhancedPrompt;
     hasRAG = ragResult.hasRAG;

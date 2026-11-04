@@ -5,10 +5,11 @@
  * Exports all user data in machine-readable JSON format
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { CONVERSATION_ATTACHMENT_TOOL_TYPE } from '@/lib/conversation/attachments/types';
 
-const log = logger.child({ module: "gdpr-export" });
+const log = logger.child({ module: 'gdpr-export' });
 
 export interface UserDataExport {
   exportedAt: string;
@@ -45,6 +46,12 @@ export interface UserDataExport {
     role: string;
     content: string;
     tokenCount?: number;
+    createdAt: string;
+  }>;
+  conversationAttachments: Array<{
+    id: string;
+    conversationId: string;
+    derivedData: unknown;
     createdAt: string;
   }>;
   learningProgress: {
@@ -129,7 +136,7 @@ export async function canUserExport(userId: string): Promise<boolean> {
     const recentExport = await prisma.complianceAuditEntry.findFirst({
       where: {
         userId,
-        eventType: "data_export",
+        eventType: 'data_export',
         createdAt: {
           gte: oneHourAgo,
         },
@@ -138,7 +145,7 @@ export async function canUserExport(userId: string): Promise<boolean> {
 
     return !recentExport;
   } catch (err) {
-    log.warn("Rate limit check failed, allowing export", {
+    log.warn('Rate limit check failed, allowing export', {
       error: String(err),
     });
     return true;
@@ -168,17 +175,18 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
       gamification,
       tosAcceptances,
       privacyPreferences,
+      attachmentRows,
     ] = await Promise.all([
       prisma.user.findUniqueOrThrow({ where: { id: userId } }),
       prisma.profile.findUnique({ where: { userId } }),
       prisma.settings.findUnique({ where: { userId } }),
       prisma.conversation.findMany({
         where: { userId },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
       }),
       prisma.message.findMany({
         where: { conversation: { userId } },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
       }),
       prisma.progress.findUnique({ where: { userId } }),
       prisma.flashcardProgress.findMany({
@@ -186,23 +194,30 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
       }),
       prisma.quizResult.findMany({
         where: { userId },
-        orderBy: { completedAt: "desc" },
+        orderBy: { completedAt: 'desc' },
       }),
       prisma.studySession.findMany({
         where: { userId },
-        orderBy: { startedAt: "desc" },
+        orderBy: { startedAt: 'desc' },
       }),
       prisma.learning.findMany({
         where: { userId },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
       }),
       prisma.accessibilitySettings.findUnique({ where: { userId } }),
       prisma.userGamification.findUnique({ where: { userId } }),
       prisma.tosAcceptance.findMany({
         where: { userId },
-        orderBy: { acceptedAt: "desc" },
+        orderBy: { acceptedAt: 'desc' },
       }),
       prisma.userPrivacyPreferences.findUnique({ where: { userId } }),
+      prisma.toolOutput.findMany({
+        where: {
+          toolType: CONVERSATION_ATTACHMENT_TOOL_TYPE,
+          conversation: { userId },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
     ]);
 
     // Build flashcard summary
@@ -257,6 +272,12 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
         content: m.content,
         tokenCount: m.tokenCount || undefined,
         createdAt: m.createdAt.toISOString(),
+      })),
+      conversationAttachments: attachmentRows.map((a) => ({
+        id: a.id,
+        conversationId: a.conversationId,
+        derivedData: parseJSON(a.data),
+        createdAt: a.createdAt.toISOString(),
       })),
       learningProgress: {
         level: progress?.level || 1,
@@ -319,7 +340,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
       },
     };
 
-    log.info("User data exported successfully", {
+    log.info('User data exported successfully', {
       userId: userId.slice(0, 8),
       messageCount: messages.length,
       conversationCount: conversations.length,
@@ -327,7 +348,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
 
     return export_data;
   } catch (err) {
-    log.error("Failed to export user data", {
+    log.error('Failed to export user data', {
       error: String(err),
       userId: userId.slice(0, 8),
     });
@@ -343,16 +364,16 @@ export async function logExportAudit(userId: string): Promise<void> {
     await prisma.complianceAuditEntry.create({
       data: {
         userId,
-        eventType: "data_export",
-        severity: "info",
-        description: "User requested complete data export (GDPR Art. 20)",
+        eventType: 'data_export',
+        severity: 'info',
+        description: 'User requested complete data export (GDPR Art. 20)',
         details: JSON.stringify({
           exportedAt: new Date().toISOString(),
         }),
       },
     });
   } catch (err) {
-    log.error("Failed to log export audit", {
+    log.error('Failed to log export audit', {
       error: String(err),
       userId: userId.slice(0, 8),
     });
@@ -390,7 +411,7 @@ export async function getExportStats(userId: string): Promise<ExportStats> {
       learningCount,
     };
   } catch (err) {
-    log.error("Failed to get export stats", {
+    log.error('Failed to get export stats', {
       error: String(err),
       userId: userId.slice(0, 8),
     });

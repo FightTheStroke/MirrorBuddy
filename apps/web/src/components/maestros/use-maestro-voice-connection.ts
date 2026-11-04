@@ -18,6 +18,7 @@ interface UseMaestroVoiceConnectionProps {
   onQuestionAsked: () => void;
   /** Current messages to provide context when starting voice */
   currentMessages?: ChatMessage[];
+  attachmentsActive?: boolean;
   /**
    * Called when the assistant requests a webcam capture (capture_homework tool)
    * during a voice call. Without this, the realtime model would wait forever for
@@ -32,9 +33,11 @@ export function useMaestroVoiceConnection({
   onTranscript,
   onQuestionAsked,
   currentMessages = [],
+  attachmentsActive = false,
   onWebcamRequest,
 }: UseMaestroVoiceConnectionProps) {
   const t = useTranslations('voice');
+  const tChat = useTranslations('chat');
   const [isVoiceActive, setIsVoiceActive] = useState(initialMode === 'voice');
   const [configError, setConfigError] = useState<string | null>(null);
   const showTransientNotice = useTransientVoiceNotice(setConfigError);
@@ -158,7 +161,8 @@ export function useMaestroVoiceConnection({
 
   // Connect voice when activated
   useEffect(() => {
-    if (!isVoiceActive || !connectionInfo || connectionState !== 'idle') return;
+    if (!isVoiceActive || attachmentsActive || !connectionInfo || connectionState !== 'idle')
+      return;
 
     const startVoice = async () => {
       setConfigError(null);
@@ -191,6 +195,7 @@ export function useMaestroVoiceConnection({
     startVoice();
   }, [
     isVoiceActive,
+    attachmentsActive,
     connectionInfo,
     connectionState,
     maestro,
@@ -200,9 +205,13 @@ export function useMaestroVoiceConnection({
   ]);
 
   const handleVoiceCall = useCallback(() => {
+    if (!isVoiceActive && attachmentsActive) {
+      showTransientNotice(tChat('attachments.voiceUnavailable'));
+      return;
+    }
     if (isVoiceActive) disconnect();
     setIsVoiceActive((prev) => !prev);
-  }, [isVoiceActive, disconnect]);
+  }, [isVoiceActive, attachmentsActive, disconnect, showTransientNotice, tChat]);
 
   return {
     isVoiceActive,
