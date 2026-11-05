@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.44.1] - 2026-11-05
+
+### Fixed
+
+- Collect mandatory tagged-release evidence after successful deployment checks,
+  even when optional ancestor jobs are skipped; still require a successful gate
+  and respect workflow cancellation.
+
 ## [0.44.0] - 2026-11-04
+
+Tagged and deployed, but not published as a GitHub release because the mandatory
+tag-evidence job was skipped. The original tag is retained unchanged.
 
 ### Added
 

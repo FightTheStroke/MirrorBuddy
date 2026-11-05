@@ -165,7 +165,10 @@ test('tagged workflow only collects metadata with read permissions and strict ar
   const evidence = workflow.split('\n  release-evidence-pack:')[1]?.split(/\n {2}[\w-]+:/)[0];
   assert.ok(evidence);
   assert.match(evidence, /needs: \[deployment-gate\]/);
-  assert.match(evidence, /if: startsWith\(github.ref, 'refs\/tags\/v'\)/);
+  assert.match(
+    evidence,
+    /if: >-\n\s+!cancelled\(\) &&\n\s+needs\.deployment-gate\.result == 'success' &&\n\s+startsWith\(github.ref, 'refs\/tags\/v'\)/,
+  );
   assert.match(evidence, /contents: read\n\s+actions: read/);
   assert.match(evidence, /GH_TOKEN: \$\{\{ secrets.GITHUB_TOKEN \}\}/);
   assert.match(evidence, /run: node scripts\/collect-ci-evidence.mjs/);
