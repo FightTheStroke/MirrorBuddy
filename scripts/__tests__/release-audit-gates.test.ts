@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -7,10 +7,160 @@ import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
 import { z } from 'zod';
 import { policyTestDatabaseEnabled } from '../../apps/web/src/test/policy-test-environment';
+import { browserProgress, browserStartupStage } from '../lib/release-evidence-progress.mjs';
 
 const script = (name: string) => readFileSync(new URL(`../${name}`, import.meta.url), 'utf8');
 
+describe('private native browser progress', () => {
+  it('distinguishes browser startup from owner setup without exposing logged payloads', () => {
+    expect(browserStartupStage('> mirrorbuddy@0.44.0 pretest\nPRIVATE')).toBe(7);
+    expect(browserStartupStage('Checking PostgreSQL status... PRIVATE')).toBe(8);
+    expect(browserStartupStage("Checking test database 'PRIVATE'...")).toBe(9);
+    expect(browserStartupStage('Checking pgvector extension... PRIVATE')).toBe(10);
+    expect(browserStartupStage('playwright test\nPRIVATE')).toBe(1);
+    expect(browserStartupStage('[WebServer] PRIVATE')).toBe(2);
+    expect(browserStartupStage('Production guards passed. PRIVATE')).toBe(3);
+    expect(browserStartupStage('Test user created in database: PRIVATE')).toBe(4);
+    expect(browserStartupStage('Global setup complete: PRIVATE')).toBe(5);
+    expect(browserStartupStage('Running 742 tests using 4 workers')).toBe(6);
+  });
+  it('reports the last completed source position without exposing titles or diagnostic data', () => {
+    const text = [
+      'PRIVATE_ENVIRONMENT_VALUE',
+      '  ✓  1 [chromium] › a.spec.ts:7:2 › PRIVATE_TITLE (1.0s)',
+      '\u001b[31m  ✘  3 [a11y] › nested/b.spec.ts:19:4 › PRIVATE_EMAIL\u001b[0m',
+      'PRIVATE_ERROR_AND_TOKEN',
+    ].join('\n');
+    expect(
+      browserProgress(text, ['apps/web/e2e/nested/b.spec.ts', 'apps/web/e2e/a.spec.ts']),
+    ).toEqual({ completed: 3, file: 2, line: 19 });
+  });
+  it('does not trust an untracked source path or an incomplete reporter line', () => {
+    expect(
+      browserProgress('  ✓  9 [chromium] › ../../private.spec.ts:42:1 › PRIVATE_TITLE', [
+        'apps/web/e2e/a.spec.ts',
+      ]),
+    ).toEqual({ completed: 9, file: 0, line: 0 });
+    expect(browserProgress('  ✓  4 [chromium] › a.spec.ts:7', [])).toEqual({
+      completed: 0,
+      file: 0,
+      line: 0,
+    });
+  });
+  it('emits only numeric progress while the private browser log is still being written', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'native-private-progress-'));
+    try {
+      writeFileSync(join(directory, 'format.json'), '{"format":"mirrorbuddy-native-release-v1"}');
+      writeFileSync(
+        join(directory, 'e2e.log'),
+        '  ✓  1 [chromium] › production-smoke/03-chat.spec.ts:7:2 › PRIVATE_TITLE\nPRIVATE_TOKEN',
+        { mode: 0o600 },
+      );
+      const result = spawnSync(
+        process.execPath,
+        [new URL('../lib/release-evidence-progress.mjs', import.meta.url).pathname, directory],
+        { encoding: 'utf8' },
+      );
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+      expect(result.stdout).toMatch(
+        /^__NATIVE_PROGRESS__ kind=3 bytes=\d+ completed=1 file=[1-9]\d* line=7 stage=0 class=0 silent=\d+\n$/,
+      );
+      expect(result.stdout).not.toContain('PRIVATE');
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+  it('rejects a browser startup that has produced no progress for ten minutes', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'native-private-stall-'));
+    try {
+      writeFileSync(join(directory, 'format.json'), '{"format":"mirrorbuddy-native-release-v1"}');
+      const log = join(directory, 'e2e.log');
+      writeFileSync(log, 'Production guards passed. PRIVATE_DATABASE_VALUE', { mode: 0o600 });
+      const past = new Date(Date.now() - 601000);
+      utimesSync(log, past, past);
+      const result = spawnSync(
+        process.execPath,
+        [new URL('../lib/release-evidence-progress.mjs', import.meta.url).pathname, directory],
+        { encoding: 'utf8' },
+      );
+      expect(result.status).toBe(1);
+      expect(result.stderr).toBe('__NATIVE_STALL__ kind=3 stage=3\n');
+      expect(result.stdout).toMatch(/stage=3 class=0 silent=60[12]\n$/);
+      expect(result.stdout + result.stderr).not.toContain('PRIVATE');
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+  it.each([0, 42])('preserves release gate exit code %i while reporting progress', (code) => {
+    const workflow = parse(
+      readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8'),
+    );
+    const command = z
+      .object({ name: z.literal('Run native release gate'), run: z.string() })
+      .parse(
+        workflow.jobs['release-validation'].steps.find(
+          (step: { name?: string }) => step.name === 'Run native release gate',
+        ),
+      ).run;
+    const result = spawnSync(
+      'bash',
+      [
+        '-e',
+        '-c',
+        `npm() { return ${code}; }\nnode() { return 0; }\nsleep() { return 0; }\n${command}`,
+      ],
+      { encoding: 'utf8', timeout: 5000 },
+    );
+    expect(result.status).toBe(code);
+  });
+});
+
 describe('release audit checks the build that can actually ship', () => {
+  it.each([true, false])(
+    'keeps database preflight noninteractive (valid credentials: %s)',
+    (valid) => {
+      const directory = mkdtempSync(join(tmpdir(), 'native-db-preflight-'));
+      try {
+        const workflow = parse(
+          readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8'),
+        ).jobs['release-validation'];
+        const credentials = workflow.services.postgres.env;
+        writeFileSync(join(directory, 'pg_isready'), '#!/bin/sh\nexit 0\n', { mode: 0o700 });
+        writeFileSync(join(directory, 'createdb'), '#!/bin/sh\nexit 92\n', { mode: 0o700 });
+        writeFileSync(
+          join(directory, 'psql'),
+          `#!/bin/sh
+[ "$PGUSER" = "$EXPECTED_USER" ] && [ "$PGPASSWORD" = "$EXPECTED_PASSWORD" ] || exit 90
+case " $* " in *" -w "*) ;; *) exit 91 ;; esac
+case "$*" in *-lqt*) echo "$EXPECTED_DB" ;; *pg_extension*) echo 1 ;; *) exit 93 ;; esac
+`,
+          { mode: 0o700 },
+        );
+        const source = script('ensure-test-db.sh').replaceAll(
+          '/opt/homebrew/opt/postgresql@17/bin/',
+          `${directory}/`,
+        );
+        writeFileSync(join(directory, 'check.sh'), source);
+        const result = spawnSync('bash', [join(directory, 'check.sh'), '--check'], {
+          encoding: 'utf8',
+          timeout: 5000,
+          env: {
+            ...process.env,
+            ...workflow.env,
+            ...(valid ? {} : { PGPASSWORD: '' }),
+            EXPECTED_USER: credentials.POSTGRES_USER,
+            EXPECTED_PASSWORD: credentials.POSTGRES_PASSWORD,
+            EXPECTED_DB: credentials.POSTGRES_DB,
+          },
+        });
+        expect(result.status).toBe(valid ? 0 : 1);
+        expect(result.stderr).toBe('');
+      } finally {
+        rmSync(directory, { recursive: true, force: true });
+      }
+    },
+  );
   it('lets native discovery collect the real database suites using one isolated target', () => {
     const workflow = parse(
       readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8'),

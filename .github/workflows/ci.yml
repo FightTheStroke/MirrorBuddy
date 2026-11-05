@@ -2959,6 +2959,8 @@ jobs:
           --health-retries 5
     env:
       CI: 'true'
+      PGUSER: postgres
+      PGPASSWORD: postgres
       DEV_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
       DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
@@ -3007,7 +3009,14 @@ jobs:
       - name: Run native release gate
         run: |
           umask 077
-          npm run release:gate -- --evidence-dir "$RUNNER_TEMP/attachment-release-evidence"
+          npm run release:gate -- --evidence-dir "$RUNNER_TEMP/attachment-release-evidence" &
+          gate_pid=$!
+          trap 'kill "$gate_pid" 2>/dev/null || true' EXIT
+          while kill -0 "$gate_pid" 2>/dev/null; do
+            node scripts/lib/release-evidence-progress.mjs "$RUNNER_TEMP/attachment-release-evidence"
+            sleep 60
+          done
+          wait "$gate_pid"
       - name: Report bounded native failure diagnostics
         if: failure()
         run: |
