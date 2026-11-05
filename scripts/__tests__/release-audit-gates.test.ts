@@ -117,6 +117,50 @@ describe('private native browser progress', () => {
 });
 
 describe('release audit checks the build that can actually ship', () => {
+  it.each([true, false])(
+    'keeps database preflight noninteractive (valid credentials: %s)',
+    (valid) => {
+      const directory = mkdtempSync(join(tmpdir(), 'native-db-preflight-'));
+      try {
+        const workflow = parse(
+          readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8'),
+        ).jobs['release-validation'];
+        const credentials = workflow.services.postgres.env;
+        writeFileSync(join(directory, 'pg_isready'), '#!/bin/sh\nexit 0\n', { mode: 0o700 });
+        writeFileSync(join(directory, 'createdb'), '#!/bin/sh\nexit 92\n', { mode: 0o700 });
+        writeFileSync(
+          join(directory, 'psql'),
+          `#!/bin/sh
+[ "$PGUSER" = "$EXPECTED_USER" ] && [ "$PGPASSWORD" = "$EXPECTED_PASSWORD" ] || exit 90
+case " $* " in *" -w "*) ;; *) exit 91 ;; esac
+case "$*" in *-lqt*) echo "$EXPECTED_DB" ;; *pg_extension*) echo 1 ;; *) exit 93 ;; esac
+`,
+          { mode: 0o700 },
+        );
+        const source = script('ensure-test-db.sh').replaceAll(
+          '/opt/homebrew/opt/postgresql@17/bin/',
+          `${directory}/`,
+        );
+        writeFileSync(join(directory, 'check.sh'), source);
+        const result = spawnSync('bash', [join(directory, 'check.sh'), '--check'], {
+          encoding: 'utf8',
+          timeout: 5000,
+          env: {
+            ...process.env,
+            ...workflow.env,
+            ...(valid ? {} : { PGPASSWORD: '' }),
+            EXPECTED_USER: credentials.POSTGRES_USER,
+            EXPECTED_PASSWORD: credentials.POSTGRES_PASSWORD,
+            EXPECTED_DB: credentials.POSTGRES_DB,
+          },
+        });
+        expect(result.status).toBe(valid ? 0 : 1);
+        expect(result.stderr).toBe('');
+      } finally {
+        rmSync(directory, { recursive: true, force: true });
+      }
+    },
+  );
   it('lets native discovery collect the real database suites using one isolated target', () => {
     const workflow = parse(
       readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8'),

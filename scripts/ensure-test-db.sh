@@ -106,11 +106,11 @@ if [[ ! -x "$PSQL" ]]; then
 fi
 
 # Check if database exists
-if $PSQL -h "$TEST_DB_HOST" -p "$TEST_DB_PORT" -lqt 2>/dev/null | cut -d \| -f 1 | grep -qw "$TEST_DB_NAME"; then
+if $PSQL -w -h "$TEST_DB_HOST" -p "$TEST_DB_PORT" -lqt 2>/dev/null | cut -d \| -f 1 | grep -qw "$TEST_DB_NAME"; then
 	echo -e "${GREEN}✓ Test database '$TEST_DB_NAME' exists${NC}"
 else
 	echo "Creating test database '$TEST_DB_NAME'..."
-	if $CREATEDB -h "$TEST_DB_HOST" -p "$TEST_DB_PORT" "$TEST_DB_NAME" 2>/dev/null; then
+	if $CREATEDB -w -h "$TEST_DB_HOST" -p "$TEST_DB_PORT" "$TEST_DB_NAME" 2>/dev/null; then
 		echo -e "${GREEN}✓ Test database created${NC}"
 
 		# Run migrations on new database
@@ -128,11 +128,11 @@ fi
 
 # Verify pgvector extension
 echo "Checking pgvector extension..."
-if $PSQL -h "$TEST_DB_HOST" -p "$TEST_DB_PORT" -d "$TEST_DB_NAME" -tAc "SELECT 1 FROM pg_extension WHERE extname='vector'" 2>/dev/null | grep -q 1; then
+if $PSQL -w -h "$TEST_DB_HOST" -p "$TEST_DB_PORT" -d "$TEST_DB_NAME" -tAc "SELECT 1 FROM pg_extension WHERE extname='vector'" 2>/dev/null | grep -q 1; then
 	echo -e "${GREEN}✓ pgvector extension installed${NC}"
 else
 	echo "Installing pgvector extension..."
-	$PSQL -h "$TEST_DB_HOST" -p "$TEST_DB_PORT" -d "$TEST_DB_NAME" -c "CREATE EXTENSION IF NOT EXISTS vector" 2>/dev/null || true
+	$PSQL -w -h "$TEST_DB_HOST" -p "$TEST_DB_PORT" -d "$TEST_DB_NAME" -c "CREATE EXTENSION IF NOT EXISTS vector" 2>/dev/null || true
 	echo -e "${GREEN}✓ pgvector extension installed${NC}"
 fi
 
