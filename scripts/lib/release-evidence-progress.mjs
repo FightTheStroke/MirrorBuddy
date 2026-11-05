@@ -4,6 +4,22 @@ import { closeSync, fstatSync, openSync, readSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { artifact, evidenceDirectory, root } from './release-evidence-store.mjs';
+import { classifyScopeFailure } from './release-evidence-scope-diagnostics.mjs';
+
+export function browserStartupStage(text) {
+  const stages = [
+    /playwright test/,
+    /\[WebServer\]/,
+    /Production guards passed/,
+    /Test user created in database:/,
+    /Global setup complete:/,
+    /Running \d+ tests? using \d+ workers?/,
+  ];
+  return stages.reduce(
+    (stage, pattern, index) => (pattern.test(text ?? '') ? index + 1 : stage),
+    0,
+  );
+}
 
 export function browserProgress(text, tracked) {
   const files = [...new Set(tracked)].filter((file) => file.startsWith('apps/web/e2e/')).sort();
@@ -48,6 +64,8 @@ function progress(input) {
     }
   }
   let bytes = 0;
+  let stage = 0;
+  let category = 0;
   let position = { completed: 0, file: 0, line: 0 };
   if (latest) {
     const descriptor = openSync(latest.file, 'r');
@@ -62,15 +80,23 @@ function progress(input) {
           timeout: 5000,
           maxBuffer: 8 * 1024 * 1024,
         }).split('\0');
-        position = browserProgress(buffer.subarray(0, length).toString('utf8'), tracked);
+        const text = buffer.subarray(0, length).toString('utf8');
+        position = browserProgress(text, tracked);
+        stage = browserStartupStage(text);
+        category = classifyScopeFailure(text, root).category;
       }
     } finally {
       closeSync(descriptor);
     }
   }
+  const silent = latest ? Math.max(0, Math.floor((Date.now() - latest.modified) / 1000)) : 0;
   console.log(
-    `__NATIVE_PROGRESS__ kind=${latest?.kind ?? 0} bytes=${bytes} completed=${position.completed} file=${position.file} line=${position.line}`,
+    `__NATIVE_PROGRESS__ kind=${latest?.kind ?? 0} bytes=${bytes} completed=${position.completed} file=${position.file} line=${position.line} stage=${stage} class=${category} silent=${silent}`,
   );
+  if (latest?.kind === 3 && !position.completed && silent >= 600) {
+    console.error(`__NATIVE_STALL__ kind=3 stage=${stage}`);
+    process.exitCode = 1;
+  }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

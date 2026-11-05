@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -7,11 +7,19 @@ import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
 import { z } from 'zod';
 import { policyTestDatabaseEnabled } from '../../apps/web/src/test/policy-test-environment';
-import { browserProgress } from '../lib/release-evidence-progress.mjs';
+import { browserProgress, browserStartupStage } from '../lib/release-evidence-progress.mjs';
 
 const script = (name: string) => readFileSync(new URL(`../${name}`, import.meta.url), 'utf8');
 
 describe('private native browser progress', () => {
+  it('distinguishes browser startup from owner setup without exposing logged payloads', () => {
+    expect(browserStartupStage('playwright test\nPRIVATE')).toBe(1);
+    expect(browserStartupStage('[WebServer] PRIVATE')).toBe(2);
+    expect(browserStartupStage('Production guards passed. PRIVATE')).toBe(3);
+    expect(browserStartupStage('Test user created in database: PRIVATE')).toBe(4);
+    expect(browserStartupStage('Global setup complete: PRIVATE')).toBe(5);
+    expect(browserStartupStage('Running 742 tests using 4 workers')).toBe(6);
+  });
   it('reports the last completed source position without exposing titles or diagnostic data', () => {
     const text = [
       'PRIVATE_ENVIRONMENT_VALUE',
@@ -52,9 +60,30 @@ describe('private native browser progress', () => {
       expect(result.status).toBe(0);
       expect(result.stderr).toBe('');
       expect(result.stdout).toMatch(
-        /^__NATIVE_PROGRESS__ kind=3 bytes=\d+ completed=1 file=[1-9]\d* line=7\n$/,
+        /^__NATIVE_PROGRESS__ kind=3 bytes=\d+ completed=1 file=[1-9]\d* line=7 stage=0 class=0 silent=\d+\n$/,
       );
       expect(result.stdout).not.toContain('PRIVATE');
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+  it('rejects a browser startup that has produced no progress for ten minutes', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'native-private-stall-'));
+    try {
+      writeFileSync(join(directory, 'format.json'), '{"format":"mirrorbuddy-native-release-v1"}');
+      const log = join(directory, 'e2e.log');
+      writeFileSync(log, 'Production guards passed. PRIVATE_DATABASE_VALUE', { mode: 0o600 });
+      const past = new Date(Date.now() - 601000);
+      utimesSync(log, past, past);
+      const result = spawnSync(
+        process.execPath,
+        [new URL('../lib/release-evidence-progress.mjs', import.meta.url).pathname, directory],
+        { encoding: 'utf8' },
+      );
+      expect(result.status).toBe(1);
+      expect(result.stderr).toBe('__NATIVE_STALL__ kind=3 stage=3\n');
+      expect(result.stdout).toMatch(/stage=3 class=0 silent=60[12]\n$/);
+      expect(result.stdout + result.stderr).not.toContain('PRIVATE');
     } finally {
       rmSync(directory, { recursive: true, force: true });
     }
