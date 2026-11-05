@@ -51,6 +51,7 @@ export function useMaestroSessionLogic({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isConversationLoading, setIsConversationLoading] = useState(false);
   const [toolCalls, setToolCalls] = useState<ToolCall[]>([]);
   const [showWebcam, setShowWebcam] = useState(false);
   const [webcamRequest, setWebcamRequest] = useState<{
@@ -157,6 +158,7 @@ export function useMaestroSessionLogic({
     onQuestionAsked,
     onTurnComplete: sessionMetrics.recordTurn,
     readyDocs: attachments.readyDocs,
+    attachmentsBusy: attachments.busy || isConversationLoading,
     ensureConversation,
     persistMessage,
   });
@@ -282,13 +284,22 @@ export function useMaestroSessionLogic({
 
   // Auto-trigger tool request when requestedToolType is present (from URL param)
   useEffect(() => {
-    if (!requestedToolType || hasAutoTriggeredRef.current) return;
-    hasAutoTriggeredRef.current = true;
+    if (
+      !requestedToolType ||
+      hasAutoTriggeredRef.current ||
+      attachments.busy ||
+      isConversationLoading ||
+      isLoading
+    )
+      return;
 
     // Webcam: open camera UI directly instead of setting text input
     if (requestedToolType === 'webcam') {
-      setTimeout(() => handleRequestPhoto(), 300);
-      return;
+      const timer = setTimeout(() => {
+        hasAutoTriggeredRef.current = true;
+        handleRequestPhoto();
+      }, 300);
+      return () => clearTimeout(timer);
     }
 
     const autoSubmitPrompts: Partial<Record<ToolType, string>> = {
@@ -305,9 +316,20 @@ export function useMaestroSessionLogic({
     const prompt = autoSubmitPrompts[requestedToolType];
     if (prompt) {
       // Auto-submit: send the prompt directly (bypasses input state timing)
-      setTimeout(() => chatHandlers.handleSubmit(undefined, prompt), 100);
+      const timer = setTimeout(() => {
+        hasAutoTriggeredRef.current = true;
+        void chatHandlers.handleSubmit(undefined, prompt);
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [requestedToolType, chatHandlers, handleRequestPhoto]);
+  }, [
+    requestedToolType,
+    chatHandlers,
+    handleRequestPhoto,
+    attachments.busy,
+    isConversationLoading,
+    isLoading,
+  ]);
 
   // Tools are now displayed inline in the chat instead of opening in fullscreen
   // Removed auto-switch to focus mode - tools remain integrated in the chat interface
@@ -423,6 +445,7 @@ export function useMaestroSessionLogic({
     adoptConversation,
     restoreAttachments,
     onFailure: showRestoreFailure,
+    onLoadingChange: setIsConversationLoading,
   });
 
   useEffect(() => {
@@ -501,7 +524,7 @@ export function useMaestroSessionLogic({
     messages,
     input,
     setInput,
-    isLoading,
+    isLoading: isLoading || isConversationLoading,
     toolCalls,
     showWebcam,
     webcamRequest,

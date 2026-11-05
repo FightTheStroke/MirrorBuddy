@@ -20,6 +20,7 @@ const deps = () => ({
   adoptConversation: vi.fn(),
   restoreAttachments: vi.fn(),
   onFailure: vi.fn(),
+  onLoadingChange: vi.fn(),
 });
 
 beforeEach(() => vi.stubGlobal('fetch', vi.fn()));
@@ -32,6 +33,8 @@ describe('useConversationLoader', () => {
     void result.current.load('c1');
     expect(d.stopVoice).toHaveBeenCalled();
     expect(d.invalidateTurn).toHaveBeenCalled();
+    expect(d.resetAttachments).toHaveBeenCalled();
+    expect(d.onLoadingChange).toHaveBeenLastCalledWith(true);
     expect(d.setMessages).not.toHaveBeenCalled();
   });
 
@@ -43,6 +46,31 @@ describe('useConversationLoader', () => {
     expect(d.adoptConversation).toHaveBeenCalledWith('c1');
     expect(d.restoreAttachments).toHaveBeenCalledWith('c1');
     expect(d.onFailure).not.toHaveBeenCalled();
+    expect(d.onLoadingChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it('keeps interactions blocked until its documents finish restoring', async () => {
+    const d = deps();
+    let restored!: () => void;
+    d.restoreAttachments.mockReturnValue(
+      new Promise<void>((resolve) => {
+        restored = resolve;
+      }),
+    );
+    vi.mocked(fetch).mockResolvedValue(response(conversation()) as never);
+    const { result } = renderHook(() => useConversationLoader(d));
+    let pending!: Promise<boolean>;
+    await act(async () => {
+      pending = result.current.load('c1');
+      await Promise.resolve();
+    });
+    expect(d.adoptConversation).toHaveBeenCalledWith('c1');
+    expect(d.onLoadingChange).toHaveBeenLastCalledWith(true);
+    await act(async () => {
+      restored();
+      expect(await pending).toBe(true);
+    });
+    expect(d.onLoadingChange).toHaveBeenLastCalledWith(false);
   });
 
   it.each([
@@ -82,6 +110,7 @@ describe('useConversationLoader', () => {
     expect(d.setMessages).not.toHaveBeenCalled();
     expect(d.adoptConversation).not.toHaveBeenCalled();
     expect(d.onFailure).not.toHaveBeenCalled();
+    expect(d.onLoadingChange).toHaveBeenLastCalledWith(false);
   });
 
   it('a newer selection supersedes an older slow one', async () => {

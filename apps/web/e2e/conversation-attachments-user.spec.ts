@@ -23,6 +23,76 @@ async function consent(page: Page) {
 }
 
 test.describe('PDF attachments as a student uses them', () => {
+  test('Enter cannot submit a question before its PDF finishes saving', async ({ page }) => {
+    let releaseSave!: () => void;
+    const saving = new Promise<void>((resolve) => {
+      releaseSave = resolve;
+    });
+    const submitted: Array<{ attachmentIds?: string[] }> = [];
+    await page.route('**/api/conversations/*/attachments', async (route) => {
+      if (route.request().method() === 'POST') await saving;
+      await route.continue();
+    });
+    await page.route('**/api/chat', async (route) => {
+      submitted.push(route.request().postDataJSON());
+      await route.fulfill({ json: { content: 'Synthetic provider response.' } });
+    });
+    try {
+      await openConversation(page);
+      await choosePdf(page, 'Slow.pdf', twoPagePdf());
+      await consent(page);
+      await expect(page.getByText(labels.status.saving, { exact: true })).toBeVisible();
+      await page.locator('textarea').fill('Spiega il documento');
+      await page.locator('textarea').press('Enter');
+      await expect(page.locator('textarea')).toHaveValue('Spiega il documento');
+      expect(submitted).toHaveLength(0);
+      releaseSave();
+      await expect(page.getByText(labels.status.ready, { exact: true })).toBeVisible();
+      await page.locator('textarea').press('Enter');
+      await expect.poll(() => submitted.length).toBe(1);
+      expect(submitted[0].attachmentIds).toHaveLength(1);
+    } finally {
+      releaseSave();
+    }
+  });
+
+  test('waits for history before accepting another PDF or a question', async ({ page }) => {
+    await openConversation(page);
+    await choosePdf(page, 'Existing.pdf', twoPagePdf());
+    await consent(page);
+    await expect(page.getByText(labels.status.ready, { exact: true })).toBeVisible();
+    let releaseRestore!: () => void;
+    let restoreRequested!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      restoreRequested = resolve;
+    });
+    const restoring = new Promise<void>((resolve) => {
+      releaseRestore = resolve;
+    });
+    await page.route('**/api/conversations/*/attachments', async (route) => {
+      if (route.request().method() !== 'GET') return route.continue();
+      const response = await route.fetch();
+      restoreRequested();
+      await restoring;
+      await route.fulfill({ response });
+    });
+    try {
+      await page.reload();
+      await pending;
+      await expect(page.getByRole('button', { name: labels.attach, exact: true })).toBeDisabled();
+      await expect(page.locator('textarea')).toBeDisabled();
+      releaseRestore();
+      await expect(page.getByText('Existing.pdf', { exact: true })).toBeVisible();
+      await expect(page.locator('textarea')).toBeEnabled();
+      await choosePdf(page, 'New.pdf', textPdf(['New lesson']));
+      await consent(page);
+      await expect(page.getByText('New.pdf', { exact: true })).toBeVisible();
+      await expect(page.getByText(labels.status.ready, { exact: true })).toHaveCount(2);
+    } finally {
+      releaseRestore();
+    }
+  });
+
   test('attaches a 3 MB PDF through the paperclip and preserves its extracted content on reload', async ({
     page,
   }, testInfo) => {

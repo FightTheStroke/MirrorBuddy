@@ -1,16 +1,25 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import type { AttachmentDocument } from '@/lib/conversation/attachments/types';
 import { useConversationAttachments } from '../use-conversation-attachments';
 import { useMaestroChatHandlers } from '../../use-maestro-chat-handlers';
 
-const mocks = vi.hoisted(() => ({ listAttachments: vi.fn(), csrfFetch: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  listAttachments: vi.fn(),
+  createAttachment: vi.fn(),
+  readAttachment: vi.fn(),
+  csrfFetch: vi.fn(),
+}));
 
 vi.mock('@/lib/conversation/attachments/client-api', () => ({
-  createAttachment: vi.fn(),
+  createAttachment: mocks.createAttachment,
   deleteAttachment: vi.fn(),
   listAttachments: mocks.listAttachments,
+}));
+vi.mock('@/lib/conversation/attachments/client-reader', async (original) => ({
+  ...(await original<typeof import('@/lib/conversation/attachments/client-reader')>()),
+  readAttachment: mocks.readAttachment,
 }));
 vi.mock('@/lib/auth', () => ({ csrfFetch: mocks.csrfFetch }));
 vi.mock('next-intl', () => ({ useLocale: () => 'it', useTranslations: () => (k: string) => k }));
@@ -42,6 +51,48 @@ const setup = () =>
 beforeEach(() => vi.clearAllMocks());
 
 describe('attachment restore races', () => {
+  it.each([
+    { savedFirst: false, restoredNew: false },
+    { savedFirst: true, restoredNew: true },
+    { savedFirst: false, restoredNew: true },
+  ])(
+    'keeps one new PDF when history arrives ($savedFirst, $restoredNew)',
+    async ({ savedFirst, restoredNew }) => {
+      const restored = deferred<AttachmentDocument[]>();
+      const saved = deferred<AttachmentDocument>();
+      mocks.listAttachments.mockReturnValueOnce(restored.promise);
+      mocks.readAttachment.mockResolvedValueOnce({
+        upload: docOf('new'),
+        totalPages: 1,
+        skippedPages: [],
+      });
+      mocks.createAttachment.mockReturnValueOnce(saved.promise);
+      const { result } = setup();
+      let restoring!: Promise<void>;
+      act(() => {
+        restoring = result.current.restore('c');
+        result.current.pickFiles([new File(['pdf'], 'new.pdf', { type: 'application/pdf' })]);
+      });
+      act(() => result.current.confirmConsent());
+      await waitFor(() => expect(result.current.items[0]?.status).toBe('saving'));
+      if (savedFirst) {
+        await act(async () => {
+          saved.resolve(docOf('new'));
+        });
+      }
+      await act(async () => {
+        restored.resolve([docOf('old'), ...(restoredNew ? [docOf('new')] : [])]);
+        await restoring;
+      });
+      expect(result.current.items.some((item) => item.localId.startsWith('att-'))).toBe(true);
+      await act(async () => {
+        saved.resolve(docOf('new'));
+      });
+      expect(result.current.items.map((item) => item.name)).toEqual(['old.pdf', 'new.pdf']);
+      expect(result.current.readyDocs.map((doc) => doc.id)).toEqual(['old', 'new']);
+    },
+  );
+
   it('drops a late restore after reset', async () => {
     const late = deferred<AttachmentDocument[]>();
     mocks.listAttachments.mockReturnValueOnce(late.promise);
@@ -50,12 +101,14 @@ describe('attachment restore races', () => {
     act(() => {
       pending = result.current.restore('A');
     });
+    expect(result.current.busy).toBe(true);
     act(() => result.current.reset());
     await act(async () => {
       late.resolve([docOf('a1')]);
       await pending;
     });
     expect(result.current.items).toEqual([]);
+    expect(result.current.busy).toBe(false);
     expect(result.current.announcement).toBeNull();
   });
 
@@ -82,6 +135,33 @@ describe('attachment restore races', () => {
 });
 
 describe('overlapping chat turns', () => {
+  it('does not send a question without its PDF while attachment processing is still in progress', async () => {
+    const setMessages = vi.fn();
+    const ensureConversation = vi.fn().mockResolvedValue('c');
+    const { result } = renderHook(() =>
+      useMaestroChatHandlers({
+        maestro: { id: 'm', systemPrompt: 's' } as never,
+        input: 'Explain the attached PDF',
+        setInput: vi.fn(),
+        isLoading: false,
+        setIsLoading: vi.fn(),
+        messages: [],
+        setMessages,
+        setToolCalls: vi.fn(),
+        onQuestionAsked: vi.fn(),
+        readyDocs: [],
+        attachmentsBusy: true,
+        ensureConversation,
+      }),
+    );
+    await act(async () => {
+      await result.current.handleSubmit();
+    });
+    expect(setMessages).not.toHaveBeenCalled();
+    expect(ensureConversation).not.toHaveBeenCalled();
+    expect(mocks.csrfFetch).not.toHaveBeenCalled();
+  });
+
   it('ignores the aborted older turn so the newer one keeps loading', async () => {
     const setIsLoading = vi.fn();
     const setMessages = vi.fn();
