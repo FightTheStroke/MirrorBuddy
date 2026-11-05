@@ -15,8 +15,20 @@ export function browserStartupStage(text) {
     /Global setup complete:/,
     /Running \d+ tests? using \d+ workers?/,
   ];
-  return stages.reduce(
+  const stage = stages.reduce(
     (stage, pattern, index) => (pattern.test(text ?? '') ? index + 1 : stage),
+    0,
+  );
+  if (stage) return stage;
+  const pretest = [
+    /mirrorbuddy@[^\n]+ pretest/,
+    /Checking PostgreSQL status/,
+    /Checking test database/,
+    /Checking pgvector extension/,
+    /Test database ready!/,
+  ];
+  return pretest.reduce(
+    (stage, pattern, index) => (pattern.test(text ?? '') ? index + 7 : stage),
     0,
   );
 }

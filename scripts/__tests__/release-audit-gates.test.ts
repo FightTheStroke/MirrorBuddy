@@ -13,6 +13,10 @@ const script = (name: string) => readFileSync(new URL(`../${name}`, import.meta.
 
 describe('private native browser progress', () => {
   it('distinguishes browser startup from owner setup without exposing logged payloads', () => {
+    expect(browserStartupStage('> mirrorbuddy@0.44.0 pretest\nPRIVATE')).toBe(7);
+    expect(browserStartupStage('Checking PostgreSQL status... PRIVATE')).toBe(8);
+    expect(browserStartupStage("Checking test database 'PRIVATE'...")).toBe(9);
+    expect(browserStartupStage('Checking pgvector extension... PRIVATE')).toBe(10);
     expect(browserStartupStage('playwright test\nPRIVATE')).toBe(1);
     expect(browserStartupStage('[WebServer] PRIVATE')).toBe(2);
     expect(browserStartupStage('Production guards passed. PRIVATE')).toBe(3);
