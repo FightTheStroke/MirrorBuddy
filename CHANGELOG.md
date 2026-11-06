@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Chat: replies from professors, coaches and buddies now show bold, italic and code as real formatting instead of asterisks, in every chat and in conversation history; what students type is shown exactly as written, and read-aloud no longer reads the marks.
+
 ## [0.44.4] - 2026-11-06
 
 - Chat attachments: a visitor who attaches a scanned PDF is now told that reading scanned pages needs an account, instead of a generic "try again"; too many scanned pages in a short time get their own message; files that cannot work (too large, too many pages, password-protected, wrong type) no longer offer a useless retry.

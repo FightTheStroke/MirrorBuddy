@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Volume2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FormattedReply } from '@/components/chat/formatted-reply';
 import { resolveReadableTextOnColor } from '@/lib/accessibility/accent-contrast';
 import type { ChatMessage, Maestro } from '@/types';
 import { useTranslations } from 'next-intl';
@@ -65,7 +66,7 @@ export function MessageBubble({ message, maestro, ttsEnabled, speak }: MessageBu
           </span>
         )}
         <p className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">
-          {message.content}
+          {isUser ? message.content : <FormattedReply text={message.content} />}
         </p>
         <div className="flex items-center justify-between mt-1 gap-2">
           <span className={cn('text-xs', !isUser && 'opacity-60')}>

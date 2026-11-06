@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import type { ChatMessage, Maestro } from "@/types";
 import { AIDisclosureBadge } from "./ai-disclosure-badge";
 import { useTranslations } from "next-intl";
+import { FormattedReply } from "@/components/chat/formatted-reply";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -69,7 +70,13 @@ export function MessageBubble({
         )}
         style={{ lineHeight: lineSpacing }}
       >
-        <p className="whitespace-pre-wrap">{message.content}</p>
+        <p className="whitespace-pre-wrap">
+          {message.role === "assistant" ? (
+            <FormattedReply text={message.content} />
+          ) : (
+            message.content
+          )}
+        </p>
 
         {/* AI Disclosure Badge for assistant messages */}
         {message.role === "assistant" && (

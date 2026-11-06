@@ -5,6 +5,7 @@ import { useLocale } from 'next-intl';
 import { useAccessibilityStore } from '@/lib/accessibility';
 import { resolveSpeechLanguage, selectSpeechVoice } from '@/lib/accessibility/speech-locale';
 import { SkipLink } from './skip-link';
+import { plainReplyText } from '@/lib/text/inline-markdown';
 
 interface AccessibilityProviderProps {
   children: React.ReactNode;
@@ -181,7 +182,7 @@ export function useTTS() {
     const synthesis = window.speechSynthesis;
     if (!synthesis) return;
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(plainReplyText(text));
     utterance.rate = settings.ttsSpeed;
     utterance.lang = language;
 

@@ -7,6 +7,7 @@ import { Loader2, MessageCircle } from "lucide-react";
 import { CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { MaestroFull } from "@/data/maestri/types";
+import { FormattedReply } from "@/components/chat/formatted-reply";
 
 interface Message {
   id: string;
@@ -91,7 +92,13 @@ export function ChatMessages({
                   : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white",
               )}
             >
-              <p className="whitespace-pre-wrap">{message.content}</p>
+              <p className="whitespace-pre-wrap">
+                {message.role === "user" ? (
+                  message.content
+                ) : (
+                  <FormattedReply text={message.content} />
+                )}
+              </p>
               <p
                 className={cn(
                   "text-xs mt-1",

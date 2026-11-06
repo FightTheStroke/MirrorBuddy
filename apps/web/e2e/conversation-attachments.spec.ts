@@ -119,7 +119,7 @@ test.describe('Conversation document attachments', () => {
     await page.route('**/api/chat', async (route) => {
       submitted.push(route.request().postDataJSON());
       await route.fulfill({
-        json: { content: 'The observatory opened in 1847 (Observatory.pdf, p. 1).' },
+        json: { content: 'The observatory opened in **1847** (Observatory.pdf, p. 1).' },
       });
     });
     await page.goto('/en/maestri/manzoni');
@@ -149,6 +149,9 @@ test.describe('Conversation document attachments', () => {
       await expect.poll(() => submitted.length).toBe(question.startsWith('When') ? 1 : 2);
       await expect(page.locator('textarea')).toBeEnabled();
     }
+    // The reply's formatting is applied, not shown as asterisks.
+    await expect(page.locator('strong', { hasText: '1847' }).first()).toBeVisible();
+    await expect(page.getByText('**1847**')).toHaveCount(0);
     expect(submitted[0].attachmentIds).toEqual([attachment.id]);
     expect(submitted[1]).toMatchObject({
       conversationId: submitted[0].conversationId,

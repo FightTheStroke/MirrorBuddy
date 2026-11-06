@@ -8,6 +8,7 @@ import type {
   ActiveCharacter,
 } from "@/lib/stores/conversation-flow-store";
 import { CharacterAvatar } from "./character-avatar";
+import { FormattedReply } from "@/components/chat/formatted-reply";
 
 interface MessageBubbleProps {
   message: FlowMessage;
@@ -60,7 +61,7 @@ export function MessageBubble({
         )}
       >
         <p className="text-sm leading-relaxed whitespace-pre-wrap">
-          {message.content}
+          {isUser ? message.content : <FormattedReply text={message.content} />}
         </p>
         <p className="text-xs opacity-60 mt-1">
           {new Date(message.timestamp).toLocaleTimeString("it-IT", {

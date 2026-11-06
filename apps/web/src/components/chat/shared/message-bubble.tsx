@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import type { ChatMessage } from '@/types';
 import { AIDisclosureBadge } from '../ai-disclosure-badge';
 import { useTranslations } from 'next-intl';
+import { FormattedReply } from '@/components/chat/formatted-reply';
 
 export interface MessageBubbleProps {
   /** The message to display */
@@ -114,7 +115,9 @@ export function MessageBubble({
         )}
 
         {/* Message content */}
-        <p className="whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.content}</p>
+        <p className="whitespace-pre-wrap break-words overflow-wrap-anywhere">
+          {isUser ? message.content : <FormattedReply text={message.content} />}
+        </p>
 
         {/* Timestamp and TTS controls */}
         <div className="flex items-center justify-between mt-1 gap-2">

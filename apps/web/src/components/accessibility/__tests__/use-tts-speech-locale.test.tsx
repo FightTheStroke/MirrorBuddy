@@ -197,4 +197,11 @@ describe('useTTS speech language', () => {
       });
     }).not.toThrow();
   });
+
+  it('reads formatted replies without the formatting marks', () => {
+    const { result } = renderHook(() => useTTS());
+    act(() => result.current.speak('Il telescopio ha **sette specchi** (*Appunti.pdf*, p. 2).'));
+
+    expect(spoken[0].text).toBe('Il telescopio ha sette specchi (Appunti.pdf, p. 2).');
+  });
 });

@@ -211,4 +211,32 @@ describe('MessageBubble', () => {
     const copyButton = screen.getByTitle(/copia messaggio/i);
     expect(copyButton).toBeInTheDocument();
   });
+
+  it('shows assistant bold and italic as formatting, not as asterisks', () => {
+    const { container } = render(
+      <MessageBubble
+        message={{ ...mockMessage, content: 'Ha **sette specchi** (*Appunti.pdf*, p. 2).' }}
+        characterType="maestro"
+        characterColor={mockMaestro.color}
+        characterName={mockMaestro.displayName}
+      />,
+    );
+
+    expect(container.querySelector('strong')?.textContent).toBe('sette specchi');
+    expect(container.querySelector('em')?.textContent).toBe('Appunti.pdf');
+    expect(container.textContent).not.toContain('**');
+  });
+
+  it('keeps what the student typed exactly as written', () => {
+    const { container } = render(
+      <MessageBubble
+        message={{ ...mockUserMessage, content: 'Quanto fa 5*3*2? **grazie**' }}
+        characterType="maestro"
+        characterColor={mockMaestro.color}
+      />,
+    );
+
+    expect(container.querySelector('strong')).toBeNull();
+    expect(container.textContent).toContain('Quanto fa 5*3*2? **grazie**');
+  });
 });
