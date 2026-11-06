@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { Copy, Check, User } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { ChatMessage, Maestro } from '@/types';
-import { AIDisclosureBadge } from './ai-disclosure-badge';
-import { useTranslations } from 'next-intl';
-import { FormattedReply } from '@/components/chat/formatted-reply';
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Copy, Check, User } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { ChatMessage, Maestro } from "@/types";
+import { AIDisclosureBadge } from "./ai-disclosure-badge";
+import { useTranslations } from "next-intl";
+import { FormattedReply } from "@/components/chat/formatted-reply";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -28,16 +28,19 @@ export function MessageBubble({
   dyslexiaFont,
   lineSpacing,
 }: MessageBubbleProps) {
-  const t = useTranslations('chat');
+  const t = useTranslations("chat");
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className={cn('flex gap-3', message.role === 'user' ? 'justify-end' : 'justify-start')}
+      className={cn(
+        "flex gap-3",
+        message.role === "user" ? "justify-end" : "justify-start",
+      )}
     >
       {/* Avatar for assistant */}
-      {message.role === 'assistant' && (
+      {message.role === "assistant" && (
         <div
           className="w-7 h-7 xs:w-8 xs:h-8 rounded-full overflow-hidden flex-shrink-0"
           style={{ boxShadow: `0 0 0 2px ${maestro.color}` }}
@@ -55,20 +58,20 @@ export function MessageBubble({
       {/* Message bubble */}
       <div
         className={cn(
-          'max-w-[70%] xs:max-w-[85%] rounded-2xl px-4 py-3 relative group',
-          message.role === 'user'
+          "max-w-[70%] xs:max-w-[85%] rounded-2xl px-4 py-3 relative group",
+          message.role === "user"
             ? highContrast
-              ? 'bg-yellow-400 text-black'
-              : 'bg-accent-themed text-white'
+              ? "bg-yellow-400 text-black"
+              : "bg-accent-themed text-white"
             : highContrast
-              ? 'bg-gray-900 text-white border border-gray-700'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white',
-          dyslexiaFont && 'tracking-wide',
+              ? "bg-gray-900 text-white border border-gray-700"
+              : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white",
+          dyslexiaFont && "tracking-wide",
         )}
         style={{ lineHeight: lineSpacing }}
       >
         <p className="whitespace-pre-wrap">
-          {message.role === 'assistant' ? (
+          {message.role === "assistant" ? (
             <FormattedReply text={message.content} />
           ) : (
             message.content
@@ -76,7 +79,7 @@ export function MessageBubble({
         </p>
 
         {/* AI Disclosure Badge for assistant messages */}
-        {message.role === 'assistant' && (
+        {message.role === "assistant" && (
           <div className="mt-2">
             <AIDisclosureBadge variant="compact" />
           </div>
@@ -86,10 +89,12 @@ export function MessageBubble({
         <button
           onClick={() => onCopy(message.content, message.id)}
           className={cn(
-            'absolute -right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 rounded-full transition-opacity',
-            highContrast ? 'bg-yellow-400 text-black' : 'bg-white dark:bg-slate-700 shadow-md',
+            "absolute -right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 rounded-full transition-opacity",
+            highContrast
+              ? "bg-yellow-400 text-black"
+              : "bg-white dark:bg-slate-700 shadow-md",
           )}
-          title={t('copiaMessaggio')}
+          title={t("copiaMessaggio")}
         >
           {copiedId === message.id ? (
             <Check className="w-3 h-3 text-green-500" />
@@ -100,11 +105,13 @@ export function MessageBubble({
       </div>
 
       {/* Avatar for user */}
-      {message.role === 'user' && (
+      {message.role === "user" && (
         <div
           className={cn(
-            'w-7 h-7 xs:w-8 xs:h-8 rounded-full flex items-center justify-center flex-shrink-0',
-            highContrast ? 'bg-yellow-400 text-black' : 'bg-accent-themed text-white',
+            "w-7 h-7 xs:w-8 xs:h-8 rounded-full flex items-center justify-center flex-shrink-0",
+            highContrast
+              ? "bg-yellow-400 text-black"
+              : "bg-accent-themed text-white",
           )}
         >
           <User className="w-3.5 h-3.5 xs:w-4 xs:h-4" />

@@ -1,11 +1,14 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { FlowMessage, ActiveCharacter } from '@/lib/stores/conversation-flow-store';
-import { CharacterAvatar } from './character-avatar';
-import { FormattedReply } from '@/components/chat/formatted-reply';
+import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type {
+  FlowMessage,
+  ActiveCharacter,
+} from "@/lib/stores/conversation-flow-store";
+import { CharacterAvatar } from "./character-avatar";
+import { FormattedReply } from "@/components/chat/formatted-reply";
 
 interface MessageBubbleProps {
   message: FlowMessage;
@@ -15,9 +18,12 @@ interface MessageBubbleProps {
 /**
  * Message bubble component.
  */
-export function MessageBubble({ message, activeCharacter }: MessageBubbleProps) {
-  const isUser = message.role === 'user';
-  const isSystem = message.role === 'system';
+export function MessageBubble({
+  message,
+  activeCharacter,
+}: MessageBubbleProps) {
+  const isUser = message.role === "user";
+  const isSystem = message.role === "system";
 
   if (isSystem) {
     return (
@@ -38,24 +44,29 @@ export function MessageBubble({ message, activeCharacter }: MessageBubbleProps) 
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn('flex gap-3 mb-4', isUser ? 'justify-end' : 'justify-start')}
+      className={cn(
+        "flex gap-3 mb-4",
+        isUser ? "justify-end" : "justify-start",
+      )}
     >
-      {!isUser && activeCharacter && <CharacterAvatar character={activeCharacter} size="sm" />}
+      {!isUser && activeCharacter && (
+        <CharacterAvatar character={activeCharacter} size="sm" />
+      )}
       <div
         className={cn(
-          'max-w-[70%] xs:max-w-[85%] px-4 py-3 rounded-2xl',
+          "max-w-[70%] xs:max-w-[85%] px-4 py-3 rounded-2xl",
           isUser
-            ? 'bg-accent-themed text-white rounded-br-md'
-            : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-bl-md',
+            ? "bg-accent-themed text-white rounded-br-md"
+            : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-bl-md",
         )}
       >
         <p className="text-sm leading-relaxed whitespace-pre-wrap">
           {isUser ? message.content : <FormattedReply text={message.content} />}
         </p>
         <p className="text-xs opacity-60 mt-1">
-          {new Date(message.timestamp).toLocaleTimeString('it-IT', {
-            hour: '2-digit',
-            minute: '2-digit',
+          {new Date(message.timestamp).toLocaleTimeString("it-IT", {
+            hour: "2-digit",
+            minute: "2-digit",
           })}
         </p>
       </div>

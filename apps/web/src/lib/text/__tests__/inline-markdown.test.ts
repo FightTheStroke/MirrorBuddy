@@ -49,6 +49,13 @@ describe('parseReplyText', () => {
     ]);
   });
 
+  it('keeps degenerate, deeply nested output as text instead of crashing the chat', () => {
+    for (const repeated of ['*'.repeat(20_000), `${'__'.repeat(8_000)}a${'__'.repeat(8_000)}`]) {
+      expect(() => parseReplyText(repeated)).not.toThrow();
+      expect(plainReplyText(repeated).length).toBeGreaterThan(0);
+    }
+  });
+
   it('handles empty and missing input', () => {
     expect(parseReplyText('')).toEqual([]);
     expect(parseReplyText(undefined as unknown as string)).toEqual([]);

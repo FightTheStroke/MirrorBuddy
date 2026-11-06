@@ -119,7 +119,7 @@ test.describe('Conversation document attachments', () => {
     await page.route('**/api/chat', async (route) => {
       submitted.push(route.request().postDataJSON());
       await route.fulfill({
-        json: { content: 'The observatory opened in **1847** (*Observatory.pdf*, p. 1).' },
+        json: { content: 'The observatory opened in **1847** (Observatory.pdf, p. 1).' },
       });
     });
     await page.goto('/en/maestri/manzoni');

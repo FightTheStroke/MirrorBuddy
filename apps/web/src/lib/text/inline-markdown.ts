@@ -22,6 +22,8 @@ const INLINE_RULES: InlineRule[] = [
   { type: 'em', pattern: /(?<!\w)_(?![\s_])(.*?[^\s_])_(?!\w)/g },
 ];
 
+// Real replies nest two or three marks; deeper nesting is degenerate output kept as text.
+const MAX_DEPTH = 8;
 const HEADING = /^\s{0,3}#{1,6}\s+(.*?)\s*#*\s*$/;
 const BULLET = /^(\s*)[-*+]\s+/;
 
@@ -32,8 +34,9 @@ function pushText(nodes: ReplyNode[], text: string): void {
   else nodes.push(text);
 }
 
-function parseInline(text: string): ReplyNode[] {
+function parseInline(text: string, depth = 0): ReplyNode[] {
   const nodes: ReplyNode[] = [];
+  if (depth >= MAX_DEPTH) return text ? [text] : nodes;
   let position = 0;
   while (position < text.length) {
     let best: { rule: InlineRule; match: RegExpExecArray } | null = null;
@@ -47,7 +50,7 @@ function parseInline(text: string): ReplyNode[] {
     const inner = best.match[1];
     nodes.push({
       type: best.rule.type,
-      children: best.rule.type === 'code' ? [inner] : parseInline(inner),
+      children: best.rule.type === 'code' ? [inner] : parseInline(inner, depth + 1),
     });
     position = best.match.index + best.match[0].length;
   }
