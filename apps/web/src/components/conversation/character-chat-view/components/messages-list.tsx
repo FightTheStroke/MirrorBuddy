@@ -9,6 +9,7 @@ import { Volume2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SafetyBlockExplanation } from '../../safety-block-explanation';
 import type { CharacterInfo } from '../utils/character-utils';
+import { FormattedReply } from '@/components/chat/formatted-reply';
 
 interface Message {
   id: string;
@@ -60,7 +61,13 @@ export function MessagesList({ messages, character, isLoading }: MessagesListPro
                 : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md shadow-sm',
             )}
           >
-            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+            <p className="text-sm whitespace-pre-wrap">
+              {message.role === 'user' ? (
+                message.content
+              ) : (
+                <FormattedReply text={message.content} />
+              )}
+            </p>
             {message.role === 'assistant' && message.safetyCategory && (
               <SafetyBlockExplanation category={message.safetyCategory} />
             )}

@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { maestri } from '@/data/maestri';
 import type { MaestroFull } from '@/data/maestri/types';
 import { clientLogger as logger } from '@/lib/logger/client';
+import { FormattedReply } from '@/components/chat/formatted-reply';
 
 interface ConversationMessage {
   id: string;
@@ -218,7 +219,13 @@ export function ConversationDetail({ conversationId, onBack }: ConversationDetai
                         : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md shadow-sm',
                     )}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">
+                      {message.role === 'user' ? (
+                        message.content
+                      ) : (
+                        <FormattedReply text={message.content} />
+                      )}
+                    </p>
                     <div className="flex items-center gap-2 mt-1">
                       {message.isVoice && <Volume2 className="w-3 h-3 opacity-60" />}
                       <p className="text-xs opacity-60">{messageTime}</p>
