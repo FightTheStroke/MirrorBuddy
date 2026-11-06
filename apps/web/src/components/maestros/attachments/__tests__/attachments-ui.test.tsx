@@ -82,7 +82,9 @@ describe('paperclip in the Maestro input row', () => {
     const button = screen.getByRole('button', { name: 'Allega un file' });
     expect(button.className).toContain('h-11');
     expect(button.className).toContain('w-11');
-    expect(screen.getByText(/PDF, JPEG, PNG o WebP/)).toBeVisible();
+    expect(
+      screen.getByText(/PDF, JPEG, PNG o WebP fino a 5 MB.*al massimo 5 pagine/),
+    ).toBeVisible();
 
     const input = screen.getByTestId('attachment-file-input') as HTMLInputElement;
     expect(input.accept).toBe('application/pdf,image/jpeg,image/png,image/webp');
@@ -102,6 +104,9 @@ describe('paperclip in the Maestro input row', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
     renderInput(attachments({ consentOpen: true }));
     expect(screen.getByRole('dialog')).toHaveTextContent('Usare questo file nella chat?');
+    expect(screen.getByRole('dialog')).toHaveTextContent(
+      translate('attachments.consent.limits', { pages: 5, mb: 5 }),
+    );
     expect(screen.getByRole('button', { name: 'Usa in chat' })).toBeInTheDocument();
   });
 });

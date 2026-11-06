@@ -566,7 +566,7 @@
     "fraseDelMaestro": "Line from the maestro",
     "attachments": {
       "attach": "Attach a file",
-      "hint": "Attach PDF, JPEG, PNG or WebP (max 10 MB; PDFs up to {pages} pages). Files are used in the text chat.",
+      "hint": "You can attach PDF, JPEG, PNG or WebP files up to {mb} MB. A PDF can have at most {pages} pages. Files are used in the text chat.",
       "listLabel": "Attached files",
       "cancel": "Cancel",
       "cancelLabel": "Cancel reading {name}",
@@ -585,8 +585,8 @@
         "unsupported": "Unsupported format. Use PDF, JPEG, PNG or WebP.",
         "encrypted": "This PDF is password-protected, so I cannot read it.",
         "unreadable": "I cannot read this file.",
-        "tooLarge": "The file is larger than 10 MB.",
-        "tooManyPages": "This PDF has too many pages. Choose a shorter one.",
+        "tooLarge": "The file is larger than {mb} MB, the maximum allowed. Choose a smaller one.",
+        "tooManyPages": "The PDF has more than {pages} pages: I can read at most {pages}. Split it or choose a shorter one.",
         "noText": "I found no readable text in the file.",
         "ocrFailed": "I could not read the scanned pages. Try again.",
         "removeFailed": "I could not remove the file. Try again.",
@@ -609,6 +609,7 @@
       "consent": {
         "title": "Use this file in the chat?",
         "body": "The text of the file and images of scanned pages or photos are sent to the AI for analysis.",
+        "limits": "Limits: a PDF can have at most {pages} pages and each file at most {mb} MB.",
         "storage": "With an account the extracted text is saved with the chat; without an account it stays only while the session is open. The original file is not uploaded.",
         "confirm": "Use in chat",
         "decline": "Cancel"

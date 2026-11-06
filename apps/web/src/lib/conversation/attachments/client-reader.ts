@@ -1,8 +1,8 @@
 import { analyzeAttachmentImage } from './client-api';
 import type { AttachmentMimeType, AttachmentPage, AttachmentUpload } from './types';
-import { MAX_FILE_SIZE } from '@/lib/storage/types';
+import { MAX_ATTACHMENT_BYTES } from './limits';
 
-export const MAX_ATTACHMENT_BYTES = MAX_FILE_SIZE;
+export { MAX_ATTACHMENT_BYTES };
 export const ATTACHMENT_ACCEPT = 'application/pdf,image/jpeg,image/png,image/webp';
 
 export type AttachmentReadErrorCode =

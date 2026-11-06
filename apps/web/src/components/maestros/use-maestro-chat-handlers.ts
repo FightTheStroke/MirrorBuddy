@@ -9,6 +9,7 @@ import {
   buildAttachmentFields,
   chatTurnError,
 } from './attachments/chat-attachment-fields';
+import { ATTACHMENT_LIMIT_PARAMS } from '@/lib/conversation/attachments/limits';
 
 interface TurnMetrics {
   latencyMs: number;
@@ -169,7 +170,7 @@ export function useMaestroChatHandlers({
             id: `error-${Date.now()}`,
             role: 'assistant',
             content: errorKey
-              ? t(`attachments.errors.${errorKey}`)
+              ? t(`attachments.errors.${errorKey}`, ATTACHMENT_LIMIT_PARAMS)
               : 'Mi dispiace, ho avuto un problema. Puoi riprovare?',
             timestamp: new Date(),
           },
@@ -296,7 +297,7 @@ export function useMaestroChatHandlers({
             id: `error-${Date.now()}`,
             role: 'assistant' as const,
             content: errorKey
-              ? t(`attachments.errors.${errorKey}`)
+              ? t(`attachments.errors.${errorKey}`, ATTACHMENT_LIMIT_PARAMS)
               : 'Mi dispiace, non sono riuscito ad analizzare la foto. Puoi descrivermi cosa vedi?',
             timestamp: new Date(),
           },

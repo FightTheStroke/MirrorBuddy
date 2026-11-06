@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import type { AttachmentAnnouncement, AttachmentItem } from './use-conversation-attachments';
 import { attachmentCodeKey } from './chat-attachment-fields';
+import { ATTACHMENT_LIMIT_PARAMS } from '@/lib/conversation/attachments/limits';
 
 interface AttachmentChipsProps {
   items: AttachmentItem[];
@@ -30,7 +31,10 @@ export function AttachmentChips({
 
   const announce = announcement
     ? announcement.type === 'error'
-      ? t(`attachments.errors.${attachmentCodeKey(announcement.code) ?? 'generic'}`)
+      ? t(
+          `attachments.errors.${attachmentCodeKey(announcement.code) ?? 'generic'}`,
+          ATTACHMENT_LIMIT_PARAMS,
+        )
       : t(`attachments.announce.${announcement.type}`, { name: announcement.name })
     : '';
 
@@ -85,7 +89,7 @@ export function AttachmentChips({
                   <span className="block truncate font-medium">{item.name}</span>
                   <span className="block">
                     {failed
-                      ? t(`attachments.errors.${errorKey}`)
+                      ? t(`attachments.errors.${errorKey}`, ATTACHMENT_LIMIT_PARAMS)
                       : item.status === 'removing'
                         ? t('attachments.status.removing')
                         : item.status === 'saving'

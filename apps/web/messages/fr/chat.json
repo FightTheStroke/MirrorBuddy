@@ -566,7 +566,7 @@
     "fraseDelMaestro": "Phrase du maître",
     "attachments": {
       "attach": "Joindre un fichier",
-      "hint": "Joignez un PDF, JPEG, PNG ou WebP (10 Mo max ; PDF jusqu'à {pages} pages). Les fichiers sont utilisés dans le chat texte.",
+      "hint": "Vous pouvez joindre des PDF, JPEG, PNG ou WebP jusqu'à {mb} Mo. Un PDF peut avoir au maximum {pages} pages. Les fichiers sont utilisés dans le chat texte.",
       "listLabel": "Fichiers joints",
       "cancel": "Annuler",
       "cancelLabel": "Annuler la lecture de {name}",
@@ -585,8 +585,8 @@
         "unsupported": "Format non pris en charge. Utilisez PDF, JPEG, PNG ou WebP.",
         "encrypted": "Ce PDF est protégé par mot de passe : je ne peux pas le lire.",
         "unreadable": "Je ne peux pas lire ce fichier.",
-        "tooLarge": "Le fichier dépasse 10 Mo.",
-        "tooManyPages": "Ce PDF a trop de pages. Choisissez-en un plus court.",
+        "tooLarge": "Le fichier dépasse {mb} Mo, le maximum autorisé. Choisissez-en un plus léger.",
+        "tooManyPages": "Le PDF a plus de {pages} pages : je peux en lire au maximum {pages}. Divisez-le ou choisissez-en un plus court.",
         "noText": "Je n'ai trouvé aucun texte lisible dans le fichier.",
         "ocrFailed": "Je n'ai pas pu lire les pages numérisées. Réessayez.",
         "removeFailed": "Je n'ai pas pu retirer le fichier. Réessayez.",
@@ -609,6 +609,7 @@
       "consent": {
         "title": "Utiliser ce fichier dans le chat ?",
         "body": "Le texte du fichier et les images des pages numérisées ou des photos sont envoyés à l'IA pour analyse.",
+        "limits": "Limites : un PDF peut avoir au maximum {pages} pages et chaque fichier au maximum {mb} Mo.",
         "storage": "Avec un compte, le texte extrait est enregistré avec le chat ; sans compte, il ne reste que tant que la session est ouverte. Le fichier d'origine n'est pas envoyé.",
         "confirm": "Utiliser dans le chat",
         "decline": "Annuler"
