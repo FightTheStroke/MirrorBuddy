@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.44.5] - 2026-11-06
+
 - Chat: replies from professors, coaches and buddies now show bold, italic and code as real formatting instead of asterisks, in every chat and in conversation history; what students type is shown exactly as written, and read-aloud no longer reads the marks.
 
 ## [0.44.4] - 2026-11-06
