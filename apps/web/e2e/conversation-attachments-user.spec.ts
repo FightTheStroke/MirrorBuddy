@@ -150,7 +150,12 @@ test.describe('PDF attachments as a student uses them', () => {
     });
     await openConversation(page);
     await choosePdf(page, 'Notes.pdf', twoPagePdf());
-    await page.getByRole('button', { name: labels.consent.decline, exact: true }).click();
+    // The dialog's corner close button shares the "decline" name; use the footer action.
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: labels.consent.decline, exact: true })
+      .first()
+      .click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
     expect(saves).toBe(0);
     await expect(page.getByText('Notes.pdf', { exact: true })).toHaveCount(0);

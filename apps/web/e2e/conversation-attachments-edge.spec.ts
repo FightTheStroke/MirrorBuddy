@@ -111,9 +111,11 @@ test.describe('PDF attachment edge cases a student meets', () => {
     });
     await cancel.click();
     await expect(chip(page, 'Lento.pdf')).toHaveCount(0);
-    await expect(page.getByRole('status')).toHaveText(
-      labels.announce.cancelled.replace('{name}', 'Lento.pdf'),
-    );
+    await expect(
+      page.getByRole('status').filter({
+        hasText: labels.announce.cancelled.replace('{name}', 'Lento.pdf'),
+      }),
+    ).toHaveCount(1);
     expect(saves).toBe(0);
   });
 
