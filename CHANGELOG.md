@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.44.3] - 2026-11-06
+
 - Chat attachments: files are now limited to 5 MB (was 10 MB), and the 5-page limit for PDFs is stated in the input hint, in the consent dialog and in the error messages, in all five languages.
 
 ## [0.44.2] - 2026-11-06
