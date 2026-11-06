@@ -10,7 +10,7 @@ import { AttachmentChips } from './attachments/attachment-chips';
 import { AttachmentConsentDialog } from './attachments/attachment-consent-dialog';
 import type { useConversationAttachments } from './attachments/use-conversation-attachments';
 import { ATTACHMENT_ACCEPT } from '@/lib/conversation/attachments/client-reader';
-import { MAX_PDF_PAGES } from '@/lib/pdf/pdf-constants';
+import { ATTACHMENT_LIMIT_PARAMS } from '@/lib/conversation/attachments/limits';
 
 type ToolType =
   | 'mindmap'
@@ -146,7 +146,7 @@ export function MaestroSessionInput({
       </div>
 
       <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-        {t('attachments.hint', { pages: MAX_PDF_PAGES })}
+        {t('attachments.hint', ATTACHMENT_LIMIT_PARAMS)}
       </p>
 
       {/* End session button */}

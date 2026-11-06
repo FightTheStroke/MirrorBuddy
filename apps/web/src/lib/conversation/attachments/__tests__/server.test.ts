@@ -69,7 +69,7 @@ describe('attachmentUploadSchema', () => {
     ['long name', { ...upload, name: 'a'.repeat(121) }],
     ['path name', { ...upload, name: '../x.pdf' }],
     ['bad mime', { ...upload, mimeType: 'text/html' }],
-    ['too big', { ...upload, size: 10 * 1024 * 1024 + 1 }],
+    ['over 5 MB', { ...upload, size: 5 * 1024 * 1024 + 1 }],
     ['extra key', { ...upload, id: 'x' }],
   ])('rejects %s', (_n, input) => {
     expect(attachmentUploadSchema.safeParse(input).success).toBe(false);

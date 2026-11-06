@@ -566,7 +566,7 @@
     "fraseDelMaestro": "Frase del maestro",
     "attachments": {
       "attach": "Adjuntar un archivo",
-      "hint": "Adjunta PDF, JPEG, PNG o WebP (máx. 10 MB; PDF de hasta {pages} páginas). Los archivos se usan en el chat de texto.",
+      "hint": "Puedes adjuntar PDF, JPEG, PNG o WebP de hasta {mb} MB. Un PDF puede tener como máximo {pages} páginas. Los archivos se usan en el chat de texto.",
       "listLabel": "Archivos adjuntos",
       "cancel": "Cancelar",
       "cancelLabel": "Cancelar la lectura de {name}",
@@ -585,8 +585,8 @@
         "unsupported": "Formato no admitido. Usa PDF, JPEG, PNG o WebP.",
         "encrypted": "Este PDF tiene contraseña y no puedo leerlo.",
         "unreadable": "No puedo leer este archivo.",
-        "tooLarge": "El archivo supera los 10 MB.",
-        "tooManyPages": "Este PDF tiene demasiadas páginas. Elige uno más corto.",
+        "tooLarge": "El archivo supera los {mb} MB, el máximo permitido. Elige uno más ligero.",
+        "tooManyPages": "El PDF tiene más de {pages} páginas: puedo leer como máximo {pages}. Divídelo o elige uno más corto.",
         "noText": "No encontré texto legible en el archivo.",
         "ocrFailed": "No pude leer las páginas escaneadas. Inténtalo de nuevo.",
         "removeFailed": "No pude quitar el archivo. Inténtalo de nuevo.",
@@ -609,6 +609,7 @@
       "consent": {
         "title": "¿Usar este archivo en el chat?",
         "body": "El texto del archivo y las imágenes de páginas escaneadas o fotos se envían a la IA para analizarlos.",
+        "limits": "Límites: un PDF puede tener como máximo {pages} páginas y cada archivo como máximo {mb} MB.",
         "storage": "Con una cuenta, el texto extraído se guarda con el chat; sin cuenta, solo permanece mientras la sesión está abierta. El archivo original no se sube.",
         "confirm": "Usar en el chat",
         "decline": "Cancelar"

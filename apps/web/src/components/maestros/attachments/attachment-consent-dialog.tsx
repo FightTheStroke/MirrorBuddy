@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
+import { ATTACHMENT_LIMIT_PARAMS } from '@/lib/conversation/attachments/limits';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,9 @@ export function AttachmentConsentDialog({
           <DialogTitle>{t('attachments.consent.title')}</DialogTitle>
           <DialogDescription>{t('attachments.consent.body')}</DialogDescription>
         </DialogHeader>
+        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+          {t('attachments.consent.limits', ATTACHMENT_LIMIT_PARAMS)}
+        </p>
         <p className="text-sm text-slate-700 dark:text-slate-300">
           {t('attachments.consent.storage')}
         </p>

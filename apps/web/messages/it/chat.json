@@ -566,7 +566,7 @@
     "fraseDelMaestro": "Frase del maestro",
     "attachments": {
       "attach": "Allega un file",
-      "hint": "Allega PDF, JPEG, PNG o WebP (max 10 MB; PDF fino a {pages} pagine). I file si usano nella chat di testo.",
+      "hint": "Puoi allegare PDF, JPEG, PNG o WebP fino a {mb} MB. Un PDF può avere al massimo {pages} pagine. I file si usano nella chat di testo.",
       "listLabel": "File allegati",
       "cancel": "Annulla",
       "cancelLabel": "Annulla la lettura di {name}",
@@ -585,8 +585,8 @@
         "unsupported": "Formato non supportato. Usa PDF, JPEG, PNG o WebP.",
         "encrypted": "Il PDF è protetto da password: non posso leggerlo.",
         "unreadable": "Non riesco a leggere questo file.",
-        "tooLarge": "Il file supera i 10 MB.",
-        "tooManyPages": "Il PDF ha troppe pagine. Scegline uno più breve.",
+        "tooLarge": "Il file supera {mb} MB, il massimo consentito. Scegline uno più leggero.",
+        "tooManyPages": "Il PDF ha più di {pages} pagine: posso leggerne al massimo {pages}. Dividilo o scegline uno più breve.",
         "noText": "Non ho trovato testo leggibile nel file.",
         "ocrFailed": "Non sono riuscito a leggere le pagine scansionate. Riprova.",
         "removeFailed": "Non sono riuscito a rimuovere il file. Riprova.",
@@ -609,6 +609,7 @@
       "consent": {
         "title": "Usare questo file nella chat?",
         "body": "Il testo del file e le immagini delle pagine scansionate o delle foto vengono inviati all'intelligenza artificiale per essere analizzati.",
+        "limits": "Limiti: un PDF può avere al massimo {pages} pagine e ogni file al massimo {mb} MB.",
         "storage": "Con un account il testo ricavato viene salvato insieme alla chat; senza account resta solo finché la sessione è aperta. Il file originale non viene caricato.",
         "confirm": "Usa in chat",
         "decline": "Annulla"

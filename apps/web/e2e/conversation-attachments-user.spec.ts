@@ -2,9 +2,17 @@ import { test, expect } from './fixtures/base-fixtures';
 import type { Page } from '@playwright/test';
 import it from '../messages/it/chat.json';
 import { textPdf, twoPagePdf } from './helpers/attachment-pdf';
-import { MAX_PDF_PAGES } from '../src/lib/pdf/pdf-constants';
+import {
+  ATTACHMENT_LIMIT_PARAMS,
+  MAX_ATTACHMENT_BYTES,
+  MAX_ATTACHMENT_PAGES,
+} from '../src/lib/conversation/attachments/limits';
 
 const labels = it.chat.attachments;
+const withLimits = (message: string) =>
+  message
+    .replaceAll('{pages}', String(ATTACHMENT_LIMIT_PARAMS.pages))
+    .replaceAll('{mb}', String(ATTACHMENT_LIMIT_PARAMS.mb));
 const attachmentPath = /\/api\/conversations\/[^/]+\/attachments$/;
 
 async function openConversation(page: Page) {
@@ -105,8 +113,9 @@ test.describe('PDF attachments as a student uses them', () => {
     const saved = page.waitForResponse(
       (r) => attachmentPath.test(r.url()) && r.request().method() === 'POST',
     );
+    await expect(page.getByText(withLimits(labels.hint), { exact: true })).toBeVisible();
     await choosePdf(page, 'Appunti di astronomia.pdf', buffer);
-    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByRole('dialog')).toContainText(withLimits(labels.consent.limits));
     await consent(page);
     await expect(page.getByText('Appunti di astronomia.pdf', { exact: true })).toBeVisible();
     await expect(page.getByText(labels.status.ready, { exact: true })).toBeVisible();
@@ -131,11 +140,11 @@ test.describe('PDF attachments as a student uses them', () => {
     await choosePdf(
       page,
       'Dispensa.pdf',
-      textPdf(Array.from({ length: MAX_PDF_PAGES + 1 }, (_, i) => `Lesson page ${i + 1}`)),
+      textPdf(Array.from({ length: MAX_ATTACHMENT_PAGES + 1 }, (_, i) => `Lesson page ${i + 1}`)),
     );
     await consent(page);
     const item = page.getByRole('listitem').filter({ hasText: 'Dispensa.pdf' });
-    await expect(item).toContainText(labels.errors.tooManyPages);
+    await expect(item).toContainText(withLimits(labels.errors.tooManyPages));
     await expect(
       item.getByRole('button', { name: labels.retryLabel.replace('{name}', 'Dispensa.pdf') }),
     ).toBeVisible();
@@ -203,14 +212,12 @@ test.describe('PDF attachments as a student uses them', () => {
     await expect(page.getByText(labels.status.ready, { exact: true })).toBeVisible();
   });
 
-  test('rejects files larger than 10 MB before saving and keeps the reason visible', async ({
-    page,
-  }) => {
+  test('rejects files larger than 5 MB before saving and states the limit', async ({ page }) => {
     await openConversation(page);
-    await choosePdf(page, 'Too large.pdf', textPdf(['Large notes'], 10 * 1024 * 1024));
+    await choosePdf(page, 'Too large.pdf', textPdf(['Large notes'], MAX_ATTACHMENT_BYTES));
     await consent(page);
     await expect(page.getByRole('listitem').filter({ hasText: 'Too large.pdf' })).toContainText(
-      labels.errors.tooLarge,
+      withLimits(labels.errors.tooLarge),
     );
   });
 

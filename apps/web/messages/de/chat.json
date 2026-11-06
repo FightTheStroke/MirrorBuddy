@@ -566,7 +566,7 @@
     "fraseDelMaestro": "Satz des Meisters",
     "attachments": {
       "attach": "Datei anhängen",
-      "hint": "PDF, JPEG, PNG oder WebP anhängen (max. 10 MB; PDF bis {pages} Seiten). Dateien werden im Text-Chat verwendet.",
+      "hint": "Du kannst PDF, JPEG, PNG oder WebP bis {mb} MB anhängen. Ein PDF darf höchstens {pages} Seiten haben. Dateien werden im Text-Chat verwendet.",
       "listLabel": "Angehängte Dateien",
       "cancel": "Abbrechen",
       "cancelLabel": "Lesen von {name} abbrechen",
@@ -585,8 +585,8 @@
         "unsupported": "Format nicht unterstützt. Verwende PDF, JPEG, PNG oder WebP.",
         "encrypted": "Dieses PDF ist passwortgeschützt, ich kann es nicht lesen.",
         "unreadable": "Ich kann diese Datei nicht lesen.",
-        "tooLarge": "Die Datei ist größer als 10 MB.",
-        "tooManyPages": "Dieses PDF hat zu viele Seiten. Wähle ein kürzeres.",
+        "tooLarge": "Die Datei ist größer als {mb} MB, das erlaubte Maximum. Wähle eine kleinere Datei.",
+        "tooManyPages": "Das PDF hat mehr als {pages} Seiten: Ich kann höchstens {pages} lesen. Teile es auf oder wähle ein kürzeres.",
         "noText": "Ich habe keinen lesbaren Text in der Datei gefunden.",
         "ocrFailed": "Ich konnte die gescannten Seiten nicht lesen. Versuche es erneut.",
         "removeFailed": "Ich konnte die Datei nicht entfernen. Versuche es erneut.",
@@ -609,6 +609,7 @@
       "consent": {
         "title": "Diese Datei im Chat verwenden?",
         "body": "Der Text der Datei und Bilder von gescannten Seiten oder Fotos werden zur Analyse an die KI gesendet.",
+        "limits": "Grenzen: Ein PDF darf höchstens {pages} Seiten haben und jede Datei höchstens {mb} MB.",
         "storage": "Mit Konto wird der gelesene Text mit dem Chat gespeichert; ohne Konto bleibt er nur, solange die Sitzung offen ist. Die Originaldatei wird nicht hochgeladen.",
         "confirm": "Im Chat verwenden",
         "decline": "Abbrechen"
