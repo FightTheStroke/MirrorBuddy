@@ -28,6 +28,7 @@ interface UseMaestroChatHandlersProps {
   onQuestionAsked: () => void;
   onTurnComplete?: (metrics: TurnMetrics) => void;
   readyDocs?: AttachmentDocument[];
+  attachmentsBusy?: boolean;
   ensureConversation?: () => Promise<string | null>;
   persistMessage?: (
     conversationId: string,
@@ -48,6 +49,7 @@ export function useMaestroChatHandlers({
   onQuestionAsked,
   onTurnComplete,
   readyDocs = [],
+  attachmentsBusy = false,
   ensureConversation,
   persistMessage,
 }: UseMaestroChatHandlersProps) {
@@ -99,7 +101,7 @@ export function useMaestroChatHandlers({
     async (e?: React.FormEvent, contentOverride?: string) => {
       e?.preventDefault();
       const userContent = (contentOverride || input).trim();
-      if (!userContent || isLoading) return;
+      if (!userContent || isLoading || attachmentsBusy) return;
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
         role: 'user',
@@ -179,6 +181,7 @@ export function useMaestroChatHandlers({
     [
       input,
       isLoading,
+      attachmentsBusy,
       messages,
       maestro.systemPrompt,
       maestro.id,

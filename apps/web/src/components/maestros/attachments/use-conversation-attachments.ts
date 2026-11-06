@@ -6,54 +6,36 @@ import {
   listAttachments,
 } from '@/lib/conversation/attachments/client-api';
 import { AttachmentReadError, readAttachment } from '@/lib/conversation/attachments/client-reader';
-import type { AttachmentDocument } from '@/lib/conversation/attachments/types';
-
-export type AttachmentStatus = 'reading' | 'saving' | 'ready' | 'error' | 'removing';
-
-export interface AttachmentItem {
-  localId: string;
-  name: string;
-  status: AttachmentStatus;
-  done: number;
-  total: number;
-  /** Pages with no readable text: the file is only partly covered. */
-  skippedPages: number[];
-  errorCode?: string;
-  doc?: AttachmentDocument;
-  /** True when the document lives on the server (registered account). */
-  remote: boolean;
-}
-
-export type AttachmentAnnouncement =
-  | { type: 'reading' | 'ready' | 'removed' | 'cancelled'; name: string }
-  | { type: 'error'; name: string; code: string };
+import {
+  patchAttachmentItems,
+  type AttachmentItem,
+  type AttachmentAnnouncement,
+} from './attachment-state';
+export type { AttachmentItem, AttachmentAnnouncement, AttachmentStatus } from './attachment-state';
 
 interface Options {
   ensureConversation: () => Promise<string | null>;
   getConversationId: () => string | null;
 }
-
 export function useConversationAttachments({ ensureConversation, getConversationId }: Options) {
   const [items, setItems] = useState<AttachmentItem[]>([]);
   const [pendingFiles, setPendingFiles] = useState<File[] | null>(null);
   const [announcement, setAnnouncement] = useState<AttachmentAnnouncement | null>(null);
+  const [restoring, setRestoring] = useState(false);
   const consentedRef = useRef(false);
   const counterRef = useRef(0);
   const filesRef = useRef(new Map<string, File>());
   const controllersRef = useRef(new Map<string, AbortController>());
   // Only the latest restore may write state; reset or a newer restore invalidates it.
   const restoreRef = useRef<AbortController | null>(null);
-
   const patch = useCallback((localId: string, changes: Partial<AttachmentItem>) => {
-    setItems((prev) => prev.map((i) => (i.localId === localId ? { ...i, ...changes } : i)));
+    setItems((prev) => patchAttachmentItems(prev, localId, changes));
   }, []);
-
   const drop = useCallback((localId: string) => {
     filesRef.current.delete(localId);
     controllersRef.current.delete(localId);
     setItems((prev) => prev.filter((i) => i.localId !== localId));
   }, []);
-
   const run = useCallback(
     async (file: File, localId: string) => {
       const controller = new AbortController();
@@ -109,7 +91,6 @@ export function useConversationAttachments({ ensureConversation, getConversation
     },
     [ensureConversation, patch, drop],
   );
-
   const startFiles = useCallback(
     (files: File[]) => {
       for (const file of files) {
@@ -178,26 +159,40 @@ export function useConversationAttachments({ ensureConversation, getConversation
     restoreRef.current?.abort();
     const controller = new AbortController();
     restoreRef.current = controller;
+    setRestoring(true);
+    const existingUploads = new Set(controllersRef.current.keys());
     const stale = () => restoreRef.current !== controller;
     try {
       const docs = await listAttachments(conversationId, controller.signal);
       if (stale()) return;
-      setItems(
-        docs.map((doc) => ({
-          localId: `srv-${doc.id}`,
-          name: doc.name,
-          status: 'ready' as const,
-          done: doc.pages.length,
-          total: doc.pages.length,
-          skippedPages: [],
-          doc,
-          remote: true,
-        })),
-      );
+      setItems((current) => {
+        // A slow history response must not erase uploads started while it was pending.
+        const added = current.filter(
+          (item) => controllersRef.current.has(item.localId) && !existingUploads.has(item.localId),
+        );
+        const addedIds = new Set(added.flatMap((item) => (item.doc ? [item.doc.id] : [])));
+        return [
+          ...docs
+            .filter((doc) => !addedIds.has(doc.id))
+            .map((doc) => ({
+              localId: `srv-${doc.id}`,
+              name: doc.name,
+              status: 'ready' as const,
+              done: doc.pages.length,
+              total: doc.pages.length,
+              skippedPages: [],
+              doc,
+              remote: true,
+            })),
+          ...added,
+        ];
+      });
     } catch (error) {
       if (stale()) return;
       logger.warn('Attachment restore failed', { error: String(error) });
       setAnnouncement({ type: 'error', name: '', code: 'restore_failed' });
+    } finally {
+      if (!stale()) setRestoring(false);
     }
   }, []);
 
@@ -210,6 +205,7 @@ export function useConversationAttachments({ ensureConversation, getConversation
     setItems([]);
     setPendingFiles(null);
     setAnnouncement(null);
+    setRestoring(false);
   }, []);
 
   useEffect(() => {
@@ -225,9 +221,9 @@ export function useConversationAttachments({ ensureConversation, getConversation
     () => items.flatMap((i) => (i.status === 'ready' && i.doc ? [i.doc] : [])),
     [items],
   );
-  const busy = items.some(
-    (i) => i.status === 'reading' || i.status === 'saving' || i.status === 'removing',
-  );
+  const busy =
+    restoring ||
+    items.some((i) => i.status === 'reading' || i.status === 'saving' || i.status === 'removing');
 
   return {
     items,

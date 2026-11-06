@@ -19,6 +19,7 @@ interface Options {
   adoptConversation: (id: string) => void;
   restoreAttachments: (id: string) => Promise<void>;
   onFailure: () => void;
+  onLoadingChange: (loading: boolean) => void;
 }
 
 /**
@@ -38,6 +39,7 @@ export function useConversationLoader(options: Options) {
     generationRef.current += 1;
     controllerRef.current?.abort();
     controllerRef.current = null;
+    optionsRef.current.onLoadingChange(false);
   }, []);
 
   const load = useCallback(
@@ -47,8 +49,10 @@ export function useConversationLoader(options: Options) {
       const controller = new AbortController();
       controllerRef.current = controller;
       const o = optionsRef.current;
+      o.onLoadingChange(true);
       o.stopVoice();
       o.invalidateTurn();
+      o.resetAttachments();
       const stale = () => generation !== generationRef.current;
       try {
         const res = await fetch(`/api/conversations/${encodeURIComponent(conversationId)}`, {
@@ -71,15 +75,16 @@ export function useConversationLoader(options: Options) {
             })),
         );
         o.setSessionEnded(false);
-        o.resetAttachments();
         o.adoptConversation(conversationId);
-        void o.restoreAttachments(conversationId);
-        return true;
+        await o.restoreAttachments(conversationId);
+        return !stale();
       } catch (error) {
         if (stale()) return false;
         logger.warn('Conversation load failed', { error: String(error) });
         o.onFailure();
         return false;
+      } finally {
+        if (!stale()) o.onLoadingChange(false);
       }
     },
     [cancel],

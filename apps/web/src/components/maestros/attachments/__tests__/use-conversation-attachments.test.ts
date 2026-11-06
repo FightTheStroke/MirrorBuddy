@@ -52,6 +52,9 @@ function setup(conversationId: string | null) {
 
 describe('useConversationAttachments', () => {
   it('asks for consent before reading or sending anything, then processes', async () => {
+    mocks.createAttachment
+      .mockResolvedValueOnce(doc)
+      .mockResolvedValueOnce({ ...doc, id: 'att-2' });
     const { result } = setup('c1');
     act(() => result.current.pickFiles([pdf()]));
     expect(result.current.consentOpen).toBe(true);

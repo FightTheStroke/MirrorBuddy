@@ -1059,7 +1059,7 @@ jobs:
         run: |
           echo "Running critical path smoke tests..."
           npm run test:e2e:smoke -- --reporter=list
-          npx playwright test --config apps/web/playwright.config.ts --project=chromium apps/web/e2e/conversation-attachments.spec.ts --workers=1 --reporter=list
+          npx playwright test --config apps/web/playwright.config.ts --project=chromium apps/web/e2e/conversation-attachments --workers=1 --reporter=list
         env:
           CI: true
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
