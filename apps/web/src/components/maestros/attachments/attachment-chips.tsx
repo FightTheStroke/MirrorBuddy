@@ -5,7 +5,7 @@ import { FileText, Loader2, X, RotateCcw, AlertTriangle, Check } from 'lucide-re
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import type { AttachmentAnnouncement, AttachmentItem } from './use-conversation-attachments';
-import { attachmentCodeKey } from './chat-attachment-fields';
+import { attachmentCodeKey, isRetryableAttachmentError } from './chat-attachment-fields';
 import { ATTACHMENT_LIMIT_PARAMS } from '@/lib/conversation/attachments/limits';
 
 interface AttachmentChipsProps {
@@ -118,7 +118,7 @@ export function AttachmentChips({
                     {t('attachments.cancel')}
                   </Button>
                 )}
-                {failed && (
+                {failed && isRetryableAttachmentError(item.errorCode) && (
                   <Button
                     type="button"
                     variant="ghost"

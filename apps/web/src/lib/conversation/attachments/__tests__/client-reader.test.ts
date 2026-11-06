@@ -90,6 +90,22 @@ describe('readAttachment', () => {
     );
   });
 
+  it.each([
+    [{ status: 403, code: 'trial_consent_required' }, 'ocr_needs_account'],
+    [{ status: 401, code: 'trial_session_required' }, 'ocr_needs_account'],
+    [{ status: 403, code: 'trial_verification_required' }, 'ocr_needs_account'],
+    [{ status: 429, code: 'trial_limit_reached' }, 'ocr_limit'],
+    [{ status: 429, code: 'RATE_LIMITED' }, 'ocr_limit'],
+    [{ status: 403, code: 'attachment_tool_not_allowed' }, 'attachment_tool_not_allowed'],
+    [new Error('network down'), 'ocr_failed'],
+  ])('explains why scanned pages could not be read: %o', async (failure, expected) => {
+    const analyze = vi.fn().mockRejectedValue(failure);
+    const pdf = file('a.pdf', 'application/pdf');
+    expect(await codeOf(readAttachment(pdf, { loadPdf: loader(pdfSource([''])), analyze }))).toBe(
+      expected,
+    );
+  });
+
   it('propagates encrypted PDFs from the loader', async () => {
     const encrypted: PdfLoader = async () => {
       throw new AttachmentReadError('encrypted');

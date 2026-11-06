@@ -589,6 +589,8 @@
         "tooManyPages": "Le PDF a plus de {pages} pages : je peux en lire au maximum {pages}. Divisez-le ou choisissez-en un plus court.",
         "noText": "Je n'ai trouvé aucun texte lisible dans le fichier.",
         "ocrFailed": "Je n'ai pas pu lire les pages numérisées. Réessayez.",
+        "ocrNeedsAccount": "Pour lire des pages numérisées, il faut un compte. Les PDF avec du texte sélectionnable fonctionnent sans compte.",
+        "ocrLimit": "Vous avez lu beaucoup de pages numérisées en peu de temps. Attendez quelques minutes et réessayez.",
         "removeFailed": "Je n'ai pas pu retirer le fichier. Réessayez.",
         "generic": "Une erreur s'est produite. Réessayez.",
         "contextTooLarge": "Le fichier est trop long pour cette conversation. Retirez-le ou joignez-en un plus court, puis réessayez.",
