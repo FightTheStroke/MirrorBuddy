@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Chat attachments: a visitor who attaches a scanned PDF is now told that reading scanned pages needs an account, instead of a generic "try again"; too many scanned pages in a short time get their own message; files that cannot work (too large, too many pages, password-protected, wrong type) no longer offer a useless retry.
+
 ## [0.44.3] - 2026-11-06
 
 - Chat attachments: files are now limited to 5 MB (was 10 MB), and the 5-page limit for PDFs is stated in the input hint, in the consent dialog and in the error messages, in all five languages.

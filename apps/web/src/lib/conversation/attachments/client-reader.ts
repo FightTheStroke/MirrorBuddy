@@ -13,6 +13,9 @@ export type AttachmentReadErrorCode =
   | 'too_many_pages'
   | 'no_text'
   | 'ocr_failed'
+  | 'ocr_needs_account'
+  | 'ocr_limit'
+  | 'attachment_tool_not_allowed'
   | 'cancelled';
 
 export class AttachmentReadError extends Error {
@@ -83,8 +86,23 @@ async function ocr(
   } catch (error) {
     throwIfCancelled(options.signal);
     if (error instanceof AttachmentReadError) throw error;
-    throw new AttachmentReadError('ocr_failed');
+    throw new AttachmentReadError(ocrRefusal(error));
   }
+}
+
+const ACCOUNT_REQUIRED = new Set([
+  'trial_consent_required',
+  'trial_session_required',
+  'trial_verification_required',
+]);
+
+/** A refusal the student can act on must not look like a temporary failure worth retrying. */
+function ocrRefusal(error: unknown): AttachmentReadErrorCode {
+  const { status, code } = (error ?? {}) as { status?: unknown; code?: unknown };
+  if (typeof code === 'string' && ACCOUNT_REQUIRED.has(code)) return 'ocr_needs_account';
+  if (code === 'attachment_tool_not_allowed') return 'attachment_tool_not_allowed';
+  if (status === 429) return 'ocr_limit';
+  return 'ocr_failed';
 }
 
 async function readPdf(file: File, options: ReadOptions): Promise<ReadResult> {

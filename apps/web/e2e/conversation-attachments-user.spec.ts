@@ -145,8 +145,12 @@ test.describe('PDF attachments as a student uses them', () => {
     await consent(page);
     const item = page.getByRole('listitem').filter({ hasText: 'Dispensa.pdf' });
     await expect(item).toContainText(withLimits(labels.errors.tooManyPages));
+    // Retrying the same file cannot help: only removing it or choosing another one can.
     await expect(
       item.getByRole('button', { name: labels.retryLabel.replace('{name}', 'Dispensa.pdf') }),
+    ).toHaveCount(0);
+    await expect(
+      item.getByRole('button', { name: labels.removeLabel.replace('{name}', 'Dispensa.pdf') }),
     ).toBeVisible();
   });
 

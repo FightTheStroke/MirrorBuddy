@@ -589,6 +589,8 @@
         "tooManyPages": "The PDF has more than {pages} pages: I can read at most {pages}. Split it or choose a shorter one.",
         "noText": "I found no readable text in the file.",
         "ocrFailed": "I could not read the scanned pages. Try again.",
+        "ocrNeedsAccount": "Reading scanned pages needs an account. PDFs with selectable text work without one.",
+        "ocrLimit": "You have read many scanned pages in a short time. Wait a few minutes and try again.",
         "removeFailed": "I could not remove the file. Try again.",
         "generic": "Something went wrong. Try again.",
         "contextTooLarge": "The file is too long for this conversation. Remove it or attach a shorter one, then try again.",

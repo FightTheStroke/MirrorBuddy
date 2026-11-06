@@ -189,6 +189,15 @@ test.describe('PDF attachments for a visitor without an account', () => {
         { pageNumber: 2, text: 'The fictional telescope has a violet lens.' },
       ]);
       expect(saves).toBe(0);
+      // Scanned pages need an account: the real server refuses, and the student is told why.
+      await attach(page, 'Scansione ospite.pdf', drawingOnlyPdf(1), { firstFile: false });
+      const scanned = chip(page, 'Scansione ospite.pdf');
+      await expect(scanned).toContainText(labels.errors.ocrNeedsAccount);
+      await expect(
+        scanned.getByRole('button', {
+          name: labels.retryLabel.replace('{name}', 'Scansione ospite.pdf'),
+        }),
+      ).toHaveCount(0);
     } finally {
       await context.close();
     }

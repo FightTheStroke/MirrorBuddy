@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { attachmentErrorKey, chatTurnError } from '../chat-attachment-fields';
+import {
+  attachmentCodeKey,
+  attachmentErrorKey,
+  chatTurnError,
+  isRetryableAttachmentError,
+} from '../chat-attachment-fields';
 
 describe('attachment request error recovery', () => {
   it.each([
@@ -25,4 +30,16 @@ describe('attachment request error recovery', () => {
       expect(attachmentErrorKey(await chatTurnError(response))).toBeNull();
     },
   );
+
+  it.each([
+    ['ocr_needs_account', 'ocrNeedsAccount', false],
+    ['ocr_limit', 'ocrLimit', true],
+    ['ocr_failed', 'ocrFailed', true],
+    ['too_many_pages', 'tooManyPages', false],
+    ['too_large', 'tooLarge', false],
+    ['remove_failed', 'removeFailed', true],
+  ])('maps %s to a message and offers retry only when it can help', (code, key, retry) => {
+    expect(attachmentCodeKey(code)).toBe(key);
+    expect(isRetryableAttachmentError(code)).toBe(retry);
+  });
 });

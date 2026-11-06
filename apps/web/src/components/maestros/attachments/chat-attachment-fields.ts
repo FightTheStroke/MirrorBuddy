@@ -56,6 +56,8 @@ const ATTACHMENT_ERROR_KEYS: Readonly<Record<string, string>> = {
   too_many_pages: 'tooManyPages',
   no_text: 'noText',
   ocr_failed: 'ocrFailed',
+  ocr_needs_account: 'ocrNeedsAccount',
+  ocr_limit: 'ocrLimit',
   remove_failed: 'removeFailed',
   restore_failed: 'restoreFailed',
   conversation_failed: 'conversationFailed',
@@ -71,6 +73,21 @@ const ATTACHMENT_ERROR_KEYS: Readonly<Record<string, string>> = {
 
 export function attachmentCodeKey(code: string): string | null {
   return Object.hasOwn(ATTACHMENT_ERROR_KEYS, code) ? ATTACHMENT_ERROR_KEYS[code] : null;
+}
+
+/** Errors where trying the same file again cannot help: the student must change something. */
+const FINAL_ERRORS = new Set([
+  'unsupported',
+  'encrypted',
+  'too_large',
+  'too_many_pages',
+  'no_text',
+  'ocr_needs_account',
+  'attachment_tool_not_allowed',
+]);
+
+export function isRetryableAttachmentError(code: string | undefined): boolean {
+  return !code || !FINAL_ERRORS.has(code);
 }
 
 export function attachmentErrorKey(error: unknown): string | null {
