@@ -70,7 +70,7 @@ export const CSRF_EXCEPTIONS: Record<string, CsrfException> = {
     method: 'POST',
     authority:
       'Password verification authorizes session issuance; presented cookie is used only for rotation.',
-    sha256: 'c07590ed17ae7f89e9cdbb9163fbf31e0fa550bfd8b3a1f0e13a4fe39b12fc2a',
+    sha256: 'c2c9dd35439a3b5f13a10a7a30541e1abbdc278aa050802b78ce87d965c3c499',
   },
   '/api/auth/forgot-password': {
     method: 'POST',
