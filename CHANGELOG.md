@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.44.6] - 2026-11-07
+
 - Progress: a student who has not completed a study day yet can save progress again (the save was refused).
 - Loading: if the connection drops while the app opens, the student's data loads again as soon as it returns, instead of staying empty until a reload; a dropped connection is no longer reported as an application error.
 - Privacy: a failed login no longer records the address that was typed, and the error logs drop login identifiers.
