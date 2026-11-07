@@ -10,6 +10,8 @@ import { ToastContainer } from '@/components/ui/toast';
 import { IOSInstallBanner } from '@/components/pwa';
 import { ConditionalUnifiedConsent } from '@/components/consent';
 import { useSettingsStore, initializeStores, setupAutoSync } from '@/lib/stores';
+import { hydrateWhenOnline } from '@/lib/stores/hydrate-when-online';
+import { isTransientNetworkError } from '@/lib/resilience/network-read';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { initializeTelemetry } from '@/lib/telemetry';
 import { ActivityTracker } from '@/lib/telemetry/use-activity-tracker';
@@ -89,7 +91,9 @@ function StoreInitializer() {
     let hydrated = false;
     let syncInterval: ReturnType<typeof setupAutoSync> | undefined;
     // Initialize stores from database
-    initializeStores()
+    hydrateWhenOnline(initializeStores, {
+      isActive: () => active && getClientIdentity() === identity,
+    })
       .then(() => {
         if (!active || getClientIdentity() !== identity) return;
         hydrated = true;
@@ -100,6 +104,11 @@ function StoreInitializer() {
         // the child signs in again. Only an unexpected failure is worth an alarm.
         if (error instanceof IdentityUnavailableError) {
           logger.debug('Store hydration skipped: the session is no longer valid');
+          return;
+        }
+        // No connection is the student's network, not an application fault.
+        if (isTransientNetworkError(error)) {
+          logger.debug('Store hydration deferred: network unavailable');
           return;
         }
         const message = error instanceof Error ? error.message : '';

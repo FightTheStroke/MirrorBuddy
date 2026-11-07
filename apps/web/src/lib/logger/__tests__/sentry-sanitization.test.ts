@@ -27,6 +27,7 @@ describe('logger sentry sanitization', () => {
       userId: 'user-123456789',
       requestId: 'req-1',
       email: 'sensitive@example.com',
+      identifier: 'typed@example.com',
       token: 'secret-token',
     });
 
@@ -42,6 +43,7 @@ describe('logger sentry sanitization', () => {
       }),
     );
     expect(payload?.extra).not.toHaveProperty('email');
+    expect(payload?.extra).not.toHaveProperty('identifier');
     expect(payload?.extra).not.toHaveProperty('token');
   });
 

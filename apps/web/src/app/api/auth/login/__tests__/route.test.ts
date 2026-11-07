@@ -39,6 +39,13 @@ vi.mock('@/lib/rate-limit', () => ({
   RATE_LIMITS: { AUTH_LOGIN: { limit: 5, window: 900 } },
 }));
 
+const loginLog = vi.hoisted(() => ({
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
+}));
+
 vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
@@ -46,10 +53,10 @@ vi.mock('@/lib/logger', () => ({
     error: vi.fn(),
     debug: vi.fn(),
     child: () => ({
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
+      info: loginLog.info,
+      warn: loginLog.warn,
+      error: loginLog.error,
+      debug: loginLog.debug,
     }),
   },
 }));
@@ -158,6 +165,39 @@ describe('POST /api/auth/login', () => {
     // No cookies should be set on failed login
     const cookies = response.cookies.getAll() as ResponseCookie[];
     expect(cookies).toHaveLength(0);
+  });
+
+  // Sentry MIRRORBUDDY-4D: a mistyped address reached the error feed with the address itself.
+  it('records an unknown account without the typed address and without raising an alarm', async () => {
+    mockPrismaFindFirst.mockResolvedValueOnce(null);
+    const typed = 'someone.unknown@example.com';
+
+    const response = (await POST(
+      new NextRequest('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email: typed, password: 'wrong' }),
+      }),
+      { params: Promise.resolve({}) },
+    )) as NextResponse;
+
+    expect(response.status).toBe(401);
+    expect(loginLog.warn).not.toHaveBeenCalled();
+    expect(loginLog.error).not.toHaveBeenCalled();
+    const logged = JSON.stringify(Object.values(loginLog).flatMap((fn) => fn.mock.calls));
+    expect(logged).not.toContain(typed);
+    expect(logged).not.toContain('someone.unknown');
+  });
+
+  it('never logs what was typed when the login input is malformed', async () => {
+    await POST(
+      new NextRequest('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'half.typed@example.com' }),
+      }),
+      { params: Promise.resolve({}) },
+    );
+
+    expect(JSON.stringify(loginLog.warn.mock.calls)).not.toContain('half.typed');
   });
 
   it('does not emit cookies when durable session insertion fails after password proof', async () => {

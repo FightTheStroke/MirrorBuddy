@@ -98,7 +98,8 @@ export const MasterySchema = z.object({
 export const StreakSchema = z.object({
   current: z.number().int().min(0).max(PROGRESS_LIMITS.MAX_STREAK).optional(),
   longest: z.number().int().min(0).max(PROGRESS_LIMITS.MAX_STREAK).optional(),
-  lastStudyDate: z.union([IsoDateString, z.date()]).optional(),
+  // null until the student completes a first study day (as GET /api/progress returns it).
+  lastStudyDate: z.union([IsoDateString, z.date()]).nullable().optional(),
 });
 
 // ============================================================================

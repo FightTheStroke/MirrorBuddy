@@ -25,6 +25,7 @@ export interface ClientLogContext {
 const isProduction = process.env.NODE_ENV === 'production';
 const PII_FIELDS = [
   'email',
+  'identifier',
   'ip',
   'name',
   'firstName',

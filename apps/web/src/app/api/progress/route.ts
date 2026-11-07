@@ -146,7 +146,7 @@ export const PUT = pipe(
   if (data.streak) {
     if (data.streak.current !== undefined) updateData.streakCurrent = data.streak.current;
     if (data.streak.longest !== undefined) updateData.streakLongest = data.streak.longest;
-    if (data.streak.lastStudyDate !== undefined) {
+    if (data.streak.lastStudyDate) {
       updateData.lastStudyDate = new Date(data.streak.lastStudyDate);
     }
   }
