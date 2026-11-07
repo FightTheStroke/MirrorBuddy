@@ -24,6 +24,7 @@ import { csrfFetch } from '@/lib/auth';
 import { IdentityUnavailableError } from '@/lib/auth/client-auth';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
 import { loadConversationSummariesFromDB } from '../persistence';
+import { isTransientNetworkError } from '@/lib/resilience/network-read';
 import {
   createActiveCharacter,
   saveCurrentConversation,
@@ -247,8 +248,8 @@ export const createSessionSlice: StateCreator<ConversationFlowState, [], [], Ses
       // An expired session simply means this load has no previous context; the
       // child signs in again and it arrives then. Reporting it put a warning in
       // the production error feed for every stale tab.
-      if (error instanceof IdentityUnavailableError) {
-        logger.debug('Conversation summaries skipped: the session is no longer valid');
+      if (error instanceof IdentityUnavailableError || isTransientNetworkError(error)) {
+        logger.debug('Conversation summaries skipped: session ended or network unavailable');
         return;
       }
       // Non-critical: app works fine without previous conversation context

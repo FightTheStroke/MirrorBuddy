@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Progress: a student who has not completed a study day yet can save progress again (the save was refused).
+- Loading: if the connection drops while the app opens, the student's data loads again as soon as it returns, instead of staying empty until a reload; a dropped connection is no longer reported as an application error.
+- Privacy: a failed login no longer records the address that was typed, and the error logs drop login identifiers.
+
 ## [0.44.5] - 2026-11-06
 
 - Chat: replies from professors, coaches and buddies now show bold, italic and code as real formatting instead of asterisks, in every chat and in conversation history; what students type is shown exactly as written, and read-aloud no longer reads the marks.

@@ -82,6 +82,7 @@ function shouldLog(level: LogLevel): boolean {
  */
 const PII_FIELDS = [
   'email',
+  'identifier',
   'ip',
   'name',
   'firstName',

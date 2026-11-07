@@ -39,7 +39,7 @@ export const POST = pipe(
   const identifier = email || username;
 
   if (!identifier || typeof identifier !== 'string' || !password || typeof password !== 'string') {
-    log.warn('Login attempt: invalid input', { identifier });
+    log.warn('Login attempt: invalid input');
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
@@ -79,7 +79,8 @@ export const POST = pipe(
   });
 
   if (!user) {
-    log.warn('Login attempt: user not found', { identifier });
+    // A mistyped address is routine, not a fault; never record what was typed (GDPR).
+    log.info('Login attempt: unknown account');
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 

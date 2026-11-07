@@ -174,7 +174,9 @@ describe('Loading previous conversation summaries for an expired session', () =>
     expect(logger.warn).toHaveBeenCalled();
   });
 
-  it('preserves the error type when the same account exhausts network retries', async () => {
+  // Sentry MIRRORBUDDY-33: the student's connection dropping is not an application
+  // fault. A broken API still warns (5xx is not a network loss, see the next test).
+  it('stays quiet when the same account exhausts network retries', async () => {
     global.fetch = vi.fn().mockRejectedValue(new TypeError('Load failed'));
     const { logger } = await import('@/lib/logger');
     const { useConversationFlowStore } = await import('../conversation-flow-store');
@@ -182,10 +184,8 @@ describe('Loading previous conversation summaries for an expired session', () =>
     await useConversationFlowStore.getState().loadFromServer();
 
     expect(fetch).toHaveBeenCalledTimes(2);
-    expect(logger.warn).toHaveBeenCalledWith(
-      'Failed to load conversation summaries',
-      expect.objectContaining({ errorName: 'TypeError' }),
-    );
+    expect(logger.warn).not.toHaveBeenCalled();
+    expect(logger.debug).toHaveBeenCalled();
   });
 
   it('still fails loudly when the conversations API is broken', async () => {
