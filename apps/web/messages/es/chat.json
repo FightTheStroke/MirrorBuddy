@@ -621,7 +621,8 @@
     "turnErrors": {
       "connectionLost": "La conexión se cortó y la respuesta no llegó. Tu pregunta está de nuevo en el campo: pulsa Enviar cuando vuelvas a tener conexión.",
       "generic": "Lo siento, he tenido un problema. ¿Puedes intentarlo de nuevo?",
-      "photoFailed": "Lo siento, no he podido analizar la foto. ¿Puedes describirme lo que ves?"
+      "photoFailed": "Lo siento, no he podido analizar la foto. ¿Puedes describirme lo que ves?",
+      "photoConnectionLost": "La conexión se cortó y la foto no llegó. Cuando vuelvas a tener conexión, hazla de nuevo."
     }
   }
 }

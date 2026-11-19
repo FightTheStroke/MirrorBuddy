@@ -621,7 +621,8 @@
     "turnErrors": {
       "connectionLost": "La connessione si è interrotta e non ho ricevuto la risposta. Ho rimesso la tua domanda nel campo: quando la connessione torna, premi Invia.",
       "generic": "Mi dispiace, ho avuto un problema. Puoi riprovare?",
-      "photoFailed": "Mi dispiace, non sono riuscito ad analizzare la foto. Puoi descrivermi cosa vedi?"
+      "photoFailed": "Mi dispiace, non sono riuscito ad analizzare la foto. Puoi descrivermi cosa vedi?",
+      "photoConnectionLost": "La connessione si è interrotta e la foto non è arrivata. Quando la connessione torna, scattala di nuovo."
     }
   }
 }

@@ -621,7 +621,8 @@
     "turnErrors": {
       "connectionLost": "Die Verbindung wurde unterbrochen und die Antwort ist nicht angekommen. Deine Frage steht wieder im Feld: Drück auf Senden, sobald du wieder online bist.",
       "generic": "Entschuldigung, da ist etwas schiefgelaufen. Kannst du es noch einmal versuchen?",
-      "photoFailed": "Entschuldigung, ich konnte das Foto nicht analysieren. Kannst du mir beschreiben, was du siehst?"
+      "photoFailed": "Entschuldigung, ich konnte das Foto nicht analysieren. Kannst du mir beschreiben, was du siehst?",
+      "photoConnectionLost": "Die Verbindung wurde unterbrochen und das Foto ist nicht angekommen. Wenn du wieder online bist, mach es noch einmal."
     }
   }
 }

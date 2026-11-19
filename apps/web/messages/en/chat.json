@@ -621,7 +621,8 @@
     "turnErrors": {
       "connectionLost": "The connection dropped and the reply didn't arrive. Your question is back in the box: press Send when you're online again.",
       "generic": "Sorry, something went wrong. Can you try again?",
-      "photoFailed": "Sorry, I couldn't analyse the photo. Can you describe what you see?"
+      "photoFailed": "Sorry, I couldn't analyse the photo. Can you describe what you see?",
+      "photoConnectionLost": "The connection dropped and the photo didn't arrive. When you're online again, take it again."
     }
   }
 }

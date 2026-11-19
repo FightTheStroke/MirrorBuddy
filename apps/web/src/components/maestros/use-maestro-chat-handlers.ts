@@ -285,7 +285,7 @@ export function useMaestroChatHandlers({
         const lostInTransit = reportTurnFailure('Webcam analysis failed', error);
         const notice = errorKey
           ? t(`attachments.errors.${errorKey}`, ATTACHMENT_LIMIT_PARAMS)
-          : t(lostInTransit ? 'turnErrors.connectionLost' : 'turnErrors.photoFailed');
+          : t(lostInTransit ? 'turnErrors.photoConnectionLost' : 'turnErrors.photoFailed');
         setMessages((prev) => [...prev, turnNotice(notice)]);
       } finally {
         if (!isStale(generation)) setIsLoading(false);
