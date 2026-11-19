@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Chat: if the phone loses its connection while waiting for a reply, the question goes back into the box with a clear message in the student's language, instead of a generic error; failure notices are no longer sent to the Maestro as part of the conversation, and a lost connection is no longer reported as an application error.
+- Account: typing the wrong current password when changing it is no longer reported as an alarm.
+- Monitoring: a dropped connection to Grafana is retried once before it is reported.
+
 ## [0.44.6] - 2026-11-07
 
 - Progress: a student who has not completed a study day yet can save progress again (the save was refused).

@@ -10,6 +10,22 @@ const mocks = vi.hoisted(() => ({
   createAttachment: vi.fn(),
   readAttachment: vi.fn(),
   csrfFetch: vi.fn(),
+  log: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    info: mocks.log.info,
+    warn: mocks.log.warn,
+    error: mocks.log.error,
+    debug: mocks.log.debug,
+    child: () => ({
+      info: mocks.log.info,
+      warn: mocks.log.warn,
+      error: mocks.log.error,
+      debug: mocks.log.debug,
+    }),
+  },
 }));
 
 vi.mock('@/lib/conversation/attachments/client-api', () => ({
@@ -201,5 +217,64 @@ describe('overlapping chat turns', () => {
     });
     expect(setMessages).not.toHaveBeenCalled();
     expect(setIsLoading).not.toHaveBeenCalled();
+  });
+
+  describe('when a chat turn fails', () => {
+    const earlier = [
+      { id: 'error-1', role: 'assistant' as const, content: 'old notice', timestamp: new Date() },
+      { id: 'u0', role: 'user' as const, content: 'prev', timestamp: new Date() },
+    ];
+    const submit = async (failure: Error) => {
+      let state = [...earlier];
+      const setMessages = vi.fn((next: unknown) => {
+        state =
+          typeof next === 'function'
+            ? (next as (p: typeof state) => typeof state)(state)
+            : (next as typeof state);
+      });
+      const setInput = vi.fn();
+      mocks.csrfFetch.mockRejectedValueOnce(failure);
+      const { result } = renderHook(() =>
+        useMaestroChatHandlers({
+          maestro: { id: 'm', systemPrompt: 's' } as never,
+          input: 'Ciao',
+          setInput,
+          isLoading: false,
+          setIsLoading: vi.fn(),
+          messages: earlier,
+          setMessages: setMessages as never,
+          setToolCalls: vi.fn(),
+          onQuestionAsked: vi.fn(),
+          ensureConversation: async () => null,
+        }),
+      );
+      await act(async () => {
+        await result.current.handleSubmit();
+      });
+      const sent = JSON.parse(mocks.csrfFetch.mock.calls[0][1].body as string);
+      return { state, setInput, sent };
+    };
+
+    // Sentry MIRRORBUDDY-4G: a phone losing its connection was reported as an application error.
+    it('treats a lost connection as no fault and gives the question back', async () => {
+      const { state, setInput, sent } = await submit(new TypeError('Failed to fetch'));
+
+      expect(mocks.log.error).not.toHaveBeenCalled();
+      expect(setInput).toHaveBeenLastCalledWith('Ciao');
+      expect(state.some((m) => m.role === 'user' && m.content === 'Ciao')).toBe(false);
+      expect(state.at(-1)?.content).toBe('turnErrors.connectionLost');
+      expect(sent.messages).toEqual([
+        { role: 'user', content: 'prev' },
+        { role: 'user', content: 'Ciao' },
+      ]);
+    });
+
+    it('still reports any other failure as an error', async () => {
+      const { state, setInput } = await submit(new Error('boom'));
+
+      expect(mocks.log.error).toHaveBeenCalledWith('Chat request failed', { error: 'Error: boom' });
+      expect(setInput).not.toHaveBeenCalledWith('Ciao');
+      expect(state.at(-1)?.content).toBe('turnErrors.generic');
+    });
   });
 });

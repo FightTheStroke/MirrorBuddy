@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { csrfFetch, whenIdentitySettled } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { ConversationUnavailableError } from './chat-attachment-fields';
+import { isTransientNetworkError } from '@/lib/resilience/network-read';
 
 /**
  * Lazily binds a Maestro chat to a server conversation using the existing
@@ -42,6 +43,11 @@ export function useMaestroConversation(maestroId: string) {
         setConversationId(data.id);
         return data.id;
       } catch (error) {
+        // Losing the connection is not "conversation unavailable": let callers say so.
+        if (isTransientNetworkError(error)) {
+          logger.debug('Conversation creation: connection lost');
+          throw error;
+        }
         logger.warn('Conversation creation failed', { error: String(error) });
         throw error instanceof ConversationUnavailableError
           ? error

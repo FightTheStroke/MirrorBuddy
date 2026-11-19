@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/auth';
 import type { Maestro, ChatMessage, ToolCall } from '@/types';
 import type { AttachmentDocument } from '@/lib/conversation/attachments/types';
@@ -10,6 +9,7 @@ import {
   chatTurnError,
 } from './attachments/chat-attachment-fields';
 import { ATTACHMENT_LIMIT_PARAMS } from '@/lib/conversation/attachments/limits';
+import { reportTurnFailure, toModelHistory, turnNotice } from './chat-turn-failure';
 
 interface TurnMetrics {
   latencyMs: number;
@@ -123,10 +123,7 @@ export function useMaestroChatHandlers({
         const response = await csrfFetch('/api/chat', {
           method: 'POST',
           body: JSON.stringify({
-            messages: [
-              ...messages.map((m) => ({ role: m.role, content: m.content })),
-              { role: 'user', content: userContent },
-            ],
+            messages: [...toModelHistory(messages), { role: 'user', content: userContent }],
             systemPrompt: maestro.systemPrompt,
             maestroId: maestro.id,
             language: locale,
@@ -163,17 +160,15 @@ export function useMaestroChatHandlers({
       } catch (error) {
         if (isStale(generation)) return;
         const errorKey = attachmentErrorKey(error);
-        logger.error('Chat request failed', { error: String(error) });
+        const lostInTransit = reportTurnFailure('Chat request failed', error);
+        // Give the unanswered question back so resending it does not duplicate it.
+        if (lostInTransit) setInput(userContent);
+        const notice = errorKey
+          ? t(`attachments.errors.${errorKey}`, ATTACHMENT_LIMIT_PARAMS)
+          : t(lostInTransit ? 'turnErrors.connectionLost' : 'turnErrors.generic');
         setMessages((prev) => [
-          ...prev,
-          {
-            id: `error-${Date.now()}`,
-            role: 'assistant',
-            content: errorKey
-              ? t(`attachments.errors.${errorKey}`, ATTACHMENT_LIMIT_PARAMS)
-              : 'Mi dispiace, ho avuto un problema. Puoi riprovare?',
-            timestamp: new Date(),
-          },
+          ...(lostInTransit ? prev.filter((m) => m.id !== userMessage.id) : prev),
+          turnNotice(notice),
         ]);
       } finally {
         if (!isStale(generation)) setIsLoading(false);
@@ -247,10 +242,7 @@ export function useMaestroChatHandlers({
         const chatRes = await csrfFetch('/api/chat', {
           method: 'POST',
           body: JSON.stringify({
-            messages: [
-              ...messages.map((m) => ({ role: m.role, content: m.content })),
-              { role: 'user', content: analysisContext },
-            ],
+            messages: [...toModelHistory(messages), { role: 'user', content: analysisContext }],
             systemPrompt: maestro.systemPrompt,
             maestroId: maestro.id,
             language: locale,
@@ -290,18 +282,11 @@ export function useMaestroChatHandlers({
       } catch (error) {
         if (isStale(generation)) return;
         const errorKey = attachmentErrorKey(error);
-        logger.error('Webcam analysis failed', { error: String(error) });
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `error-${Date.now()}`,
-            role: 'assistant' as const,
-            content: errorKey
-              ? t(`attachments.errors.${errorKey}`, ATTACHMENT_LIMIT_PARAMS)
-              : 'Mi dispiace, non sono riuscito ad analizzare la foto. Puoi descrivermi cosa vedi?',
-            timestamp: new Date(),
-          },
-        ]);
+        const lostInTransit = reportTurnFailure('Webcam analysis failed', error);
+        const notice = errorKey
+          ? t(`attachments.errors.${errorKey}`, ATTACHMENT_LIMIT_PARAMS)
+          : t(lostInTransit ? 'turnErrors.photoConnectionLost' : 'turnErrors.photoFailed');
+        setMessages((prev) => [...prev, turnNotice(notice)]);
       } finally {
         if (!isStale(generation)) setIsLoading(false);
       }
