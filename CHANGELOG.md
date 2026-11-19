@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Chat: if the phone loses its connection while waiting for a reply, the question goes back into the box with a clear message in the student's language, instead of a generic error; failure notices are no longer sent to the Maestro as part of the conversation, and a lost connection is no longer reported as an application error.
 - Account: typing the wrong current password when changing it is no longer reported as an alarm.
 - Monitoring: a dropped connection to Grafana is retried once before it is reported.
+- Security: Next.js updated to 16.4.5, which fixes four cache disclosure and poisoning advisories.
 
 ## [0.44.6] - 2026-11-07
 
