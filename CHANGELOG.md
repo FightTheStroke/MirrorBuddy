@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.44.8] - 2026-11-19
+
+- No user-facing changes recorded.
+
 ## [0.44.7] - 2026-11-19
 
 - Chat: if the phone loses its connection while waiting for a reply, the question goes back into the box with a clear message in the student's language, instead of a generic error; failure notices are no longer sent to the Maestro as part of the conversation, and a lost connection is no longer reported as an application error.
