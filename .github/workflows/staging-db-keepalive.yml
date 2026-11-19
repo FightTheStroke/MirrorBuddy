@@ -1,0 +1,60 @@
+name: Staging Database Keep-Alive
+
+# The staging Supabase project is on the free tier and pauses after seven days
+# without activity. A paused staging database blocks every release: the staging
+# build cannot reach it, so nothing is promoted to production (2026-11-19).
+# Twice a week keeps it inside the seven-day window with a margin.
+
+on:
+  schedule:
+    # Monday and Thursday, 06:17 UTC
+    - cron: '17 6 * * 1,4'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: staging-db-keepalive
+  cancel-in-progress: false
+
+jobs:
+  keepalive:
+    name: Wake the staging database
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Query the staging database
+        id: ping
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+        run: bash scripts/staging-db-keepalive.sh
+
+      - name: Open an issue when the database does not answer
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: Staging database is not answering — releases cannot go live
+        run: |
+          if gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq 'length' | grep -qv '^0$'; then
+            echo "An open issue already tracks this."
+            exit 1
+          fi
+          gh issue create --title "$TITLE" --body "$(cat <<'BODY'
+          The staging Supabase database did not answer the keep-alive query
+          (run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+          Most likely Supabase paused it for inactivity (free tier). While it is paused,
+          the staging deploy fails and no release reaches production.
+
+          Fix: in the Supabase dashboard open the project linked to the Vercel Preview
+          `DATABASE_URL` (on 2026-11-19: `supabase-claret-horizon`) and press
+          **Restore project**. Then re-run this workflow to confirm.
+          BODY
+          )"
+          exit 1
