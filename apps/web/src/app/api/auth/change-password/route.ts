@@ -75,8 +75,15 @@ export const POST = pipe(
   }
 
   // Verify current password
-  if (!user.passwordHash || !(await verifyPassword(currentPassword, user.passwordHash))) {
-    log.warn('Change password attempt: invalid current password', {
+  if (!user.passwordHash) {
+    log.warn('Change password attempt: account has no password set', { userId: ctx.userId });
+    return NextResponse.json({ error: 'Current password is incorrect' }, { status: 401 });
+  }
+
+  // A mistyped current password is a user mistake, not an alarm (Sentry MIRRORBUDDY-4F);
+  // verifier failures are already logged as errors inside verifyPassword.
+  if (!(await verifyPassword(currentPassword, user.passwordHash))) {
+    log.info('Change password attempt: invalid current password', {
       userId: ctx.userId,
     });
     return NextResponse.json({ error: 'Current password is incorrect' }, { status: 401 });

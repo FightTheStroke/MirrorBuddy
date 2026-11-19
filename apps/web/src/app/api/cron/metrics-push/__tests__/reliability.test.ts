@@ -229,4 +229,15 @@ describe('isolated collectors and transport', () => {
       }
     },
   );
+  // Sentry MIRRORBUDDY-35: Grafana dropping a reused socket raised an alarm on every blip.
+  it('retries once when Grafana drops the connection, then succeeds silently', async () => {
+    mocks.fetch.mockRejectedValueOnce(new TypeError('fetch failed'));
+    const { GET } = await import('../route');
+
+    const response = await GET(request());
+
+    expect(response.status).toBe(200);
+    expect(mocks.fetch).toHaveBeenCalledTimes(2);
+    expect(mocks.report).not.toHaveBeenCalled();
+  });
 });

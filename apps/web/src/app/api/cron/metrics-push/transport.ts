@@ -54,13 +54,20 @@ export async function pushToGrafana(samples: MetricSample[]): Promise<void> {
   }
   if (sendable.length === 0) return;
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain',
-      Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString('base64')}`,
-    },
-    body: formatInfluxLineProtocol(sendable),
+  const send = () =>
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain',
+        Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString('base64')}`,
+      },
+      body: formatInfluxLineProtocol(sendable),
+    });
+  // Grafana sometimes drops a reused socket (UND_ERR_SOCKET, Sentry MIRRORBUDDY-35).
+  // Samples carry their own timestamps, so a second write is idempotent.
+  const response = await send().catch((error: unknown) => {
+    if (!(error instanceof TypeError)) throw error;
+    return send();
   });
   if (!response.ok) {
     throw new MetricsPushError(response.status, '');

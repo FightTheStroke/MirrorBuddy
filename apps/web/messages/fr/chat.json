@@ -617,6 +617,11 @@
         "decline": "Annuler"
       },
       "voiceUnavailable": "Pour discuter des fichiers joints, utilisez le chat texte. Retirez-les pour démarrer un appel vocal."
+    },
+    "turnErrors": {
+      "connectionLost": "La connexion a été interrompue et la réponse n'est pas arrivée. Ta question est de nouveau dans le champ : appuie sur Envoyer quand la connexion revient.",
+      "generic": "Désolé, j'ai eu un problème. Tu peux réessayer ?",
+      "photoFailed": "Désolé, je n'ai pas réussi à analyser la photo. Tu peux me décrire ce que tu vois ?"
     }
   }
 }
