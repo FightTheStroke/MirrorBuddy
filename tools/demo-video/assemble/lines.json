@@ -1,0 +1,128 @@
+[
+ {
+  "id": "s_risposta",
+  "voice": "shimmer",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nA fictional twelve-year-old Italian student thinking aloud. Plain, unperformed delivery, young and light. No baby voice, exaggerated pitch or cuteness.\nDelivery for this line: Ask for a shortcut, casually and a little hopefully. Not distressed. Let the question end lightly.",
+  "text": "Mi dici la risposta?",
+  "takes": 4
+ },
+ {
+  "id": "n_tutor",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Name the product plainly. Take a small breath, then give the definition as useful information, not a slogan.",
+  "text": "MirrorBuddy. Un tutor con intelligenza artificiale.",
+  "takes": 4
+ },
+ {
+  "id": "n_uguali",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Make a simple observation. No pity, gravity or inspirational emphasis.",
+  "text": "Non siamo tutti uguali.",
+  "takes": 4
+ },
+ {
+  "id": "n_modo",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Continue the previous thought in the same register. Land gently on «imparare».",
+  "text": "Nemmeno il modo di imparare.",
+  "takes": 4
+ },
+ {
+  "id": "e_ottavi",
+  "voice": "cedar",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nThe app's patient AI maths tutor, Euclide. Clear and attentive, never theatrical or patronising. Standard Italian; no foreign accent.\nDelivery for this line: Ask a genuine question. Brief pause after «quarti». Be interested in her reasoning; do not hint at the answer.",
+  "text": "Tre quarti: quanti ottavi sono?",
+  "takes": 4
+ },
+ {
+  "id": "s_sei",
+  "voice": "shimmer",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nA fictional twelve-year-old Italian student thinking aloud. Plain, unperformed delivery, young and light. No baby voice, exaggerated pitch or cuteness.\nDelivery for this line: You have just worked it out. Slight uncertainty at the start, then commit. No question-mark ending.",
+  "text": "Sei ottavi.",
+  "takes": 4
+ },
+ {
+  "id": "e_unaltro",
+  "voice": "cedar",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nThe app's patient AI maths tutor, Euclide. Clear and attentive, never theatrical or patronising. Standard Italian; no foreign accent.\nDelivery for this line: Offer the next small step. Short and open. No congratulations, no testing tone.",
+  "text": "E con un ottavo in più?",
+  "takes": 4
+ },
+ {
+  "id": "s_ci_sono",
+  "voice": "shimmer",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nA fictional twelve-year-old Italian student thinking aloud. Plain, unperformed delivery, young and light. No baby voice, exaggerated pitch or cuteness.\nDelivery for this line: Say «Sette ottavi» as a discovery. Pause briefly. Say «Ci sono» to yourself, with quiet relief.",
+  "text": "Sette ottavi. Ci sono.",
+  "takes": 4
+ },
+ {
+  "id": "n_insieme",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Understate the first sentence. Give the second a little more warmth, not more volume.",
+  "text": "Non al posto tuo. Insieme a te.",
+  "takes": 4
+ },
+ {
+  "id": "n_coach",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Continue explaining what support means. Light emphasis on «metodo».",
+  "text": "Un coach, per trovare il tuo metodo.",
+  "takes": 4
+ },
+ {
+  "id": "n_buddy",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Same conversational flow. Warm, not sentimental.",
+  "text": "Un buddy, per non sentirti sola.",
+  "takes": 4
+ },
+ {
+  "id": "n_genitori",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Include parents naturally in the thought. No formal or institutional voice.",
+  "text": "E uno spazio per i genitori.",
+  "takes": 4
+ },
+ {
+  "id": "n_percorso",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Reassuring and practical: understanding the learning journey, not monitoring.",
+  "text": "Per seguire il percorso.",
+  "takes": 4
+ },
+ {
+  "id": "n_regole",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Plain and matter-of-fact. No dramatic emphasis, no tone of absolute certainty.",
+  "text": "Con protezioni e regole chiare.",
+  "takes": 4
+ },
+ {
+  "id": "n_device",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Two connected, easy phrases. No punchy advertising beats.",
+  "text": "Sul computer. Sul telefono.",
+  "takes": 4
+ },
+ {
+  "id": "n_curiosita",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: Let a little curiosity enter the voice, without sounding excited on command.",
+  "text": "La curiosità non si ferma qui.",
+  "takes": 4
+ },
+ {
+  "id": "n_robot",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: A small reveal, not a launch. Relaxed, a hint of warmth on «robot».",
+  "text": "E anche su un piccolo robot.",
+  "takes": 4
+ },
+ {
+  "id": "n_chiusa",
+  "voice": "marin",
+  "instructions": "Speak only the supplied Italian line, verbatim. Use natural contemporary Italian. Do not add greetings, filler or commentary. Do not read stage directions aloud. Keep breaths subtle. Do not rush.\nAn adult narrator speaking to one person nearby. Quiet confidence, conversational phrasing, no announcer cadence, no aspirational advertising tone.\nDelivery for this line: State the name, pause naturally, then finish the thought evenly. No crescendo.",
+  "text": "MirrorBuddy. La scuola che si adatta a chi impara.",
+  "takes": 4
+ }
+]
