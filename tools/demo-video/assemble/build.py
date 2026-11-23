@@ -188,7 +188,9 @@ def pick_take(line_id):
         return FORCE[line_id]
     import re
     ok = []
-    for l in open(os.path.join(HERE, VOICES, "report.txt"), encoding="utf-8"):
+    with open(os.path.join(HERE, VOICES, "report.txt"), encoding="utf-8") as report:
+        lines = report.readlines()
+    for l in lines:
         m = re.match(rf"{line_id} t(\d+)\s+missing=-", l)
         if m:
             f = os.path.join(HERE, VOICES, "takes", f"{line_id}_t{m.group(1)}.wav")
@@ -232,9 +234,10 @@ def main():
     if "--plan" in sys.argv:
         return
 
-    json.dump({"laptop": LAPTOP, "phone": PHONE, "labels": LABELS, "footer": FOOTER,
-               "captions": [{"id": c["id"], "role": c["role"], "text": c["cap"], "top": c["id"] in TOP} for c in cues]},
-              open(os.path.join(HERE, "overlays.json"), "w"), ensure_ascii=False, indent=1)
+    with open(os.path.join(HERE, "overlays.json"), "w", encoding="utf-8") as out:
+        json.dump({"laptop": LAPTOP, "phone": PHONE, "labels": LABELS, "footer": FOOTER,
+                   "captions": [{"id": c["id"], "role": c["role"], "text": c["cap"], "top": c["id"] in TOP} for c in cues]},
+                  out, ensure_ascii=False, indent=1)
     run(["node", os.path.join(CODE, "overlays.mjs")])
     os.makedirs(SEG, exist_ok=True)
     files = []
@@ -307,8 +310,9 @@ def main():
     final = os.path.join(OUTDIR, f"{NAME}.mp4")
     run([FF, "-y", "-loglevel", "error", "-i", silent, "-i", wav, "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
          "-movflags", "+faststart", "-shortest", final])
-    json.dump({"total": total, "starts": starts, "cues": [{k: v for k, v in c.items() if k != "file"} for c in cues]},
-              open(os.path.join(HERE, "timeline.json"), "w"), indent=1)
+    with open(os.path.join(HERE, "timeline.json"), "w", encoding="utf-8") as out:
+        json.dump({"total": total, "starts": starts, "cues": [{k: v for k, v in c.items() if k != "file"} for c in cues]},
+                  out, indent=1)
     print("written", final)
 
 
