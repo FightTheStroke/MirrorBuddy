@@ -248,6 +248,11 @@ describe('POST /api/auth/login', () => {
     const routeContext = { params: Promise.resolve({}) };
     const response = (await POST(request, routeContext)) as NextResponse;
     expect(response.status).toBe(401);
+    // Sentry MIRRORBUDDY-4J: a mistyped password is routine, not an alarm.
+    expect(loginLog.warn).not.toHaveBeenCalled();
+    expect(loginLog.info).toHaveBeenCalledWith('Login attempt: invalid password', {
+      userId: 'user-123',
+    });
 
     // No cookies should be set on failed login
     const cookies = response.cookies.getAll() as ResponseCookie[];

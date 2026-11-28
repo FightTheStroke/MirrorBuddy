@@ -80,15 +80,20 @@ describe('slow query monitor: one-time startup of a new instance', () => {
     );
   });
 
-  it('keeps the previous WARN threshold for every query once the instance is warm', async () => {
+  it('warns on warm queries from 2 s and only records 1-2 s pooler spikes (#1355)', async () => {
     const run = await loadMonitor();
     await query(run, 1100);
 
-    await query(run, 1001);
+    await query(run, 1798);
+    await query(run, 2001);
 
+    expect(logger.info).toHaveBeenCalledWith(
+      '[SlowQuery] Slow',
+      expect.objectContaining({ durationMs: 1798, coldStart: false }),
+    );
     expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
       '[SlowQuery] WARN',
-      expect.objectContaining({ durationMs: 1001, coldStart: false }),
+      expect.objectContaining({ durationMs: 2001, coldStart: false }),
     );
   });
 
@@ -107,7 +112,7 @@ describe('slow query monitor: one-time startup of a new instance', () => {
     await query(run, 1300);
 
     expect(logger.warn).not.toHaveBeenCalled();
-    await query(run, 1300);
+    await query(run, 2300);
     expect(logger.warn).toHaveBeenCalledTimes(1);
   });
 });

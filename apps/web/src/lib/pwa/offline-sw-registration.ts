@@ -53,11 +53,16 @@ export async function registerOfflineServiceWorker(): Promise<boolean> {
     const errorName =
       error instanceof Error || error instanceof DOMException ? error.name : 'UnknownError';
     // The browser refuses service workers by policy (private browsing, blocked site data):
-    // a user setting, not a fault. Network and programming failures stay reported.
+    // a user setting, not a fault. A TypeError means our script could not be fetched or
+    // evaluated, which breaks offline support for everyone and stays reported. Any other
+    // failure is device-specific (MIRRORBUDDY-3T: one old Android browser) and offline
+    // caching is an optional enhancement, so it is recorded without alerting.
     if (error instanceof DOMException && error.name === 'SecurityError') {
       logger.debug('[Offline SW] Registration blocked by the browser', { errorName });
-    } else {
+    } else if (error instanceof TypeError) {
       logger.warn('[Offline SW] Registration failed', { errorName });
+    } else {
+      logger.info('[Offline SW] Registration failed on this device', { errorName });
     }
     return false;
   }
