@@ -251,6 +251,8 @@ done
   monitor logs queries started before an instance's first successful query as
   `[SlowQuery] Cold start` (info, runtime logs only) instead of WARN; CRITICAL (≥3000 ms) still
   fires for them (#1163).
+- **Isolated warm spikes** (1000-2000 ms): logged as `[SlowQuery] Slow` (info, runtime logs
+  only). WARN reaches Sentry from 2000 ms, CRITICAL from 3000 ms (#1355).
 - **Consistent slow** (all requests >1000ms): Check Supabase slow query log
 
 ## Performance Baselines

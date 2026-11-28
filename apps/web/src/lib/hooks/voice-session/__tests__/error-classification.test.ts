@@ -1,10 +1,35 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   getVoiceErrorMessage,
   isVoiceCapabilityError,
   isVoiceRootCauseError,
   shouldEscalateVoiceError,
 } from '../error-classification';
+import { logMicrophonePermissionRequest } from '../voice-error-logger';
+import { logger } from '@/lib/logger';
+
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    child: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
+  },
+}));
+
+// Sentry MIRRORBUDDY-1K: a refused microphone is the student's choice, not a fault.
+describe('microphone permission logging', () => {
+  it('records a denied microphone without raising a warning', () => {
+    logMicrophonePermissionRequest('denied');
+
+    expect(logger.warn).not.toHaveBeenCalled();
+    expect(logger.info).toHaveBeenCalledWith(
+      '[VoiceSession] Microphone permission denied by user',
+      expect.objectContaining({ permissionResult: 'denied' }),
+    );
+  });
+});
 
 describe('voice error classification', () => {
   it('detects root-cause marked errors', () => {

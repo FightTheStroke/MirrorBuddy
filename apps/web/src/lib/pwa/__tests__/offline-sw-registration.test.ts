@@ -180,7 +180,8 @@ describe('registerOfflineServiceWorker', () => {
 
     expect(result).toBe(false);
     expect(logger.error).not.toHaveBeenCalled();
-    expect(logger.warn).toHaveBeenCalledWith('[Offline SW] Registration failed', {
+    expect(logger.warn).not.toHaveBeenCalled();
+    expect(logger.info).toHaveBeenCalledWith('[Offline SW] Registration failed on this device', {
       errorName: 'Error',
     });
   });

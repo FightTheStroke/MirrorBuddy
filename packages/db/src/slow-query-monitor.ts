@@ -3,8 +3,13 @@
  * Logs queries exceeding the threshold for performance monitoring.
  *
  * Thresholds:
- * - WARN: >1000ms (logged as warning)
+ * - SLOW: >1000ms (logged as info, kept for diagnosis)
+ * - WARN: >2000ms (logged as warning)
  * - CRITICAL: >3000ms (logged as error)
+ *
+ * Warm queries of 1-2 s are pooler round-trip spikes (MIRRORBUDDY-37, Nov 2026:
+ * 1.1-1.8 s on an indexed findUnique and a tiny count), not query plans, so they
+ * are recorded without alerting (#1355).
  *
  * Cold start: queries started before the first query of the process succeeds
  * also pay one-time startup (Prisma engine initialisation and the first pooler
@@ -17,7 +22,8 @@
 import { Prisma } from '@prisma/client';
 import { logger } from '@mirrorbuddy/logger';
 
-const SLOW_QUERY_WARN_MS = 1000;
+const SLOW_QUERY_LOG_MS = 1000;
+const SLOW_QUERY_WARN_MS = 2000;
 const SLOW_QUERY_CRITICAL_MS = 3000;
 
 let stackWarm = false;
@@ -41,9 +47,10 @@ export function createSlowQueryMonitor() {
 
           if (durationMs >= SLOW_QUERY_CRITICAL_MS) {
             logger.error('[SlowQuery] CRITICAL', details);
-          } else if (durationMs >= SLOW_QUERY_WARN_MS) {
+          } else if (durationMs >= SLOW_QUERY_LOG_MS) {
             if (coldStart) logger.info('[SlowQuery] Cold start', details);
-            else logger.warn('[SlowQuery] WARN', details);
+            else if (durationMs >= SLOW_QUERY_WARN_MS) logger.warn('[SlowQuery] WARN', details);
+            else logger.info('[SlowQuery] Slow', details);
           }
 
           return result;

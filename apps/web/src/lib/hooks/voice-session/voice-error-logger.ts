@@ -167,7 +167,8 @@ export function logMicrophonePermissionRequest(
   if (result === 'granted') {
     logger.info('[VoiceSession] Microphone permission granted', context);
   } else if (result === 'denied') {
-    logger.warn('[VoiceSession] Microphone permission denied by user', context);
+    // The user's own choice, not a fault: keep it out of the alert feed.
+    logger.info('[VoiceSession] Microphone permission denied by user', context);
   } else if (result === 'error') {
     logger.error('[VoiceSession] Microphone permission request error', context);
   }

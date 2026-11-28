@@ -90,7 +90,8 @@ export const POST = pipe(
   }
 
   if (!user.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
-    log.warn('Login attempt: invalid password', { userId: user.id });
+    // A mistyped password is routine; brute force is handled by rate limiting, not by alerts.
+    log.info('Login attempt: invalid password', { userId: user.id });
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
